@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Treino de Bicicleta - 15 minutos</title>
+  <style>
+    :root {
+      --azul-baixa: #0284c7;
+      --azul-baixa-2: #0ea5e9;
+      --vermelho-alta: #be123c;
+      --vermelho-alta-2: #fb7185;
+      --verde-fim: #3f6212;
+      --texto: #ffffff;
+      --escuro: rgba(0, 0, 0, 0.30);
+      --escuro-forte: rgba(0, 0, 0, 0.48);
+      --claro: rgba(255, 255, 255, 0.24);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--texto);
+      overflow-x: hidden;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      transition: background 0.18s ease, filter 0.18s ease;
+    }
+
+    /* INTENSIDADE BAIXA: FUNDO AZUL */
+    body.baixa {
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,0.26), transparent 28%),
+        linear-gradient(160deg, var(--azul-baixa-2), var(--azul-baixa));
+    }
+
+    /* INTENSIDADE ALTA: FUNDO VERMELHO */
+    body.alta {
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,0.24), transparent 30%),
+        linear-gradient(160deg, var(--vermelho-alta-2), var(--vermelho-alta));
+    }
+
+    body.fim {
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,0.24), transparent 30%),
+        linear-gradient(160deg, #84cc16, var(--verde-fim));
+    }
+
+    .screen {
+      width: min(760px, 100%);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      padding: max(18px, env(safe-area-inset-top)) 18px max(18px, env(safe-area-inset-bottom));
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.15rem, 4vw, 1.6rem);
+      letter-spacing: -0.03em;
+      opacity: 0.94;
+    }
+
+    .badge {
+      background: var(--escuro);
+      border: 1px solid var(--claro);
+      border-radius: 999px;
+      padding: 9px 12px;
+      font-weight: 900;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      gap: 16px;
+    }
+
+    .phase {
+      font-size: clamp(4.3rem, 26vw, 11rem);
+      line-height: 0.88;
+      font-weight: 1000;
+      letter-spacing: -0.10em;
+      text-transform: uppercase;
+      text-shadow: 0 12px 36px rgba(0,0,0,0.36);
+      margin: 0;
+    }
+
+    .instruction {
+      width: fit-content;
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 14px 20px;
+      border-radius: 24px;
+      background: var(--escuro-forte);
+      border: 1px solid var(--claro);
+      font-size: clamp(1.15rem, 5vw, 2rem);
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      box-shadow: 0 16px 50px rgba(0,0,0,0.22);
+    }
+
+    .phase-time {
+      font-variant-numeric: tabular-nums;
+      font-size: clamp(5.5rem, 30vw, 12rem);
+      line-height: 0.9;
+      font-weight: 1000;
+      letter-spacing: -0.08em;
+      text-shadow: 0 12px 38px rgba(0,0,0,0.34);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .card {
+      background: var(--escuro);
+      border: 1px solid var(--claro);
+      border-radius: 22px;
+      padding: 14px 12px;
+      text-align: center;
+    }
+
+    .card strong {
+      display: block;
+      font-size: 0.86rem;
+      opacity: 0.90;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .card span {
+      display: block;
+      font-variant-numeric: tabular-nums;
+      font-size: clamp(1.65rem, 7vw, 2.4rem);
+      font-weight: 1000;
+    }
+
+    .progress-wrap {
+      height: 18px;
+      background: rgba(0,0,0,0.25);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid var(--claro);
+      margin-top: 8px;
+    }
+
+    .progress {
+      height: 100%;
+      width: 0%;
+      background: #ffffff;
+      border-radius: 999px;
+      transition: width 0.2s linear;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button {
+      appearance: none;
+      border: 2px solid rgba(255,255,255,0.58);
+      background: rgba(0,0,0,0.32);
+      color: #fff;
+      border-radius: 18px;
+      padding: 17px 12px;
+      font-size: 1.03rem;
+      font-weight: 950;
+      cursor: pointer;
+      touch-action: manipulation;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    }
+
+    button.primary {
+      background: #ffffff;
+      color: #111827;
+      border-color: #ffffff;
+      font-size: 1.16rem;
+    }
+
+    button:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
+    .hint {
+      margin: 12px 4px 0;
+      text-align: center;
+      color: rgba(255,255,255,0.88);
+      font-size: 0.88rem;
+      line-height: 1.35;
+    }
+
+    .flash {
+      animation: flash 0.55s ease-in-out 3;
+    }
+
+    .pulse-alta .phase {
+      animation: pulseAlta 0.72s ease-in-out infinite alternate;
+    }
+
+    @keyframes flash {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.55); }
+    }
+
+    @keyframes pulseAlta {
+      from { transform: scale(1); }
+      to { transform: scale(1.035); }
+    }
+
+    @media (max-width: 460px) {
+      .screen {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      .top {
+        align-items: flex-start;
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      .buttons {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body class="baixa">
+  <main class="screen">
+    <header class="top">
+      <h1>Treino de Bike</h1>
+      <div id="cycle" class="badge">Ciclo 1 / 10</div>
+    </header>
+
+    <section class="main" aria-live="polite">
+      <div id="phase" class="phase">BAIXA</div>
+      <div id="instruction" class="instruction">Intensidade mínima</div>
+      <div id="phaseTime" class="phase-time">00:30</div>
+
+      <div class="cards">
+        <div class="card">
+          <strong>Total restante</strong>
+          <span id="totalTime">15:00</span>
+        </div>
+        <div class="card">
+          <strong>Próxima troca</strong>
+          <span id="nextChange">ALTA</span>
+        </div>
+      </div>
+
+      <div class="progress-wrap" aria-label="Progresso do treino">
+        <div id="progress" class="progress"></div>
+      </div>
+
+      <div class="buttons">
+        <button id="startPause" class="primary">INICIAR</button>
+        <button id="reset">REINICIAR</button>
+        <button id="testSound">TESTAR SOM</button>
+      </div>
+
+      <p class="hint">
+        Azul = intensidade baixa. Vermelho = intensidade alta. O som é gerado pelo navegador, sem arquivo de áudio.
+      </p>
+    </section>
+  </main>
+
+  <script>
+    const TOTAL_SECONDS = 15 * 60;
+    const LOW_SECONDS = 30;
+    const HIGH_SECONDS = 60;
+    const CYCLE_SECONDS = LOW_SECONDS + HIGH_SECONDS;
+    const TOTAL_CYCLES = Math.ceil(TOTAL_SECONDS / CYCLE_SECONDS);
+
+    let elapsed = 0;
+    let running = false;
+    let intervalId = null;
+    let lastPhase = "baixa";
+    let audioCtx = null;
+
+    const bodyEl = document.body;
+    const phaseEl = document.getElementById("phase");
+    const instructionEl = document.getElementById("instruction");
+    const phaseTimeEl = document.getElementById("phaseTime");
+    const totalTimeEl = document.getElementById("totalTime");
+    const cycleEl = document.getElementById("cycle");
+    const nextChangeEl = document.getElementById("nextChange");
+    const progressEl = document.getElementById("progress");
+    const startPauseBtn = document.getElementById("startPause");
+    const resetBtn = document.getElementById("reset");
+    const testSoundBtn = document.getElementById("testSound");
+
+    function formatTime(seconds) {
+      const m = Math.floor(seconds / 60).toString().padStart(2, "0");
+      const s = Math.floor(seconds % 60).toString().padStart(2, "0");
+      return `${m}:${s}`;
+    }
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function beep({ frequency = 880, duration = 0.22, type = "sine", volume = 0.45 } = {}) {
+      const ctx = getAudioContext();
+      const oscillator = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      oscillator.type = type;
+      oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
+
+      gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(volume, ctx.currentTime + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+
+      oscillator.connect(gain);
+      gain.connect(ctx.destination);
+
+      oscillator.start(ctx.currentTime);
+      oscillator.stop(ctx.currentTime + duration + 0.04);
+    }
+
+    function flashScreen() {
+      bodyEl.classList.remove("flash");
+      void bodyEl.offsetWidth;
+      bodyEl.classList.add("flash");
+    }
+
+    function soundHigh() {
+      // Som mantido da versão que você gostou: três bipes agudos para ALTA.
+      beep({ frequency: 1000, duration: 0.16, type: "square", volume: 0.42 });
+      setTimeout(() => beep({ frequency: 1250, duration: 0.16, type: "square", volume: 0.42 }), 190);
+      setTimeout(() => beep({ frequency: 1500, duration: 0.28, type: "square", volume: 0.46 }), 380);
+      if ("vibrate" in navigator) navigator.vibrate([160, 70, 160, 70, 240]);
+      flashScreen();
+    }
+
+    function soundLow() {
+      // Som mantido da versão que você gostou: bip grave para BAIXA.
+      beep({ frequency: 430, duration: 0.55, type: "sine", volume: 0.50 });
+      setTimeout(() => beep({ frequency: 330, duration: 0.35, type: "sine", volume: 0.44 }), 260);
+      if ("vibrate" in navigator) navigator.vibrate(280);
+      flashScreen();
+    }
+
+    function soundDone() {
+      beep({ frequency: 700, duration: 0.16, type: "triangle", volume: 0.42 });
+      setTimeout(() => beep({ frequency: 950, duration: 0.16, type: "triangle", volume: 0.42 }), 190);
+      setTimeout(() => beep({ frequency: 1250, duration: 0.16, type: "triangle", volume: 0.42 }), 380);
+      setTimeout(() => beep({ frequency: 1600, duration: 0.45, type: "triangle", volume: 0.48 }), 570);
+      if ("vibrate" in navigator) navigator.vibrate([180, 80, 180, 80, 320]);
+      flashScreen();
+    }
+
+    function currentPhaseInfo() {
+      if (elapsed >= TOTAL_SECONDS) {
+        return {
+          phase: "fim",
+          phaseLabel: "FIM",
+          instruction: "Treino concluído",
+          phaseRemaining: 0,
+          next: "-",
+          cycle: TOTAL_CYCLES
+        };
+      }
+
+      const pos = elapsed % CYCLE_SECONDS;
+      const cycle = Math.floor(elapsed / CYCLE_SECONDS) + 1;
+
+      if (pos < LOW_SECONDS) {
+        return {
+          phase: "baixa",
+          phaseLabel: "BAIXA",
+          instruction: "Intensidade mínima",
+          phaseRemaining: LOW_SECONDS - pos,
+          next: "ALTA",
+          cycle
+        };
+      }
+
+      return {
+        phase: "alta",
+        phaseLabel: "ALTA",
+        instruction: "Velocidade alta",
+        phaseRemaining: CYCLE_SECONDS - pos,
+        next: "BAIXA",
+        cycle
+      };
+    }
+
+    function render() {
+      const info = currentPhaseInfo();
+      const totalRemaining = Math.max(0, TOTAL_SECONDS - elapsed);
+
+      bodyEl.classList.toggle("baixa", info.phase === "baixa");
+      bodyEl.classList.toggle("alta", info.phase === "alta");
+      bodyEl.classList.toggle("fim", info.phase === "fim");
+      bodyEl.classList.toggle("pulse-alta", info.phase === "alta" && running);
+
+      phaseEl.textContent = info.phaseLabel;
+      instructionEl.textContent = info.instruction;
+      phaseTimeEl.textContent = formatTime(info.phaseRemaining);
+      totalTimeEl.textContent = formatTime(totalRemaining);
+      cycleEl.textContent = `Ciclo ${Math.min(info.cycle, TOTAL_CYCLES)} / ${TOTAL_CYCLES}`;
+      nextChangeEl.textContent = info.next;
+      progressEl.style.width = `${Math.min(100, (elapsed / TOTAL_SECONDS) * 100)}%`;
+
+      if (info.phase === "fim") {
+        phaseTimeEl.textContent = "00:00";
+        startPauseBtn.textContent = "CONCLUÍDO";
+        startPauseBtn.disabled = true;
+      } else {
+        startPauseBtn.disabled = false;
+        startPauseBtn.textContent = running ? "PAUSAR" : "INICIAR";
+      }
+    }
+
+    function tick() {
+      if (!running) return;
+
+      elapsed += 1;
+
+      const info = currentPhaseInfo();
+
+      if (elapsed >= TOTAL_SECONDS) {
+        elapsed = TOTAL_SECONDS;
+        stopTimer();
+        render();
+        soundDone();
+        return;
+      }
+
+      if (info.phase !== lastPhase) {
+        lastPhase = info.phase;
+        if (info.phase === "alta") soundHigh();
+        if (info.phase === "baixa") soundLow();
+      }
+
+      render();
+    }
+
+    function startTimer() {
+      getAudioContext();
+
+      if (elapsed >= TOTAL_SECONDS) return;
+
+      if (!running) {
+        const info = currentPhaseInfo();
+        lastPhase = info.phase;
+
+        if (elapsed === 0) soundLow();
+
+        running = true;
+        intervalId = setInterval(tick, 1000);
+        render();
+      }
+    }
+
+    function stopTimer() {
+      running = false;
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+      render();
+    }
+
+    function resetTimer() {
+      stopTimer();
+      elapsed = 0;
+      lastPhase = "baixa";
+      startPauseBtn.disabled = false;
+      render();
+    }
+
+    startPauseBtn.addEventListener("click", () => {
+      if (running) stopTimer();
+      else startTimer();
+    });
+
+    resetBtn.addEventListener("click", resetTimer);
+
+    testSoundBtn.addEventListener("click", () => {
+      soundHigh();
+      setTimeout(soundLow, 1100);
+    });
+
+    render();
+  </script>
+</body>
+</html>

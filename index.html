@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Meus Treinos</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #ffffff;
+      background:
+        radial-gradient(circle at top, rgba(56, 189, 248, 0.24), transparent 34%),
+        linear-gradient(160deg, #020617, #0f172a 50%, #111827);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: max(18px, env(safe-area-inset-top)) 18px max(18px, env(safe-area-inset-bottom));
+    }
+
+    main {
+      width: min(620px, 100%);
+      text-align: center;
+    }
+
+    .card {
+      background: rgba(15, 23, 42, 0.86);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 30px;
+      padding: 30px 22px;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(10px);
+    }
+
+    .emoji {
+      font-size: clamp(4rem, 18vw, 7rem);
+      line-height: 1;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2.2rem, 10vw, 4.2rem);
+      line-height: 0.95;
+      letter-spacing: -0.06em;
+      font-weight: 1000;
+    }
+
+    p {
+      margin: 0 auto 26px;
+      max-width: 430px;
+      color: #cbd5e1;
+      font-size: clamp(1rem, 4vw, 1.2rem);
+      line-height: 1.45;
+    }
+
+    .workout {
+      display: block;
+      text-decoration: none;
+      color: #06110a;
+      background: #bef264;
+      border: 2px solid #ecfccb;
+      border-radius: 24px;
+      padding: 22px 18px;
+      font-size: clamp(1.3rem, 6vw, 2rem);
+      font-weight: 1000;
+      letter-spacing: -0.03em;
+      box-shadow: 0 16px 42px rgba(190, 242, 100, 0.22);
+      margin: 0 auto;
+      width: min(420px, 100%);
+    }
+
+    .workout span {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 850;
+      margin-top: 6px;
+      opacity: 0.76;
+      letter-spacing: 0;
+    }
+
+    .workout:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
+    .small {
+      margin-top: 18px;
+      color: #94a3b8;
+      font-size: 0.92rem;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="card">
+      <div class="emoji" aria-hidden="true">🚴‍♂️</div>
+      <h1>Meus Treinos</h1>
+      <p>Escolha o treino e toque para começar. Na bike: azul é intensidade baixa; vermelho é intensidade alta.</p>
+
+      <a class="workout" href="treino_bicicleta_15_minutos_azul_vermelho.html">
+        Entrar no treino de bicicleta
+        <span>30s baixa + 1min alta por 15 minutos</span>
+      </a>
+
+      <div class="small">Funciona offline se os arquivos estiverem na mesma pasta.</div>
+    </section>
+  </main>
+</body>
+</html>
