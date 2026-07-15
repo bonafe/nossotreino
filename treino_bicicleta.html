@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Treino de Bicicleta - 15 minutos</title>
+  <title>Treino de Bicicleta</title>
   <style>
     :root {
       --azul-baixa: #0284c7;
@@ -39,15 +39,15 @@
       transition: background 0.18s ease, filter 0.18s ease;
     }
 
-    /* INTENSIDADE BAIXA: FUNDO AZUL */
-    body.baixa {
+    /* INTENSIDADE LEVE: FUNDO AZUL */
+    body.leve {
       background:
         radial-gradient(circle at top, rgba(255,255,255,0.26), transparent 28%),
         linear-gradient(160deg, var(--azul-baixa-2), var(--azul-baixa));
     }
 
-    /* INTENSIDADE ALTA: FUNDO VERMELHO */
-    body.alta {
+    /* INTENSIDADE MÁXIMA: FUNDO VERMELHO */
+    body.maxima {
       background:
         radial-gradient(circle at top, rgba(255,255,255,0.24), transparent 30%),
         linear-gradient(160deg, var(--vermelho-alta-2), var(--vermelho-alta));
@@ -57,6 +57,11 @@
       background:
         radial-gradient(circle at top, rgba(255,255,255,0.24), transparent 30%),
         linear-gradient(160deg, #84cc16, var(--verde-fim));
+    }
+
+    body.carregando,
+    body.erro {
+      background: linear-gradient(160deg, #1e293b, #0f172a);
     }
 
     .screen {
@@ -191,7 +196,7 @@
       margin-top: 14px;
     }
 
-    button {
+    button, .link-button {
       appearance: none;
       border: 2px solid rgba(255,255,255,0.58);
       background: rgba(0,0,0,0.32);
@@ -203,6 +208,9 @@
       cursor: pointer;
       touch-action: manipulation;
       box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+      text-decoration: none;
+      text-align: center;
+      display: inline-block;
     }
 
     button.primary {
@@ -212,8 +220,13 @@
       font-size: 1.16rem;
     }
 
-    button:active {
+    button:active, .link-button:active {
       transform: translateY(1px) scale(0.99);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 
     .hint {
@@ -228,8 +241,8 @@
       animation: flash 0.55s ease-in-out 3;
     }
 
-    .pulse-alta .phase {
-      animation: pulseAlta 0.72s ease-in-out infinite alternate;
+    .pulse-maxima .phase {
+      animation: pulseMaxima 0.72s ease-in-out infinite alternate;
     }
 
     @keyframes flash {
@@ -237,7 +250,7 @@
       50% { filter: brightness(1.55); }
     }
 
-    @keyframes pulseAlta {
+    @keyframes pulseMaxima {
       from { transform: scale(1); }
       to { transform: scale(1.035); }
     }
@@ -262,26 +275,26 @@
     }
   </style>
 </head>
-<body class="baixa">
+<body class="carregando">
   <main class="screen">
     <header class="top">
-      <h1>Treino de Bike</h1>
-      <div id="cycle" class="badge">Ciclo 1 / 10</div>
+      <h1 id="titulo">Treino de Bike</h1>
+      <div id="cycle" class="badge">Carregando…</div>
     </header>
 
     <section class="main" aria-live="polite">
-      <div id="phase" class="phase">BAIXA</div>
-      <div id="instruction" class="instruction">Intensidade mínima</div>
-      <div id="phaseTime" class="phase-time">00:30</div>
+      <div id="phase" class="phase">—</div>
+      <div id="instruction" class="instruction">Carregando treino…</div>
+      <div id="phaseTime" class="phase-time">00:00</div>
 
       <div class="cards">
         <div class="card">
           <strong>Total restante</strong>
-          <span id="totalTime">15:00</span>
+          <span id="totalTime">00:00</span>
         </div>
         <div class="card">
           <strong>Próxima troca</strong>
-          <span id="nextChange">ALTA</span>
+          <span id="nextChange">—</span>
         </div>
       </div>
 
@@ -290,31 +303,45 @@
       </div>
 
       <div class="buttons">
-        <button id="startPause" class="primary">INICIAR</button>
-        <button id="reset">REINICIAR</button>
-        <button id="testSound">TESTAR SOM</button>
+        <button id="startPause" class="primary" disabled>INICIAR</button>
+        <button id="reset" disabled>REINICIAR</button>
+        <button id="testSound" disabled>TESTAR SOM</button>
       </div>
 
-      <p class="hint">
-        Azul = intensidade baixa. Vermelho = intensidade alta. O som é gerado pelo navegador, sem arquivo de áudio.
+      <p id="hint" class="hint">
+        Carregando dados do treino…
       </p>
     </section>
   </main>
 
   <script>
-    const TOTAL_SECONDS = 15 * 60;
-    const LOW_SECONDS = 30;
-    const HIGH_SECONDS = 60;
-    const CYCLE_SECONDS = LOW_SECONDS + HIGH_SECONDS;
-    const TOTAL_CYCLES = Math.ceil(TOTAL_SECONDS / CYCLE_SECONDS);
+    const INTENSITY_STYLES = {
+      leve: {
+        classe: "leve",
+        label: "LEVE",
+        instructionPrefix: "Recuperação leve",
+        som: () => soundLow()
+      },
+      maxima: {
+        classe: "maxima",
+        label: "MÁXIMA",
+        instructionPrefix: "Intensidade máxima",
+        som: () => soundHigh()
+      }
+    };
+
+    let config = null;
+    let CYCLE_SECONDS = 0;
+    let TOTAL_SECONDS = 0;
 
     let elapsed = 0;
     let running = false;
     let intervalId = null;
-    let lastPhase = "baixa";
+    let lastPhase = null;
     let audioCtx = null;
 
     const bodyEl = document.body;
+    const tituloEl = document.getElementById("titulo");
     const phaseEl = document.getElementById("phase");
     const instructionEl = document.getElementById("instruction");
     const phaseTimeEl = document.getElementById("phaseTime");
@@ -325,6 +352,7 @@
     const startPauseBtn = document.getElementById("startPause");
     const resetBtn = document.getElementById("reset");
     const testSoundBtn = document.getElementById("testSound");
+    const hintEl = document.getElementById("hint");
 
     function formatTime(seconds) {
       const m = Math.floor(seconds / 60).toString().padStart(2, "0");
@@ -368,7 +396,7 @@
     }
 
     function soundHigh() {
-      // Som mantido da versão que você gostou: três bipes agudos para ALTA.
+      // Três bipes onda quadrada, do grave para o agudo: entrando em MÁXIMA.
       beep({ frequency: 1000, duration: 0.16, type: "square", volume: 0.42 });
       setTimeout(() => beep({ frequency: 1250, duration: 0.16, type: "square", volume: 0.42 }), 190);
       setTimeout(() => beep({ frequency: 1500, duration: 0.28, type: "square", volume: 0.46 }), 380);
@@ -377,10 +405,11 @@
     }
 
     function soundLow() {
-      // Som mantido da versão que você gostou: bip grave para BAIXA.
-      beep({ frequency: 430, duration: 0.55, type: "sine", volume: 0.50 });
-      setTimeout(() => beep({ frequency: 330, duration: 0.35, type: "sine", volume: 0.44 }), 260);
-      if ("vibrate" in navigator) navigator.vibrate(280);
+      // Espelho do soundHigh: mesmo estilo, descendo do agudo para o grave: entrando em LEVE.
+      beep({ frequency: 1500, duration: 0.16, type: "square", volume: 0.42 });
+      setTimeout(() => beep({ frequency: 1250, duration: 0.16, type: "square", volume: 0.42 }), 190);
+      setTimeout(() => beep({ frequency: 1000, duration: 0.28, type: "square", volume: 0.46 }), 380);
+      if ("vibrate" in navigator) navigator.vibrate([160, 70, 160, 70, 240]);
       flashScreen();
     }
 
@@ -397,35 +426,40 @@
       if (elapsed >= TOTAL_SECONDS) {
         return {
           phase: "fim",
+          intensidade: null,
           phaseLabel: "FIM",
           instruction: "Treino concluído",
           phaseRemaining: 0,
           next: "-",
-          cycle: TOTAL_CYCLES
+          serie: config.series
         };
       }
 
       const pos = elapsed % CYCLE_SECONDS;
-      const cycle = Math.floor(elapsed / CYCLE_SECONDS) + 1;
+      const serie = Math.floor(elapsed / CYCLE_SECONDS) + 1;
 
-      if (pos < LOW_SECONDS) {
+      if (pos < config.tempoRecuperacaoSegundos) {
+        const estilo = INTENSITY_STYLES[config.intensidadeRecuperacao];
         return {
-          phase: "baixa",
-          phaseLabel: "BAIXA",
-          instruction: "Intensidade mínima",
-          phaseRemaining: LOW_SECONDS - pos,
-          next: "ALTA",
-          cycle
+          phase: "recuperacao",
+          intensidade: config.intensidadeRecuperacao,
+          phaseLabel: estilo.label,
+          instruction: "Recuperação — " + estilo.instructionPrefix,
+          phaseRemaining: config.tempoRecuperacaoSegundos - pos,
+          next: INTENSITY_STYLES[config.intensidadeEstimulo].label,
+          serie
         };
       }
 
+      const estilo = INTENSITY_STYLES[config.intensidadeEstimulo];
       return {
-        phase: "alta",
-        phaseLabel: "ALTA",
-        instruction: "Velocidade alta",
+        phase: "estimulo",
+        intensidade: config.intensidadeEstimulo,
+        phaseLabel: estilo.label,
+        instruction: "Estímulo — " + estilo.instructionPrefix,
         phaseRemaining: CYCLE_SECONDS - pos,
-        next: "BAIXA",
-        cycle
+        next: INTENSITY_STYLES[config.intensidadeRecuperacao].label,
+        serie
       };
     }
 
@@ -433,16 +467,16 @@
       const info = currentPhaseInfo();
       const totalRemaining = Math.max(0, TOTAL_SECONDS - elapsed);
 
-      bodyEl.classList.toggle("baixa", info.phase === "baixa");
-      bodyEl.classList.toggle("alta", info.phase === "alta");
+      bodyEl.classList.toggle("leve", info.intensidade === "leve");
+      bodyEl.classList.toggle("maxima", info.intensidade === "maxima");
       bodyEl.classList.toggle("fim", info.phase === "fim");
-      bodyEl.classList.toggle("pulse-alta", info.phase === "alta" && running);
+      bodyEl.classList.toggle("pulse-maxima", info.intensidade === "maxima" && running);
 
       phaseEl.textContent = info.phaseLabel;
       instructionEl.textContent = info.instruction;
       phaseTimeEl.textContent = formatTime(info.phaseRemaining);
       totalTimeEl.textContent = formatTime(totalRemaining);
-      cycleEl.textContent = `Ciclo ${Math.min(info.cycle, TOTAL_CYCLES)} / ${TOTAL_CYCLES}`;
+      cycleEl.textContent = `Série ${Math.min(info.serie, config.series)} / ${config.series}`;
       nextChangeEl.textContent = info.next;
       progressEl.style.width = `${Math.min(100, (elapsed / TOTAL_SECONDS) * 100)}%`;
 
@@ -471,10 +505,9 @@
         return;
       }
 
-      if (info.phase !== lastPhase) {
-        lastPhase = info.phase;
-        if (info.phase === "alta") soundHigh();
-        if (info.phase === "baixa") soundLow();
+      if (info.intensidade !== lastPhase) {
+        lastPhase = info.intensidade;
+        INTENSITY_STYLES[info.intensidade].som();
       }
 
       render();
@@ -487,9 +520,9 @@
 
       if (!running) {
         const info = currentPhaseInfo();
-        lastPhase = info.phase;
+        lastPhase = info.intensidade;
 
-        if (elapsed === 0) soundLow();
+        if (elapsed === 0) INTENSITY_STYLES[info.intensidade].som();
 
         running = true;
         intervalId = setInterval(tick, 1000);
@@ -509,9 +542,60 @@
     function resetTimer() {
       stopTimer();
       elapsed = 0;
-      lastPhase = "baixa";
+      lastPhase = null;
       startPauseBtn.disabled = false;
       render();
+    }
+
+    function mostrarErro(mensagem) {
+      bodyEl.classList.remove("carregando");
+      bodyEl.classList.add("erro");
+      tituloEl.textContent = "Treino de Bike";
+      cycleEl.textContent = "Erro";
+      phaseEl.textContent = "😕";
+      instructionEl.textContent = mensagem;
+      phaseTimeEl.textContent = "";
+      hintEl.innerHTML = 'Volte ao <a href="treino_bicicleta_menu.html" style="color:#fff;">menu de treinos</a> e escolha um treino.';
+    }
+
+    function iniciarComConfig(cfg) {
+      config = cfg;
+      CYCLE_SECONDS = config.tempoEstimuloSegundos + config.tempoRecuperacaoSegundos;
+      TOTAL_SECONDS = config.series * CYCLE_SECONDS;
+
+      bodyEl.classList.remove("carregando");
+      tituloEl.textContent = config.nome || "Treino de Bike";
+      document.title = `${config.nome || "Treino de Bike"} — Treino de Bicicleta`;
+
+      startPauseBtn.disabled = false;
+      resetBtn.disabled = false;
+      testSoundBtn.disabled = false;
+
+      hintEl.innerHTML =
+        `Azul = ${INTENSITY_STYLES.leve.label}. Vermelho = ${INTENSITY_STYLES.maxima.label}. ` +
+        'O som é gerado pelo navegador, sem arquivo de áudio. ' +
+        '<a href="treino_bicicleta_menu.html" style="color:#fff;">Trocar de treino</a>.';
+
+      render();
+    }
+
+    async function carregarTreino() {
+      const params = new URLSearchParams(window.location.search);
+      const treinoId = params.get("treino");
+
+      if (!treinoId) {
+        mostrarErro("Nenhum treino selecionado.");
+        return;
+      }
+
+      try {
+        const resposta = await fetch(`treinos-bicicleta/${treinoId}.json`);
+        if (!resposta.ok) throw new Error("Treino não encontrado");
+        const cfg = await resposta.json();
+        iniciarComConfig(cfg);
+      } catch (erro) {
+        mostrarErro("Não foi possível carregar este treino.");
+      }
     }
 
     startPauseBtn.addEventListener("click", () => {
@@ -526,7 +610,7 @@
       setTimeout(soundLow, 1100);
     });
 
-    render();
+    carregarTreino();
   </script>
 </body>
 </html>

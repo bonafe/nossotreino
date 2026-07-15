@@ -1,0 +1,9 @@
+{
+  "id": "treino-1",
+  "nome": "Treino 1",
+  "series": 10,
+  "tempoEstimuloSegundos": 60,
+  "tempoRecuperacaoSegundos": 30,
+  "intensidadeEstimulo": "maxima",
+  "intensidadeRecuperacao": "leve"
+}

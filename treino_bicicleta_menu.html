@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Treino de Bicicleta — Escolher treino</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #ffffff;
+      background:
+        radial-gradient(circle at top, rgba(56, 189, 248, 0.24), transparent 34%),
+        linear-gradient(160deg, #020617, #0f172a 50%, #111827);
+      display: flex;
+      justify-content: center;
+      padding: max(18px, env(safe-area-inset-top)) 18px max(18px, env(safe-area-inset-bottom));
+    }
+
+    main {
+      width: min(680px, 100%);
+      padding-top: 8px;
+    }
+
+    h1 {
+      margin: 0 0 4px;
+      font-size: clamp(1.6rem, 7vw, 2.4rem);
+      letter-spacing: -0.04em;
+      font-weight: 1000;
+      text-align: center;
+    }
+
+    p.subtitle {
+      margin: 0 0 22px;
+      text-align: center;
+      color: #94a3b8;
+      font-size: clamp(0.95rem, 3.5vw, 1.05rem);
+    }
+
+    .lista {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .treino {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: rgba(15, 23, 42, 0.86);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: 0 16px 50px rgba(0, 0, 0, 0.30);
+    }
+
+    .treino:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
+    .treino h2 {
+      margin: 0 0 12px;
+      font-size: clamp(1.2rem, 5vw, 1.5rem);
+      font-weight: 1000;
+      letter-spacing: -0.02em;
+      color: #bef264;
+    }
+
+    .campos {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px 14px;
+    }
+
+    .campo strong {
+      display: block;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #94a3b8;
+      margin-bottom: 2px;
+    }
+
+    .campo span {
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    .estado {
+      text-align: center;
+      color: #94a3b8;
+      padding: 30px 10px;
+    }
+
+    .voltar {
+      display: block;
+      text-align: center;
+      margin-top: 22px;
+      color: #94a3b8;
+      font-size: 0.92rem;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>🚴‍♂️ Treino de Bicicleta</h1>
+    <p class="subtitle">Escolha um treino para começar.</p>
+
+    <div id="lista" class="lista">
+      <div class="estado">Carregando treinos…</div>
+    </div>
+
+    <a class="voltar" href="index.html">← Voltar</a>
+  </main>
+
+  <script>
+    function formatarTempo(segundos) {
+      if (segundos % 60 === 0) {
+        const min = segundos / 60;
+        return `${min} min`;
+      }
+      return `${segundos}s`;
+    }
+
+    function labelIntensidade(intensidade) {
+      return intensidade === "maxima" ? "Máxima" : "Leve";
+    }
+
+    function cartaoTreino(cfg) {
+      const a = document.createElement("a");
+      a.className = "treino";
+      a.href = `treino_bicicleta.html?treino=${encodeURIComponent(cfg.id)}`;
+
+      a.innerHTML = `
+        <h2>${cfg.nome}</h2>
+        <div class="campos">
+          <div class="campo"><strong>Séries</strong><span>${cfg.series}</span></div>
+          <div class="campo"><strong>Tempo de estímulo</strong><span>${formatarTempo(cfg.tempoEstimuloSegundos)}</span></div>
+          <div class="campo"><strong>Recuperação</strong><span>${formatarTempo(cfg.tempoRecuperacaoSegundos)}</span></div>
+          <div class="campo"><strong>Intensidade do estímulo</strong><span>${labelIntensidade(cfg.intensidadeEstimulo)}</span></div>
+          <div class="campo"><strong>Intensidade da recuperação</strong><span>${labelIntensidade(cfg.intensidadeRecuperacao)}</span></div>
+        </div>
+      `;
+      return a;
+    }
+
+    async function carregarTreinos() {
+      const listaEl = document.getElementById("lista");
+
+      try {
+        const respostaIndice = await fetch("treinos-bicicleta/indice.json");
+        if (!respostaIndice.ok) throw new Error("Índice não encontrado");
+        const indice = await respostaIndice.json();
+
+        const configs = await Promise.all(
+          indice.map(async (item) => {
+            const resposta = await fetch(`treinos-bicicleta/${item.arquivo}`);
+            if (!resposta.ok) throw new Error(`Treino ${item.id} não encontrado`);
+            return resposta.json();
+          })
+        );
+
+        listaEl.innerHTML = "";
+        configs.forEach((cfg) => listaEl.appendChild(cartaoTreino(cfg)));
+      } catch (erro) {
+        listaEl.innerHTML =
+          '<div class="estado">Não foi possível carregar os treinos. Se você abriu este arquivo direto do disco, sirva a pasta por HTTP (ex.: <code>python3 -m http.server</code>) e tente de novo.</div>';
+      }
+    }
+
+    carregarTreinos();
+  </script>
+</body>
+</html>
