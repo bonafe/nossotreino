@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Carregar Dados do Treino</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #ffffff;
+      background:
+        radial-gradient(circle at top, rgba(56, 189, 248, 0.24), transparent 34%),
+        linear-gradient(160deg, #020617, #0f172a 50%, #111827);
+      display: flex;
+      justify-content: center;
+      padding: max(18px, env(safe-area-inset-top)) 18px max(40px, env(safe-area-inset-bottom));
+    }
+
+    main {
+      width: min(620px, 100%);
+      padding-top: 8px;
+    }
+
+    .top {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .voltar-icon {
+      flex-shrink: 0;
+      text-decoration: none;
+      color: #cbd5e1;
+      background: rgba(148, 163, 184, 0.14);
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      border-radius: 14px;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: clamp(1.3rem, 6vw, 1.8rem);
+      letter-spacing: -0.03em;
+      font-weight: 1000;
+    }
+
+    .painel {
+      background: rgba(15, 23, 42, 0.86);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 20px;
+      padding: 20px;
+    }
+
+    .painel p {
+      margin: 0 0 16px;
+      color: #cbd5e1;
+      font-size: 0.94rem;
+      line-height: 1.5;
+    }
+
+    .painel h2 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+      font-weight: 900;
+      color: #bef264;
+    }
+
+    .secao-download {
+      margin-top: 18px;
+    }
+
+    button.secondary {
+      appearance: none;
+      display: block;
+      width: 100%;
+      border-radius: 18px;
+      padding: 17px 12px;
+      font-size: 1.05rem;
+      font-weight: 950;
+      cursor: pointer;
+      touch-action: manipulation;
+      background: rgba(148, 163, 184, 0.12);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      color: #e2e8f0;
+    }
+
+    button.secondary:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
+    .painel code {
+      background: rgba(148, 163, 184, 0.16);
+      border-radius: 6px;
+      padding: 1px 6px;
+      font-size: 0.9em;
+    }
+
+    .status {
+      background: rgba(148, 163, 184, 0.1);
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 18px;
+      font-size: 0.88rem;
+      color: #cbd5e1;
+    }
+
+    .status strong {
+      color: #ffffff;
+    }
+
+    .campo-arquivo {
+      display: block;
+      text-align: center;
+      background: rgba(148, 163, 184, 0.12);
+      border: 1px dashed rgba(148, 163, 184, 0.4);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+      font-weight: 800;
+      color: #e2e8f0;
+      cursor: pointer;
+    }
+
+    .campo-arquivo:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
+    .ou {
+      text-align: center;
+      color: #64748b;
+      font-size: 0.82rem;
+      margin: 0 0 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    textarea {
+      width: 100%;
+      background: rgba(2, 6, 23, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 0.85rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: #e2e8f0;
+      resize: vertical;
+      margin-bottom: 14px;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #bef264;
+    }
+
+    button.primary {
+      appearance: none;
+      display: block;
+      width: 100%;
+      border: none;
+      border-radius: 18px;
+      padding: 17px 12px;
+      font-size: 1.05rem;
+      font-weight: 950;
+      cursor: pointer;
+      touch-action: manipulation;
+      background: #bef264;
+      color: #06110a;
+    }
+
+    button.primary:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
+    .mensagem {
+      margin-top: 14px;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .mensagem.sucesso {
+      background: rgba(190, 242, 100, 0.14);
+      border: 1px solid rgba(190, 242, 100, 0.4);
+      color: #bef264;
+    }
+
+    .mensagem.erro {
+      background: rgba(251, 113, 133, 0.14);
+      border: 1px solid rgba(251, 113, 133, 0.4);
+      color: #fb7185;
+    }
+
+    .mensagem a {
+      color: inherit;
+      font-weight: 900;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="top">
+      <a class="voltar-icon" href="index.html" aria-label="Voltar">←</a>
+      <div>
+        <h1>Carregar dados do treino</h1>
+      </div>
+    </header>
+
+    <section class="painel">
+      <p>
+        Esse site não guarda o plano de treino no código — os dados ficam só
+        no seu navegador. Carregue o arquivo <code>dados_treinos.json</code>
+        aqui uma vez (em cada navegador/aparelho que for usar) pra poder
+        usar os treinos. Ele fica salvo neste navegador para as próximas
+        visitas, mesmo offline.
+      </p>
+
+      <div id="statusAtual" class="status">Carregando status…</div>
+
+      <label class="campo-arquivo">
+        <input type="file" id="arquivoInput" accept="application/json,.json" hidden />
+        📂 Escolher arquivo dados_treinos.json
+      </label>
+
+      <p class="ou">ou cole o conteúdo aqui</p>
+
+      <textarea id="jsonTextarea" rows="10" placeholder="Cole o conteúdo de dados_treinos.json..."></textarea>
+
+      <button id="salvarBtn" class="primary" type="button">Salvar</button>
+
+      <div id="mensagem" class="mensagem" hidden></div>
+    </section>
+
+    <section class="painel secao-download">
+      <h2>Baixar backup</h2>
+      <p>
+        Baixa um arquivo com os dados do treino, o histórico de séries e
+        sessões, e o progresso de treinos em andamento — pra guardar ou
+        levar pra outro navegador/aparelho. Depois é só carregar esse
+        arquivo aqui de novo (na caixa acima) que tudo volta, incluindo a
+        carga de onde você parou.
+      </p>
+      <button id="baixarBtn" class="secondary" type="button">⬇️ Baixar backup</button>
+    </section>
+  </main>
+
+  <script src="storage.js"></script>
+  <script>
+    const CAMPOS_OBRIGATORIOS = ["metadata", "guia", "aquecimentoPadrao", "exercicios", "cardios", "treinos"];
+
+    function validarDados(dados) {
+      return dados && typeof dados === "object" && CAMPOS_OBRIGATORIOS.every((campo) => campo in dados);
+    }
+
+    function formatarDataHora(iso) {
+      const d = new Date(iso);
+      const data = `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+      const hora = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+      return `${data} ${hora}`;
+    }
+
+    function atualizarStatus() {
+      const statusEl = document.getElementById("statusAtual");
+      const dados = TreinosStorage.lerJSON("dadosTreinos.v1", null);
+      const carregadoEm = TreinosStorage.lerJSON("dadosTreinosCarregadoEm.v1", null);
+
+      if (!dados) {
+        statusEl.innerHTML = "Nenhum dado carregado neste navegador ainda.";
+        return;
+      }
+
+      const totalTreinos = Array.isArray(dados.treinos) ? dados.treinos.length : 0;
+      const totalSeries = TreinosStorage.lerJSON("historico.serieMusculacao.v1", []).length;
+      const totalSessoesBike = TreinosStorage.lerJSON("historico.sessaoBicicleta.v1", []).length;
+      const sessoesLabel = totalSessoesBike === 1 ? "sessão" : "sessões";
+
+      statusEl.innerHTML =
+        `<strong>${totalTreinos} treino${totalTreinos === 1 ? "" : "s"}</strong> carregados` +
+        (carregadoEm ? ` em <strong>${formatarDataHora(carregadoEm)}</strong>.` : ".") +
+        `<br>${totalSeries} série${totalSeries === 1 ? "" : "s"} de musculação e ` +
+        `${totalSessoesBike} ${sessoesLabel} de bike no histórico.`;
+    }
+
+    function mostrarMensagem(texto, tipo) {
+      const el = document.getElementById("mensagem");
+      el.hidden = false;
+      el.className = `mensagem ${tipo}`;
+      el.innerHTML = texto;
+    }
+
+    document.getElementById("arquivoInput").addEventListener("change", (evento) => {
+      const arquivo = evento.target.files[0];
+      if (!arquivo) return;
+
+      const leitor = new FileReader();
+      leitor.onload = () => {
+        document.getElementById("jsonTextarea").value = leitor.result;
+      };
+      leitor.readAsText(arquivo);
+    });
+
+    document.getElementById("salvarBtn").addEventListener("click", () => {
+      const texto = document.getElementById("jsonTextarea").value.trim();
+
+      if (!texto) {
+        mostrarMensagem("Escolha um arquivo ou cole o conteúdo do JSON antes de salvar.", "erro");
+        return;
+      }
+
+      let dados;
+      try {
+        dados = JSON.parse(texto);
+      } catch (erro) {
+        mostrarMensagem("Esse texto não é um JSON válido.", "erro");
+        return;
+      }
+
+      if (dados && dados.tipo === "backup-treinos") {
+        if (!validarDados(dados.dadosTreinos)) {
+          mostrarMensagem("Esse backup não tem dados de treino válidos.", "erro");
+          return;
+        }
+        TreinosStorage.restaurarBackup(dados);
+        atualizarStatus();
+        mostrarMensagem(
+          'Backup restaurado — dados do treino, histórico e progresso em andamento recuperados! Já dá pra usar o <a href="treino_exercicios_menu.html">treino de musculação</a> ou o <a href="treino_bicicleta_menu.html">treino de bicicleta</a>.',
+          "sucesso"
+        );
+        return;
+      }
+
+      if (!validarDados(dados)) {
+        mostrarMensagem(
+          "Esse JSON não parece ser um dados_treinos.json nem um backup válido — faltam campos como treinos, exercicios ou cardios.",
+          "erro"
+        );
+        return;
+      }
+
+      TreinosStorage.definirDadosTreinos(dados);
+      atualizarStatus();
+      mostrarMensagem(
+        'Dados salvos! Já dá pra usar o <a href="treino_exercicios_menu.html">treino de musculação</a> ou o <a href="treino_bicicleta_menu.html">treino de bicicleta</a>.',
+        "sucesso"
+      );
+    });
+
+    document.getElementById("baixarBtn").addEventListener("click", () => {
+      const backup = TreinosStorage.montarBackup();
+      if (!backup.dadosTreinos) {
+        mostrarMensagem("Carregue os dados do treino antes de baixar um backup.", "erro");
+        return;
+      }
+
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `treinos-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    atualizarStatus();
+  </script>
+</body>
+</html>

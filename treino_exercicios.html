@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Treino de Exercícios</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #ffffff;
+      background:
+        radial-gradient(circle at top, rgba(56, 189, 248, 0.24), transparent 34%),
+        linear-gradient(160deg, #020617, #0f172a 50%, #111827);
+      display: flex;
+      justify-content: center;
+      padding: max(18px, env(safe-area-inset-top)) 18px max(40px, env(safe-area-inset-bottom));
+    }
+
+    main {
+      width: min(680px, 100%);
+      padding-top: 8px;
+    }
+
+    .top {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .voltar-icon {
+      flex-shrink: 0;
+      text-decoration: none;
+      color: #cbd5e1;
+      background: rgba(148, 163, 184, 0.14);
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      border-radius: 14px;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: clamp(1.4rem, 6vw, 2rem);
+      letter-spacing: -0.03em;
+      font-weight: 1000;
+    }
+
+    .tag {
+      display: inline-block;
+      background: rgba(190, 242, 100, 0.16);
+      border: 1px solid rgba(190, 242, 100, 0.4);
+      color: #bef264;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .iniciar {
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      color: #06110a;
+      background: #bef264;
+      border: 2px solid #ecfccb;
+      border-radius: 18px;
+      padding: 16px 18px;
+      font-size: 1.1rem;
+      font-weight: 1000;
+      letter-spacing: -0.02em;
+      box-shadow: 0 16px 42px rgba(190, 242, 100, 0.22);
+      margin-bottom: 18px;
+    }
+
+    .iniciar:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
+    .guia {
+      background: rgba(15, 23, 42, 0.86);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 20px;
+      padding: 6px 18px;
+      margin-bottom: 18px;
+    }
+
+    .guia summary {
+      cursor: pointer;
+      padding: 12px 0;
+      font-weight: 850;
+      color: #cbd5e1;
+      list-style: none;
+    }
+
+    .guia summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .guia summary::before {
+      content: "▸ ";
+      color: #94a3b8;
+    }
+
+    .guia[open] summary::before {
+      content: "▾ ";
+    }
+
+    .guia ul {
+      margin: 0 0 14px;
+      padding-left: 18px;
+      color: #94a3b8;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .guia li {
+      margin-bottom: 8px;
+    }
+
+    .guia li strong {
+      color: #e2e8f0;
+    }
+
+    .secao {
+      background: rgba(15, 23, 42, 0.86);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 20px;
+      padding: 18px 20px;
+      margin-bottom: 18px;
+    }
+
+    .secao h2 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+      font-weight: 900;
+      color: #bef264;
+    }
+
+    .secao p {
+      margin: 0 0 10px;
+      color: #cbd5e1;
+      font-size: 0.94rem;
+      line-height: 1.5;
+    }
+
+    .secao a {
+      color: #7dd3fc;
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .bloco {
+      margin-bottom: 20px;
+    }
+
+    .bloco-titulo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 10px;
+      color: #94a3b8;
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .itens {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .item {
+      background: rgba(15, 23, 42, 0.86);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-left: 4px solid rgba(148, 163, 184, 0.4);
+      border-radius: 18px;
+      padding: 14px 16px;
+      cursor: pointer;
+    }
+
+    .item:hover {
+      border-color: rgba(190, 242, 100, 0.45);
+    }
+
+    .item:active {
+      transform: translateY(1px) scale(0.995);
+    }
+
+    .item.isometria {
+      border-left-color: #38bdf8;
+    }
+
+    .item.substituto {
+      background: rgba(51, 65, 85, 0.5);
+      border-left-color: rgba(148, 163, 184, 0.3);
+      color: #94a3b8;
+    }
+
+    .item-cabecalho {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+
+    .item-nome {
+      font-size: 1.02rem;
+      font-weight: 850;
+      color: inherit;
+    }
+
+    .item-acoes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .ver-video,
+    .ver-progresso {
+      appearance: none;
+      display: inline-block;
+      text-decoration: none;
+      border-radius: 12px;
+      padding: 8px 12px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+
+    .ver-video {
+      background: rgba(125, 211, 252, 0.14);
+      border-color: rgba(125, 211, 252, 0.4);
+      color: #7dd3fc;
+    }
+
+    .ver-progresso {
+      background: rgba(190, 242, 100, 0.14);
+      border-color: rgba(190, 242, 100, 0.4);
+      color: #bef264;
+    }
+
+    .ver-video:active,
+    .ver-progresso:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
+    .item-substituto-label {
+      flex-shrink: 0;
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+    }
+
+    .item-grupos {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .item-grupos span {
+      background: rgba(148, 163, 184, 0.14);
+      border-radius: 999px;
+      padding: 2px 9px;
+      font-size: 0.72rem;
+      color: #cbd5e1;
+    }
+
+    .item-detalhes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      font-size: 0.88rem;
+      color: #cbd5e1;
+    }
+
+    .item-detalhes strong {
+      color: inherit;
+    }
+
+    .item-isometria-nota {
+      margin-top: 8px;
+      font-size: 0.82rem;
+      color: #7dd3fc;
+    }
+
+    .campos {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px 14px;
+    }
+
+    .campo strong {
+      display: block;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #94a3b8;
+      margin-bottom: 2px;
+    }
+
+    .campo span {
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    .estado {
+      text-align: center;
+      color: #94a3b8;
+      padding: 30px 10px;
+    }
+
+    .estado a {
+      color: #bef264;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="top">
+      <a class="voltar-icon" href="treino_exercicios_menu.html" aria-label="Voltar">←</a>
+      <div>
+        <h1 id="titulo">Carregando…</h1>
+        <span id="tipoTag" class="tag" hidden></span>
+      </div>
+    </header>
+
+    <a id="iniciarTreino" class="iniciar" href="#" hidden>Iniciar treino →</a>
+
+    <details id="guiaDetails" class="guia" hidden>
+      <summary>Guia rápido</summary>
+      <ul id="guiaLista"></ul>
+    </details>
+
+    <section id="aquecimento" class="secao" hidden>
+      <h2>Aquecimento</h2>
+      <p id="aquecimentoTexto"></p>
+      <a id="aquecimentoVideo" href="#" target="_blank" rel="noopener">Ver vídeo de mobilidade →</a>
+    </section>
+
+    <div id="blocos"></div>
+
+    <section id="cardio" class="secao" hidden>
+      <h2>Cardio complementar</h2>
+      <div id="cardioCampos" class="campos"></div>
+      <a id="cardioLink" class="iniciar" href="#" style="margin-top: 14px;">Fazer bicicleta →</a>
+    </section>
+
+    <div id="vazio" class="estado" hidden>Nenhum exercício cadastrado ainda para este treino.</div>
+
+    <div id="carregando" class="estado">Carregando treino…</div>
+
+    <div id="erro" class="estado" hidden></div>
+  </main>
+
+  <script src="storage.js"></script>
+  <script>
+    const LABEL_TIPO = {
+      musculacao: "Musculação",
+      "peso-do-corpo": "Peso do corpo",
+      funcional: "Funcional",
+      flexibilidade: "Flexibilidade"
+    };
+
+    const LABEL_AGRUPAMENTO = {
+      superset: "Superset — fazer em sequência",
+      sequencial: "Sequencial",
+      circuito: "Circuito — uma série de cada por volta"
+    };
+
+    function formatarTempo(segundos) {
+      if (segundos % 60 === 0) {
+        const min = segundos / 60;
+        return `${min} min`;
+      }
+      return `${segundos}s`;
+    }
+
+    function labelIntensidade(intensidade) {
+      return intensidade === "maxima" ? "Máxima" : "Leve";
+    }
+
+    function formatarRepeticoes(repeticoes) {
+      if (repeticoes.modo === "faixa") return `${repeticoes.min} a ${repeticoes.max} repetições`;
+      if (repeticoes.modo === "tempo") return `${repeticoes.segundos} segundos`;
+      return "Máximo de repetições";
+    }
+
+    function gruposMusculares(grupoMuscular) {
+      return [grupoMuscular.principal, grupoMuscular.sinergista1, grupoMuscular.sinergista2].filter(Boolean);
+    }
+
+    function montarGuia(guia) {
+      const itens = [
+        { titulo: "Ajuste de carga", texto: guia.ajusteCarga },
+        { titulo: "Cadência", texto: guia.cadencia },
+        { titulo: "Pausa entre séries", texto: `${guia.pausaSegundos.min} a ${guia.pausaSegundos.max} segundos.` },
+        { titulo: "Cor cinza", texto: guia.corCinza },
+        { titulo: "Superset", texto: guia.superSet },
+        { titulo: "Isometria", texto: guia.isometria },
+        { titulo: "Circuito", texto: guia.circuito }
+      ];
+
+      return itens.map((i) => `<li><strong>${i.titulo}:</strong> ${i.texto}</li>`).join("");
+    }
+
+    function montarAquecimento(treino, aquecimentoPadrao) {
+      const secaoEl = document.getElementById("aquecimento");
+      if (!treino.aquecimento) return;
+
+      secaoEl.hidden = false;
+      const textoEl = document.getElementById("aquecimentoTexto");
+      const videoEl = document.getElementById("aquecimentoVideo");
+      const partes = [];
+
+      if (treino.aquecimento.usaPadrao) {
+        partes.push(aquecimentoPadrao.texto);
+        videoEl.href = aquecimentoPadrao.videoUrl;
+      } else {
+        videoEl.hidden = true;
+      }
+
+      if (treino.aquecimento.extra) partes.push(treino.aquecimento.extra);
+
+      textoEl.textContent = partes.join(" ");
+    }
+
+    function itemCard(item, exercicios, treinoId, slotIndex, opcaoIndex) {
+      const exercicio = exercicios[item.exercicioId];
+      const classes = ["item"];
+      if (item.tecnica === "isometria") classes.push("isometria");
+      if (item.substituto) classes.push("substituto");
+
+      const grupos = gruposMusculares(item.grupoMuscular);
+      const nome = exercicio ? exercicio.nome : item.exercicioId;
+      const execucaoUrl = `treino_execucao.html?treino=${encodeURIComponent(treinoId)}&exercicio=${slotIndex}&opcao=${opcaoIndex}`;
+      const progressoUrl = `treino_exercicio_progresso.html?exercicio=${encodeURIComponent(item.exercicioId)}&treino=${encodeURIComponent(treinoId)}`;
+
+      const div = document.createElement("div");
+      div.className = classes.join(" ");
+      div.tabIndex = 0;
+      div.setAttribute("role", "link");
+      div.innerHTML = `
+        <div class="item-cabecalho">
+          <span class="item-nome">${nome}</span>
+          ${item.substituto ? '<span class="item-substituto-label">Substituto</span>' : ""}
+        </div>
+        ${grupos.length ? `<div class="item-grupos">${grupos.map((g) => `<span>${g}</span>`).join("")}</div>` : ""}
+        <div class="item-detalhes">
+          <span><strong>${item.series}</strong> séries</span>
+          <span>${formatarRepeticoes(item.repeticoes)}</span>
+        </div>
+        ${item.tecnica === "isometria" ? '<div class="item-isometria-nota">Isometria de 20s a 50% da amplitude, nas duas últimas séries.</div>' : ""}
+        <div class="item-acoes">
+          ${exercicio && exercicio.videoUrl ? '<button type="button" class="ver-video">Ver vídeo →</button>' : ""}
+          <a class="ver-progresso" href="${progressoUrl}">Ver progresso →</a>
+        </div>
+      `;
+
+      div.addEventListener("click", () => {
+        window.location.href = execucaoUrl;
+      });
+      div.addEventListener("keydown", (evento) => {
+        if (evento.key === "Enter" || evento.key === " ") {
+          evento.preventDefault();
+          window.location.href = execucaoUrl;
+        }
+      });
+
+      const videoBtn = div.querySelector(".ver-video");
+      if (videoBtn) {
+        videoBtn.addEventListener("click", (evento) => {
+          evento.stopPropagation();
+          window.open(exercicio.videoUrl, "_blank", "noopener");
+        });
+      }
+
+      div.querySelector(".ver-progresso").addEventListener("click", (evento) => {
+        evento.stopPropagation();
+      });
+
+      return div;
+    }
+
+    function montarBlocos(treino, exercicios) {
+      const blocosEl = document.getElementById("blocos");
+      const vazioEl = document.getElementById("vazio");
+
+      if (!treino.blocos.length) {
+        vazioEl.hidden = false;
+        return;
+      }
+
+      let slotIndex = -1;
+      let opcaoIndex = 0;
+
+      treino.blocos.forEach((bloco) => {
+        const blocoEl = document.createElement("div");
+        blocoEl.className = "bloco";
+
+        const rotulo = bloco.grupo ? `Bloco ${bloco.grupo} · ` : "";
+        const agrupamento = LABEL_AGRUPAMENTO[bloco.tipoAgrupamento] || bloco.tipoAgrupamento;
+
+        const itensEl = document.createElement("div");
+        itensEl.className = "itens";
+        bloco.itens.forEach((item) => {
+          if (item.substituto && slotIndex >= 0) {
+            opcaoIndex += 1;
+          } else {
+            slotIndex += 1;
+            opcaoIndex = 0;
+          }
+          itensEl.appendChild(itemCard(item, exercicios, treino.id, slotIndex, opcaoIndex));
+        });
+
+        blocoEl.innerHTML = `<h3 class="bloco-titulo">${rotulo}${agrupamento}</h3>`;
+        blocoEl.appendChild(itensEl);
+        blocosEl.appendChild(blocoEl);
+      });
+    }
+
+    function montarCardio(cardio, cardioId) {
+      if (!cardio) return;
+
+      document.getElementById("cardio").hidden = false;
+      document.getElementById("cardioCampos").innerHTML = `
+        <div class="campo"><strong>Exercício</strong><span>${cardio.exercicio}</span></div>
+        <div class="campo"><strong>Séries</strong><span>${cardio.series}</span></div>
+        <div class="campo"><strong>Tempo de estímulo</strong><span>${formatarTempo(cardio.tempoEstimulo.segundos)}</span></div>
+        <div class="campo"><strong>Recuperação</strong><span>${formatarTempo(cardio.recuperacao.segundos)}</span></div>
+        <div class="campo"><strong>Intensidade do estímulo</strong><span>${labelIntensidade(cardio.intensidadeEstimulo)}</span></div>
+        <div class="campo"><strong>Intensidade da recuperação</strong><span>${labelIntensidade(cardio.intensidadeRecuperacao)}</span></div>
+      `;
+      document.getElementById("cardioLink").href = `treino_bicicleta.html?cardio=${encodeURIComponent(cardioId)}`;
+    }
+
+    function mostrarErro(mensagem) {
+      document.getElementById("carregando").hidden = true;
+      const erroEl = document.getElementById("erro");
+      erroEl.hidden = false;
+      erroEl.innerHTML = `${mensagem} Volte ao <a href="treino_exercicios_menu.html">menu de treinos</a>.`;
+      document.getElementById("titulo").textContent = "Treino de Exercícios";
+    }
+
+    function iniciarComDados(dados, treinoId) {
+      const treino = dados.treinos.find((t) => t.id === treinoId);
+      if (!treino) {
+        mostrarErro("Este treino não foi encontrado.");
+        return;
+      }
+
+      document.getElementById("carregando").hidden = true;
+
+      document.title = `${treino.nome} — Treino de Exercícios`;
+      document.getElementById("titulo").textContent = treino.nome;
+
+      const tipoTagEl = document.getElementById("tipoTag");
+      tipoTagEl.hidden = false;
+      tipoTagEl.textContent = LABEL_TIPO[treino.tipo] || treino.tipo;
+
+      const guiaEl = document.getElementById("guiaDetails");
+      guiaEl.hidden = false;
+      document.getElementById("guiaLista").innerHTML = montarGuia(dados.guia);
+
+      montarAquecimento(treino, dados.aquecimentoPadrao);
+      montarBlocos(treino, dados.exercicios);
+      montarCardio(dados.cardios[treino.cardioId], treino.cardioId);
+
+      if (treino.blocos.some((bloco) => bloco.itens.length)) {
+        const iniciarEl = document.getElementById("iniciarTreino");
+        iniciarEl.hidden = false;
+        iniciarEl.href = `treino_execucao.html?treino=${encodeURIComponent(treino.id)}`;
+
+        const progressoSalvo = TreinosStorage.lerJSON(TreinosStorage.chaves.execucaoMusculacao(treino.id), null);
+        const emAndamento = progressoSalvo && progressoSalvo.slotIndex >= 0 && progressoSalvo.serieAtual >= 1;
+        iniciarEl.textContent = emAndamento ? "Continuar treino →" : "Iniciar treino →";
+      }
+    }
+
+    async function carregarTreino() {
+      const params = new URLSearchParams(window.location.search);
+      const treinoId = params.get("treino");
+
+      if (!treinoId) {
+        mostrarErro("Nenhum treino selecionado.");
+        return;
+      }
+
+      try {
+        const dados = await TreinosStorage.carregarDadosTreinos();
+        iniciarComDados(dados, treinoId);
+      } catch (erro) {
+        mostrarErro('Nenhum dado de treino carregado ainda neste navegador. <a href="importar_dados.html">Carregue o arquivo dados_treinos.json</a> pra começar.');
+      }
+    }
+
+    carregarTreino();
+  </script>
+</body>
+</html>

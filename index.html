@@ -39,12 +39,6 @@
       backdrop-filter: blur(10px);
     }
 
-    .emoji {
-      font-size: clamp(4rem, 18vw, 7rem);
-      line-height: 1;
-      margin-bottom: 14px;
-    }
-
     h1 {
       margin: 0 0 10px;
       font-size: clamp(2.2rem, 10vw, 4.2rem);
@@ -95,22 +89,63 @@
       color: #94a3b8;
       font-size: 0.92rem;
     }
+
+    .small a {
+      color: #7dd3fc;
+      font-weight: 700;
+    }
+
+    .aviso-dados {
+      display: block;
+      text-decoration: none;
+      background: rgba(190, 242, 100, 0.12);
+      border: 1px dashed rgba(190, 242, 100, 0.5);
+      border-radius: 18px;
+      padding: 14px 16px;
+      margin-bottom: 18px;
+      color: #bef264;
+      font-weight: 800;
+      font-size: 0.95rem;
+    }
+
+    .aviso-dados:active {
+      transform: translateY(1px) scale(0.99);
+    }
   </style>
 </head>
 <body>
   <main>
     <section class="card">
-      <div class="emoji" aria-hidden="true">🚴‍♂️</div>
       <h1>Meus Treinos</h1>
-      <p>Escolha o treino e toque para começar. Na bike: azul é intensidade leve; vermelho é intensidade máxima.</p>
+      <p>Escolha um treino para começar.</p>
+
+      <a id="avisoDados" class="aviso-dados" href="importar_dados.html" hidden>
+        ⚠️ Primeiro acesso — carregue os dados do treino
+      </a>
 
       <a class="workout" href="treino_bicicleta_menu.html">
-        Entrar no treino de bicicleta
+        🚴‍♂️ Entrar no treino de bicicleta
         <span>Escolha entre os treinos disponíveis</span>
       </a>
 
-      <div class="small">Funciona offline se os arquivos estiverem na mesma pasta.</div>
+      <a class="workout" href="treino_exercicios_menu.html" style="margin-top: 14px;">
+        🏋️ Entrar no treino de musculação
+        <span>Musculação, peso do corpo e funcional</span>
+      </a>
+
+      <div class="small">
+        Funciona offline depois de carregado.
+        <br />
+        <a href="importar_dados.html">Carregar/atualizar dados do treino</a>
+      </div>
     </section>
   </main>
+
+  <script src="storage.js"></script>
+  <script>
+    if (!TreinosStorage.lerJSON("dadosTreinos.v1", null)) {
+      document.getElementById("avisoDados").hidden = false;
+    }
+  </script>
 </body>
 </html>

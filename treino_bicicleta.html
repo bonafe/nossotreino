@@ -191,7 +191,7 @@
 
     .buttons {
       display: grid;
-      grid-template-columns: 1.35fr 1fr 1fr;
+      grid-template-columns: 1.35fr 1fr;
       gap: 10px;
       margin-top: 14px;
     }
@@ -305,7 +305,6 @@
       <div class="buttons">
         <button id="startPause" class="primary" disabled>INICIAR</button>
         <button id="reset" disabled>REINICIAR</button>
-        <button id="testSound" disabled>TESTAR SOM</button>
       </div>
 
       <p id="hint" class="hint">
@@ -314,6 +313,7 @@
     </section>
   </main>
 
+  <script src="storage.js"></script>
   <script>
     const INTENSITY_STYLES = {
       leve: {
@@ -351,7 +351,6 @@
     const progressEl = document.getElementById("progress");
     const startPauseBtn = document.getElementById("startPause");
     const resetBtn = document.getElementById("reset");
-    const testSoundBtn = document.getElementById("testSound");
     const hintEl = document.getElementById("hint");
 
     function formatTime(seconds) {
@@ -490,6 +489,16 @@
       }
     }
 
+    function registrarSessaoConcluida() {
+      TreinosStorage.adicionarAoHistorico(TreinosStorage.chaves.historicoSessaoBicicleta, {
+        cardioId: config.id,
+        cardioNome: config.nome,
+        dataHora: new Date().toISOString(),
+        duracaoSegundos: TOTAL_SECONDS,
+        series: config.series
+      });
+    }
+
     function tick() {
       if (!running) return;
 
@@ -502,6 +511,7 @@
         stopTimer();
         render();
         soundDone();
+        registrarSessaoConcluida();
         return;
       }
 
@@ -547,7 +557,7 @@
       render();
     }
 
-    function mostrarErro(mensagem) {
+    function mostrarErro(mensagem, mostrarLinkImportar) {
       bodyEl.classList.remove("carregando");
       bodyEl.classList.add("erro");
       tituloEl.textContent = "Treino de Bike";
@@ -555,7 +565,10 @@
       phaseEl.textContent = "😕";
       instructionEl.textContent = mensagem;
       phaseTimeEl.textContent = "";
-      hintEl.innerHTML = 'Volte ao <a href="treino_bicicleta_menu.html" style="color:#fff;">menu de treinos</a> e escolha um treino.';
+      hintEl.innerHTML = 'Volte ao <a href="treino_bicicleta_menu.html" style="color:#fff;">menu de treinos</a> e escolha um treino.' +
+        (mostrarLinkImportar
+          ? ' Se ainda não carregou os dados neste navegador, <a href="importar_dados.html" style="color:#fff;">carregue o arquivo dados_treinos.json</a> primeiro.'
+          : '');
     }
 
     function iniciarComConfig(cfg) {
@@ -569,7 +582,6 @@
 
       startPauseBtn.disabled = false;
       resetBtn.disabled = false;
-      testSoundBtn.disabled = false;
 
       hintEl.innerHTML =
         `Azul = ${INTENSITY_STYLES.leve.label}. Vermelho = ${INTENSITY_STYLES.maxima.label}. ` +
@@ -579,22 +591,34 @@
       render();
     }
 
+    function extrairConfigBicicleta(cardioId, cardio) {
+      return {
+        id: cardioId,
+        nome: cardio.nome,
+        series: cardio.series,
+        tempoEstimuloSegundos: cardio.tempoEstimulo.segundos,
+        tempoRecuperacaoSegundos: cardio.recuperacao.segundos,
+        intensidadeEstimulo: cardio.intensidadeEstimulo,
+        intensidadeRecuperacao: cardio.intensidadeRecuperacao
+      };
+    }
+
     async function carregarTreino() {
       const params = new URLSearchParams(window.location.search);
-      const treinoId = params.get("treino");
+      const cardioId = params.get("cardio");
 
-      if (!treinoId) {
+      if (!cardioId) {
         mostrarErro("Nenhum treino selecionado.");
         return;
       }
 
       try {
-        const resposta = await fetch(`treinos-bicicleta/${treinoId}.json`);
-        if (!resposta.ok) throw new Error("Treino não encontrado");
-        const cfg = await resposta.json();
-        iniciarComConfig(cfg);
+        const dados = await TreinosStorage.carregarDadosTreinos();
+        const cardio = dados.cardios[cardioId];
+        if (!cardio) throw new Error("Treino não encontrado");
+        iniciarComConfig(extrairConfigBicicleta(cardioId, cardio));
       } catch (erro) {
-        mostrarErro("Não foi possível carregar este treino.");
+        mostrarErro("Não foi possível carregar este treino.", true);
       }
     }
 
@@ -604,11 +628,6 @@
     });
 
     resetBtn.addEventListener("click", resetTimer);
-
-    testSoundBtn.addEventListener("click", () => {
-      soundHigh();
-      setTimeout(soundLow, 1100);
-    });
 
     carregarTreino();
   </script>

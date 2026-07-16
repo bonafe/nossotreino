@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Treino de Bicicleta — Escolher treino</title>
+  <title>Treino de Exercícios — Escolher treino</title>
   <style>
     * {
       box-sizing: border-box;
@@ -52,6 +52,7 @@
 
     .treino {
       display: block;
+      position: relative;
       text-decoration: none;
       color: inherit;
       background: rgba(15, 23, 42, 0.86);
@@ -61,36 +62,53 @@
       box-shadow: 0 16px 50px rgba(0, 0, 0, 0.30);
     }
 
+    .treino.hoje {
+      border-color: rgba(190, 242, 100, 0.6);
+    }
+
     .treino:active {
       transform: translateY(1px) scale(0.99);
     }
 
+    .cabecalho {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
     .treino h2 {
-      margin: 0 0 12px;
+      margin: 0;
       font-size: clamp(1.2rem, 5vw, 1.5rem);
       font-weight: 1000;
       letter-spacing: -0.02em;
       color: #bef264;
     }
 
-    .campos {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px 14px;
-    }
-
-    .campo strong {
-      display: block;
+    .tag {
+      flex-shrink: 0;
+      background: rgba(148, 163, 184, 0.16);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      color: #cbd5e1;
+      border-radius: 999px;
+      padding: 4px 10px;
       font-size: 0.72rem;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: #94a3b8;
-      margin-bottom: 2px;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
     }
 
-    .campo span {
-      font-size: 1rem;
-      font-weight: 800;
+    .tag.hoje {
+      background: rgba(190, 242, 100, 0.18);
+      border-color: rgba(190, 242, 100, 0.5);
+      color: #bef264;
+    }
+
+    .resumo {
+      color: #94a3b8;
+      font-size: 0.92rem;
     }
 
     .estado {
@@ -115,7 +133,7 @@
 </head>
 <body>
   <main>
-    <h1>🚴‍♂️ Treino de Bicicleta</h1>
+    <h1>🏋️ Treino de Exercícios</h1>
     <p class="subtitle">Escolha um treino para começar.</p>
 
     <div id="lista" class="lista">
@@ -127,46 +145,48 @@
 
   <script src="storage.js"></script>
   <script>
-    function formatarTempo(segundos) {
-      if (segundos % 60 === 0) {
-        const min = segundos / 60;
-        return `${min} min`;
-      }
-      return `${segundos}s`;
+    const DIAS_SEMANA = ["domingo", "segunda", "terca", "quarta", "quinta", "sexta", "sabado"];
+
+    const LABEL_TIPO = {
+      musculacao: "Musculação",
+      "peso-do-corpo": "Peso do corpo",
+      funcional: "Funcional",
+      flexibilidade: "Flexibilidade"
+    };
+
+    function contarExercicios(treino) {
+      return treino.blocos.reduce((total, bloco) => total + bloco.itens.length, 0);
     }
 
-    function labelIntensidade(intensidade) {
-      return intensidade === "maxima" ? "Máxima" : "Leve";
+    function diaDeHoje() {
+      return DIAS_SEMANA[new Date().getDay()];
     }
 
-    function cartaoTreino(cfg) {
+    function treinoDeHoje(dados) {
+      const hoje = diaDeHoje();
+      const entrada = dados.distribuicaoSemanal.find((d) => d.dia === hoje);
+      return entrada ? entrada.treinoId : null;
+    }
+
+    function cartaoTreino(treino, idTreinoHoje) {
       const a = document.createElement("a");
-      a.className = "treino";
-      a.href = `treino_bicicleta.html?cardio=${encodeURIComponent(cfg.id)}`;
+      const ehHoje = treino.id === idTreinoHoje;
+      a.className = ehHoje ? "treino hoje" : "treino";
+      a.href = `treino_exercicios.html?treino=${encodeURIComponent(treino.id)}`;
+
+      const qtdExercicios = contarExercicios(treino);
+      const resumo = qtdExercicios === 0
+        ? "Nenhum exercício cadastrado"
+        : `${qtdExercicios} exercício${qtdExercicios === 1 ? "" : "s"}`;
 
       a.innerHTML = `
-        <h2>${cfg.nome}</h2>
-        <div class="campos">
-          <div class="campo"><strong>Séries</strong><span>${cfg.series}</span></div>
-          <div class="campo"><strong>Tempo de estímulo</strong><span>${formatarTempo(cfg.tempoEstimuloSegundos)}</span></div>
-          <div class="campo"><strong>Recuperação</strong><span>${formatarTempo(cfg.tempoRecuperacaoSegundos)}</span></div>
-          <div class="campo"><strong>Intensidade do estímulo</strong><span>${labelIntensidade(cfg.intensidadeEstimulo)}</span></div>
-          <div class="campo"><strong>Intensidade da recuperação</strong><span>${labelIntensidade(cfg.intensidadeRecuperacao)}</span></div>
+        <div class="cabecalho">
+          <h2>${treino.nome}</h2>
+          <span class="tag ${ehHoje ? "hoje" : ""}">${ehHoje ? "Hoje · " : ""}${LABEL_TIPO[treino.tipo] || treino.tipo}</span>
         </div>
+        <div class="resumo">${resumo}</div>
       `;
       return a;
-    }
-
-    function extrairConfigBicicleta(cardioId, cardio) {
-      return {
-        id: cardioId,
-        nome: cardio.nome,
-        series: cardio.series,
-        tempoEstimuloSegundos: cardio.tempoEstimulo.segundos,
-        tempoRecuperacaoSegundos: cardio.recuperacao.segundos,
-        intensidadeEstimulo: cardio.intensidadeEstimulo,
-        intensidadeRecuperacao: cardio.intensidadeRecuperacao
-      };
     }
 
     async function carregarTreinos() {
@@ -174,16 +194,10 @@
 
       try {
         const dados = await TreinosStorage.carregarDadosTreinos();
-        const configs = Object.entries(dados.cardios)
-          .filter(([, cardio]) => cardio.exercicio === "Bicicleta")
-          .map(([cardioId, cardio]) => extrairConfigBicicleta(cardioId, cardio));
+        const idTreinoHoje = treinoDeHoje(dados);
 
         listaEl.innerHTML = "";
-        if (!configs.length) {
-          listaEl.innerHTML = '<div class="estado">Nenhum treino de bicicleta cadastrado ainda.</div>';
-          return;
-        }
-        configs.forEach((cfg) => listaEl.appendChild(cartaoTreino(cfg)));
+        dados.treinos.forEach((treino) => listaEl.appendChild(cartaoTreino(treino, idTreinoHoje)));
       } catch (erro) {
         listaEl.innerHTML =
           '<div class="estado">Nenhum dado de treino carregado ainda neste navegador. <a href="importar_dados.html">Carregue o arquivo dados_treinos.json</a> pra começar.</div>';

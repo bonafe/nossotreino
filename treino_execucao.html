@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Execução do Treino</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #ffffff;
+      background:
+        radial-gradient(circle at top, rgba(56, 189, 248, 0.24), transparent 34%),
+        linear-gradient(160deg, #020617, #0f172a 50%, #111827);
+      display: flex;
+      justify-content: center;
+      padding: max(18px, env(safe-area-inset-top)) 18px max(40px, env(safe-area-inset-bottom));
+    }
+
+    main {
+      width: min(560px, 100%);
+      padding-top: 8px;
+    }
+
+    .top {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+
+    .voltar-icon {
+      flex-shrink: 0;
+      text-decoration: none;
+      color: #cbd5e1;
+      background: rgba(148, 163, 184, 0.14);
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      border-radius: 14px;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: clamp(1.3rem, 6vw, 1.8rem);
+      letter-spacing: -0.03em;
+      font-weight: 1000;
+    }
+
+    .tag {
+      display: inline-block;
+      background: rgba(148, 163, 184, 0.16);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      color: #cbd5e1;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stepper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 4px 0 12px;
+    }
+
+    .stepper-btn {
+      appearance: none;
+      flex-shrink: 0;
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: rgba(148, 163, 184, 0.14);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      color: #e2e8f0;
+      font-size: 1.3rem;
+      line-height: 1;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .stepper-btn:active {
+      transform: translateY(1px) scale(0.95);
+    }
+
+    .stepper-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .hint-sair {
+      margin: 0 0 20px;
+      text-align: center;
+      color: #64748b;
+      font-size: 0.82rem;
+    }
+
+    .estado {
+      text-align: center;
+      color: #94a3b8;
+      padding: 40px 10px;
+    }
+
+    .estado a {
+      color: #bef264;
+    }
+
+    .card-exercicio {
+      background: rgba(15, 23, 42, 0.86);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.30);
+    }
+
+    .card-exercicio h2 {
+      margin: 0 0 8px;
+      font-size: clamp(1.3rem, 6vw, 1.7rem);
+      font-weight: 1000;
+      letter-spacing: -0.02em;
+      color: #bef264;
+    }
+
+    .item-grupos {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .item-grupos span {
+      background: rgba(148, 163, 184, 0.14);
+      border-radius: 999px;
+      padding: 2px 9px;
+      font-size: 0.76rem;
+      color: #cbd5e1;
+    }
+
+    .serie-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      background: rgba(148, 163, 184, 0.1);
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+    }
+
+    .serie-info span:first-child {
+      font-size: 1.15rem;
+      font-weight: 900;
+    }
+
+    .serie-info span:last-child {
+      color: #cbd5e1;
+      font-size: 0.94rem;
+    }
+
+    .item-isometria-nota {
+      margin: -6px 0 16px;
+      font-size: 0.84rem;
+      color: #7dd3fc;
+    }
+
+    .serie-timer {
+      text-align: center;
+      margin: 4px 0 16px;
+    }
+
+    .serie-timer-label {
+      display: block;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #94a3b8;
+      margin-bottom: 2px;
+    }
+
+    .serie-timer-valor {
+      font-size: clamp(2rem, 10vw, 2.6rem);
+      font-weight: 1000;
+      font-variant-numeric: tabular-nums;
+      color: #bef264;
+    }
+
+    .campo-input {
+      margin-bottom: 14px;
+    }
+
+    .campo-input label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+    }
+
+    .campo-input .opcional {
+      font-weight: 500;
+      color: #64748b;
+      text-transform: none;
+    }
+
+    .campo-input input {
+      width: 100%;
+      background: rgba(2, 6, 23, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      border-radius: 14px;
+      padding: 14px 14px;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #ffffff;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .campo-input input:focus {
+      outline: none;
+      border-color: #bef264;
+    }
+
+    button.primary,
+    button.secondary,
+    a.iniciar {
+      appearance: none;
+      display: block;
+      width: 100%;
+      border-radius: 18px;
+      padding: 17px 12px;
+      font-size: 1.05rem;
+      font-weight: 950;
+      cursor: pointer;
+      touch-action: manipulation;
+      text-align: center;
+      text-decoration: none;
+      border: 2px solid transparent;
+    }
+
+    button.primary {
+      background: #bef264;
+      color: #06110a;
+      margin-bottom: 10px;
+    }
+
+    button.secondary {
+      background: rgba(148, 163, 184, 0.12);
+      color: #e2e8f0;
+      border-color: rgba(148, 163, 184, 0.3);
+      margin-bottom: 10px;
+    }
+
+    button.primary:active,
+    button.secondary:active,
+    a.iniciar:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
+    .link {
+      display: block;
+      text-align: center;
+      color: #7dd3fc;
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-decoration: none;
+      margin-top: 4px;
+    }
+
+    #descanso {
+      text-align: center;
+    }
+
+    #descanso h2 {
+      text-align: center;
+    }
+
+    .descanso-tempo {
+      font-size: clamp(3rem, 18vw, 4.4rem);
+      font-weight: 1000;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.04em;
+      margin: 6px 0 8px;
+      color: #e2e8f0;
+      transition: color 0.2s ease;
+    }
+
+    .descanso-tempo.no-alvo {
+      color: #bef264;
+    }
+
+    .descanso-tempo.acima-maximo {
+      color: #fb7185;
+    }
+
+    .descanso-alvo {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      color: #94a3b8;
+      font-size: 0.86rem;
+      margin-bottom: 18px;
+    }
+
+    .descanso-alvo strong {
+      color: #cbd5e1;
+    }
+
+    .descanso-proximo {
+      color: #cbd5e1;
+      font-size: 0.94rem;
+      margin: 0 0 20px;
+    }
+
+    .ajuste-carga {
+      background: rgba(251, 191, 36, 0.14);
+      border: 1px solid rgba(251, 191, 36, 0.4);
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin: -6px 0 20px;
+      color: #fbbf24;
+      font-size: 0.88rem;
+      line-height: 1.4;
+      text-align: left;
+    }
+
+    .ajuste-carga strong {
+      color: #fef3c7;
+    }
+
+    body.flash {
+      animation: flash 0.5s ease-in-out 2;
+    }
+
+    body.flash-forte {
+      animation: flashForte 0.6s ease-in-out 3;
+    }
+
+    @keyframes flash {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.4); }
+    }
+
+    @keyframes flashForte {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.7); }
+    }
+
+    #concluido {
+      background: rgba(15, 23, 42, 0.86);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 24px;
+      padding: 40px 22px;
+    }
+
+    #concluido .emoji {
+      font-size: 3.4rem;
+      margin-bottom: 10px;
+    }
+
+    #concluido h2 {
+      margin: 0 0 8px;
+      font-size: 1.5rem;
+      font-weight: 1000;
+    }
+
+    #concluido p {
+      color: #cbd5e1;
+      margin: 0 0 22px;
+    }
+
+    a.iniciar {
+      background: #bef264;
+      color: #06110a;
+      width: min(320px, 100%);
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="top">
+      <a id="voltarIcon" class="voltar-icon" href="treino_exercicios_menu.html" aria-label="Sair">←</a>
+      <div>
+        <h1 id="titulo">Carregando…</h1>
+      </div>
+    </header>
+
+    <div id="stepper" class="stepper" hidden>
+      <button id="exercicioAnterior" class="stepper-btn" type="button" aria-label="Exercício anterior">‹</button>
+      <span id="progressoTag" class="tag"></span>
+      <button id="exercicioProximo" class="stepper-btn" type="button" aria-label="Próximo exercício">›</button>
+    </div>
+
+    <p class="hint-sair">Seu progresso fica salvo — pode sair e retomar depois.</p>
+
+    <div id="carregando" class="estado">Carregando treino…</div>
+    <div id="erro" class="estado" hidden></div>
+
+    <section id="execucao" class="card-exercicio" hidden>
+      <h2 id="exercicioNome"></h2>
+      <div id="exercicioGrupos" class="item-grupos"></div>
+
+      <div class="serie-info">
+        <span id="serieAtualLabel"></span>
+        <span id="alvoRepeticoes"></span>
+      </div>
+
+      <div id="isometriaNota" class="item-isometria-nota" hidden>
+        Isometria de 20s a 50% da amplitude, nas duas últimas séries.
+      </div>
+
+      <div id="serieTimer" class="serie-timer" hidden>
+        <span class="serie-timer-label">Em andamento</span>
+        <span id="serieTimerValor" class="serie-timer-valor">00:00</span>
+      </div>
+
+      <div class="campo-input">
+        <label for="cargaInput">Carga (kg) <span class="opcional">— opcional</span></label>
+        <input id="cargaInput" type="number" inputmode="decimal" min="0" step="0.5" placeholder="0" />
+      </div>
+
+      <div id="repeticoesCampo" class="campo-input">
+        <label for="repeticoesInput">Repetições realizadas</label>
+        <input id="repeticoesInput" type="number" inputmode="numeric" min="0" step="1" placeholder="0" />
+      </div>
+
+      <button id="comecarSerie" class="primary">▶ Começar série</button>
+      <button id="concluirSerie" class="primary" hidden>Concluir série</button>
+
+      <button id="usarSubstituto" class="secondary" hidden></button>
+
+      <a id="verVideo" class="link" href="#" target="_blank" rel="noopener" hidden>Ver vídeo do exercício →</a>
+    </section>
+
+    <section id="descanso" class="card-exercicio" hidden>
+      <h2>Descanso</h2>
+      <div id="descansoTempo" class="descanso-tempo">00:00</div>
+      <div class="descanso-alvo">
+        <span>Mín. <strong id="descansoMin"></strong></span>
+        <span>Máx. <strong id="descansoMax"></strong></span>
+      </div>
+      <p id="descansoProximo" class="descanso-proximo"></p>
+      <div id="descansoAjusteCarga" class="ajuste-carga" hidden></div>
+      <button id="iniciarSerie" class="primary">Iniciar série</button>
+    </section>
+
+    <section id="concluido" hidden>
+      <div class="emoji">🎉</div>
+      <h2>Treino concluído!</h2>
+      <p id="resumoConclusao"></p>
+      <a class="iniciar" href="treino_exercicios_menu.html">Voltar ao menu</a>
+    </section>
+  </main>
+
+  <script src="storage.js"></script>
+  <script>
+    function formatarRepeticoes(repeticoes) {
+      if (repeticoes.modo === "faixa") return `${repeticoes.min} a ${repeticoes.max} repetições`;
+      if (repeticoes.modo === "tempo") return `${repeticoes.segundos} segundos`;
+      return "Máximo de repetições";
+    }
+
+    function gruposMusculares(grupoMuscular) {
+      return [grupoMuscular.principal, grupoMuscular.sinergista1, grupoMuscular.sinergista2].filter(Boolean);
+    }
+
+    function formatarDuracao(segundos) {
+      const min = Math.floor(segundos / 60);
+      const seg = segundos % 60;
+      if (min === 0) return `${seg}s`;
+      return `${min} min ${seg}s`;
+    }
+
+    function formatarRelogio(segundos) {
+      const m = Math.floor(segundos / 60).toString().padStart(2, "0");
+      const s = Math.floor(segundos % 60).toString().padStart(2, "0");
+      return `${m}:${s}`;
+    }
+
+    function formatarTempoAlvo(segundos) {
+      if (segundos % 60 === 0) return `${segundos / 60} min`;
+      return `${segundos}s`;
+    }
+
+    let audioCtx = null;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function beep({ frequency = 880, duration = 0.16, type = "square", volume = 0.4 } = {}) {
+      const ctx = getAudioContext();
+      const oscillator = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      oscillator.type = type;
+      oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
+
+      gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(volume, ctx.currentTime + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+
+      oscillator.connect(gain);
+      gain.connect(ctx.destination);
+
+      oscillator.start(ctx.currentTime);
+      oscillator.stop(ctx.currentTime + duration + 0.04);
+    }
+
+    function flashTela(classe) {
+      document.body.classList.remove("flash", "flash-forte");
+      void document.body.offsetWidth;
+      document.body.classList.add(classe);
+    }
+
+    function sinalPausaMinima() {
+      // Três bipes iguais: pausa mínima atingida, já dá para começar a próxima série.
+      beep({ frequency: 880, duration: 0.15, volume: 0.4 });
+      setTimeout(() => beep({ frequency: 880, duration: 0.15, volume: 0.4 }), 220);
+      setTimeout(() => beep({ frequency: 880, duration: 0.15, volume: 0.4 }), 440);
+      if ("vibrate" in navigator) navigator.vibrate([120, 80, 120, 80, 120]);
+      flashTela("flash");
+    }
+
+    function sinalPausaMaxima() {
+      // Mesmo som da pausa mínima, mais forte: já passou do tempo máximo de descanso.
+      beep({ frequency: 880, duration: 0.26, volume: 0.65 });
+      setTimeout(() => beep({ frequency: 880, duration: 0.26, volume: 0.65 }), 220);
+      setTimeout(() => beep({ frequency: 880, duration: 0.26, volume: 0.65 }), 440);
+      if ("vibrate" in navigator) navigator.vibrate([220, 100, 220, 100, 220]);
+      flashTela("flash-forte");
+    }
+
+    function construirSlots(treino) {
+      const slots = [];
+      treino.blocos.forEach((bloco) => {
+        bloco.itens.forEach((item) => {
+          if (item.substituto && slots.length) {
+            slots[slots.length - 1].opcoes.push(item);
+          } else {
+            slots.push({ opcoes: [item] });
+          }
+        });
+      });
+      return slots;
+    }
+
+    let treino = null;
+    let exercicios = null;
+    let slots = null;
+    let progresso = null;
+    let guia = null;
+    let ajusteCargaAtual = null;
+
+    let descansoIntervalId = null;
+    let descansoSegundos = 0;
+    let descansoSinalMinimoTocado = false;
+    let descansoSinalMaximoTocado = false;
+
+    let serieIntervalId = null;
+    let serieSegundosAcumulados = 0;
+    let serieUltimoInicio = null;
+    let serieRodando = false;
+    let serieJaIniciada = false;
+
+    function pausaAlvo() {
+      return (guia && guia.pausaSegundos) || { min: 60, max: 120 };
+    }
+
+    function ultimoRegistroDoExercicio(exercicioId) {
+      const historico = TreinosStorage.lerJSON(TreinosStorage.chaves.historicoSerieMusculacao, []);
+      return historico
+        .filter((e) => e.exercicioId === exercicioId)
+        .reduce((mais, atual) => (!mais || new Date(atual.dataHora) > new Date(mais.dataHora) ? atual : mais), null);
+    }
+
+    function chaveExecucao() {
+      return TreinosStorage.chaves.execucaoMusculacao(treino.id);
+    }
+
+    function salvarProgresso() {
+      TreinosStorage.salvarJSON(chaveExecucao(), progresso);
+    }
+
+    function carregarOuIniciarProgresso() {
+      const salvo = TreinosStorage.lerJSON(chaveExecucao(), null);
+      const valido = salvo &&
+        salvo.slotIndex >= 0 && salvo.slotIndex < slots.length &&
+        salvo.opcaoIndex >= 0 && salvo.opcaoIndex < slots[salvo.slotIndex].opcoes.length &&
+        salvo.serieAtual >= 1;
+
+      if (valido) {
+        progresso = salvo;
+      } else {
+        progresso = { slotIndex: 0, opcaoIndex: 0, serieAtual: 1, iniciadoEm: new Date().toISOString() };
+        salvarProgresso();
+      }
+    }
+
+    function itemAtual() {
+      return slots[progresso.slotIndex].opcoes[progresso.opcaoIndex];
+    }
+
+    function serieSegundosAtuais() {
+      const emAndamento = serieRodando ? Math.round((Date.now() - serieUltimoInicio) / 1000) : 0;
+      return serieSegundosAcumulados + emAndamento;
+    }
+
+    function pararSerieInterval() {
+      if (serieIntervalId) {
+        clearInterval(serieIntervalId);
+        serieIntervalId = null;
+      }
+    }
+
+    function atualizarBotaoSerie() {
+      const btn = document.getElementById("comecarSerie");
+      if (serieRodando) {
+        btn.textContent = "⏸ Pausar";
+      } else if (serieJaIniciada) {
+        btn.textContent = "▶ Continuar";
+      } else {
+        btn.textContent = "▶ Começar série";
+      }
+    }
+
+    function atualizarSerieTimerTela() {
+      document.getElementById("serieTimerValor").textContent = formatarRelogio(serieSegundosAtuais());
+    }
+
+    function alternarSerie() {
+      if (serieRodando) {
+        serieSegundosAcumulados = serieSegundosAtuais();
+        serieRodando = false;
+        pararSerieInterval();
+      } else {
+        getAudioContext();
+        serieJaIniciada = true;
+        serieRodando = true;
+        serieUltimoInicio = Date.now();
+        document.getElementById("serieTimer").hidden = false;
+        document.getElementById("concluirSerie").hidden = false;
+        pararSerieInterval();
+        serieIntervalId = setInterval(atualizarSerieTimerTela, 1000);
+      }
+      atualizarSerieTimerTela();
+      atualizarBotaoSerie();
+    }
+
+    function renderExercicioAtual() {
+      const item = itemAtual();
+      const exercicio = exercicios[item.exercicioId];
+
+      document.getElementById("exercicioNome").textContent = exercicio ? exercicio.nome : item.exercicioId;
+
+      const grupos = gruposMusculares(item.grupoMuscular);
+      document.getElementById("exercicioGrupos").innerHTML = grupos.map((g) => `<span>${g}</span>`).join("");
+
+      document.getElementById("serieAtualLabel").textContent = `Série ${progresso.serieAtual} de ${item.series}`;
+      document.getElementById("alvoRepeticoes").textContent = formatarRepeticoes(item.repeticoes);
+      document.getElementById("isometriaNota").hidden = item.tecnica !== "isometria";
+
+      document.getElementById("repeticoesCampo").hidden = item.repeticoes.modo === "tempo";
+
+      const ultimoRegistro = ultimoRegistroDoExercicio(item.exercicioId);
+      document.getElementById("cargaInput").value =
+        ultimoRegistro && ultimoRegistro.cargaKg !== null ? ultimoRegistro.cargaKg : "";
+      document.getElementById("repeticoesInput").value =
+        ultimoRegistro && ultimoRegistro.repeticoes !== null ? ultimoRegistro.repeticoes : "";
+
+      const videoEl = document.getElementById("verVideo");
+      if (exercicio && exercicio.videoUrl) {
+        videoEl.hidden = false;
+        videoEl.href = exercicio.videoUrl;
+      } else {
+        videoEl.hidden = true;
+      }
+
+      const slot = slots[progresso.slotIndex];
+      const substitutoBtn = document.getElementById("usarSubstituto");
+      if (slot.opcoes.length > 1) {
+        const proximo = slot.opcoes[(progresso.opcaoIndex + 1) % slot.opcoes.length];
+        const proximoExercicio = exercicios[proximo.exercicioId];
+        substitutoBtn.hidden = false;
+        substitutoBtn.textContent = `Usar substituto: ${proximoExercicio ? proximoExercicio.nome : proximo.exercicioId}`;
+      } else {
+        substitutoBtn.hidden = true;
+      }
+
+      document.getElementById("stepper").hidden = false;
+      document.getElementById("progressoTag").textContent = `Exercício ${progresso.slotIndex + 1} de ${slots.length}`;
+      document.getElementById("exercicioAnterior").disabled = progresso.slotIndex === 0;
+      document.getElementById("exercicioProximo").disabled = progresso.slotIndex === slots.length - 1;
+
+      pararSerieInterval();
+      serieSegundosAcumulados = 0;
+      serieUltimoInicio = null;
+      serieRodando = false;
+      serieJaIniciada = false;
+      document.getElementById("serieTimer").hidden = true;
+      document.getElementById("serieTimerValor").textContent = "00:00";
+      document.getElementById("concluirSerie").hidden = true;
+      atualizarBotaoSerie();
+    }
+
+    function irParaExercicio(novoSlotIndex) {
+      if (novoSlotIndex < 0 || novoSlotIndex >= slots.length) return;
+      progresso.slotIndex = novoSlotIndex;
+      progresso.opcaoIndex = 0;
+      progresso.serieAtual = 1;
+      salvarProgresso();
+      renderExercicioAtual();
+    }
+
+    function renderDescanso() {
+      const pausa = pausaAlvo();
+
+      const tempoEl = document.getElementById("descansoTempo");
+      tempoEl.textContent = formatarRelogio(descansoSegundos);
+      tempoEl.classList.toggle("no-alvo", descansoSegundos >= pausa.min && descansoSegundos < pausa.max);
+      tempoEl.classList.toggle("acima-maximo", descansoSegundos >= pausa.max);
+
+      document.getElementById("descansoMin").textContent = formatarTempoAlvo(pausa.min);
+      document.getElementById("descansoMax").textContent = formatarTempoAlvo(pausa.max);
+
+      const item = itemAtual();
+      const exercicio = exercicios[item.exercicioId];
+      document.getElementById("descansoProximo").textContent =
+        `Próximo: ${exercicio ? exercicio.nome : item.exercicioId} — série ${progresso.serieAtual} de ${item.series}`;
+
+      const ajusteEl = document.getElementById("descansoAjusteCarga");
+      if (ajusteCargaAtual) {
+        const emoji = ajusteCargaAtual.direcao === "aumentar" ? "💪" : "⚠️";
+        ajusteEl.hidden = false;
+        ajusteEl.innerHTML =
+          `${emoji} <strong>${ajusteCargaAtual.exercicioNome}</strong>: ${ajusteCargaAtual.repeticoes} repetições ` +
+          `(alvo ${ajusteCargaAtual.min}–${ajusteCargaAtual.max}) — considere ${ajusteCargaAtual.direcao} a carga na próxima série desse exercício.`;
+      } else {
+        ajusteEl.hidden = true;
+      }
+    }
+
+    function tickDescanso() {
+      descansoSegundos += 1;
+      const pausa = pausaAlvo();
+
+      if (!descansoSinalMinimoTocado && descansoSegundos >= pausa.min) {
+        descansoSinalMinimoTocado = true;
+        sinalPausaMinima();
+      }
+      if (!descansoSinalMaximoTocado && descansoSegundos >= pausa.max) {
+        descansoSinalMaximoTocado = true;
+        sinalPausaMaxima();
+      }
+
+      renderDescanso();
+    }
+
+    function iniciarDescanso() {
+      getAudioContext();
+
+      descansoSegundos = 0;
+      descansoSinalMinimoTocado = false;
+      descansoSinalMaximoTocado = false;
+
+      document.getElementById("execucao").hidden = true;
+      document.getElementById("descanso").hidden = false;
+
+      renderDescanso();
+      descansoIntervalId = setInterval(tickDescanso, 1000);
+    }
+
+    function finalizarDescanso() {
+      if (descansoIntervalId) {
+        clearInterval(descansoIntervalId);
+        descansoIntervalId = null;
+      }
+
+      document.getElementById("descanso").hidden = true;
+      document.getElementById("execucao").hidden = false;
+      renderExercicioAtual();
+    }
+
+    function concluirSerie() {
+      const item = itemAtual();
+      const exercicio = exercicios[item.exercicioId];
+
+      const cargaRaw = document.getElementById("cargaInput").value;
+      const repeticoesRaw = document.getElementById("repeticoesInput").value;
+
+      const cargaKg = cargaRaw === "" ? null : Number(cargaRaw);
+      const repeticoes = (item.repeticoes.modo === "tempo" || repeticoesRaw === "") ? null : Number(repeticoesRaw);
+
+      const duracaoSegundos = serieJaIniciada ? serieSegundosAtuais() : null;
+      pararSerieInterval();
+
+      ajusteCargaAtual = null;
+      if (item.repeticoes.modo === "faixa" && repeticoes !== null) {
+        if (repeticoes > item.repeticoes.max) {
+          ajusteCargaAtual = { direcao: "aumentar", exercicioNome: exercicio ? exercicio.nome : item.exercicioId, repeticoes, min: item.repeticoes.min, max: item.repeticoes.max };
+        } else if (repeticoes < item.repeticoes.min) {
+          ajusteCargaAtual = { direcao: "diminuir", exercicioNome: exercicio ? exercicio.nome : item.exercicioId, repeticoes, min: item.repeticoes.min, max: item.repeticoes.max };
+        }
+      }
+
+      TreinosStorage.adicionarAoHistorico(TreinosStorage.chaves.historicoSerieMusculacao, {
+        treinoId: treino.id,
+        treinoNome: treino.nome,
+        exercicioId: item.exercicioId,
+        exercicioNome: exercicio ? exercicio.nome : item.exercicioId,
+        serie: progresso.serieAtual,
+        cargaKg,
+        repeticoes,
+        duracaoSegundos,
+        dataHora: new Date().toISOString()
+      });
+
+      if (progresso.serieAtual < item.series) {
+        progresso.serieAtual += 1;
+        salvarProgresso();
+        iniciarDescanso();
+        return;
+      }
+
+      if (progresso.slotIndex < slots.length - 1) {
+        progresso.slotIndex += 1;
+        progresso.opcaoIndex = 0;
+        progresso.serieAtual = 1;
+        salvarProgresso();
+        iniciarDescanso();
+        return;
+      }
+
+      concluirTreino();
+    }
+
+    function usarSubstituto() {
+      const slot = slots[progresso.slotIndex];
+      progresso.opcaoIndex = (progresso.opcaoIndex + 1) % slot.opcoes.length;
+      progresso.serieAtual = 1;
+      salvarProgresso();
+      renderExercicioAtual();
+    }
+
+    function concluirTreino() {
+      const concluidoEm = new Date();
+      const duracaoSegundos = Math.round((concluidoEm - new Date(progresso.iniciadoEm)) / 1000);
+
+      TreinosStorage.adicionarAoHistorico(TreinosStorage.chaves.historicoSessaoMusculacao, {
+        treinoId: treino.id,
+        treinoNome: treino.nome,
+        iniciadoEm: progresso.iniciadoEm,
+        concluidoEm: concluidoEm.toISOString(),
+        duracaoSegundos,
+        totalSlots: slots.length
+      });
+
+      TreinosStorage.removerChave(chaveExecucao());
+
+      document.getElementById("execucao").hidden = true;
+      document.getElementById("concluido").hidden = false;
+      document.getElementById("resumoConclusao").textContent =
+        `${treino.nome} — ${slots.length} exercícios em ${formatarDuracao(duracaoSegundos)}.`;
+    }
+
+    function mostrarErro(mensagem) {
+      document.getElementById("carregando").hidden = true;
+      const erroEl = document.getElementById("erro");
+      erroEl.hidden = false;
+      erroEl.innerHTML = `${mensagem} Volte ao <a href="treino_exercicios_menu.html">menu de treinos</a>.`;
+      document.getElementById("titulo").textContent = "Execução do Treino";
+    }
+
+    function aplicarSaltoParaExercicio(params) {
+      if (!params.has("exercicio")) return;
+
+      const slotAlvo = Number(params.get("exercicio"));
+      if (!Number.isInteger(slotAlvo) || slotAlvo < 0 || slotAlvo >= slots.length) return;
+
+      const opcaoAlvo = Number(params.get("opcao"));
+      const opcaoValida = Number.isInteger(opcaoAlvo) && opcaoAlvo >= 0 && opcaoAlvo < slots[slotAlvo].opcoes.length
+        ? opcaoAlvo
+        : 0;
+
+      progresso.slotIndex = slotAlvo;
+      progresso.opcaoIndex = opcaoValida;
+      progresso.serieAtual = 1;
+      salvarProgresso();
+
+      const url = `treino_execucao.html?treino=${encodeURIComponent(treino.id)}`;
+      window.history.replaceState({}, "", url);
+    }
+
+    async function iniciar() {
+      const params = new URLSearchParams(window.location.search);
+      const treinoId = params.get("treino");
+
+      if (!treinoId) {
+        mostrarErro("Nenhum treino selecionado.");
+        return;
+      }
+
+      document.getElementById("voltarIcon").href = `treino_exercicios.html?treino=${encodeURIComponent(treinoId)}`;
+
+      let dados;
+      try {
+        dados = await TreinosStorage.carregarDadosTreinos();
+      } catch (erro) {
+        mostrarErro('Nenhum dado de treino carregado ainda neste navegador. <a href="importar_dados.html">Carregue o arquivo dados_treinos.json</a> pra começar.');
+        return;
+      }
+
+      treino = dados.treinos.find((t) => t.id === treinoId);
+      if (!treino) {
+        mostrarErro("Este treino não foi encontrado.");
+        return;
+      }
+
+      exercicios = dados.exercicios;
+      guia = dados.guia;
+      slots = construirSlots(treino);
+
+      if (!slots.length) {
+        mostrarErro("Este treino ainda não tem exercícios cadastrados.");
+        return;
+      }
+
+      carregarOuIniciarProgresso();
+      aplicarSaltoParaExercicio(params);
+
+      document.title = `${treino.nome} — Execução`;
+      document.getElementById("titulo").textContent = treino.nome;
+      document.getElementById("carregando").hidden = true;
+      document.getElementById("execucao").hidden = false;
+
+      renderExercicioAtual();
+    }
+
+    document.getElementById("comecarSerie").addEventListener("click", alternarSerie);
+    document.getElementById("concluirSerie").addEventListener("click", concluirSerie);
+    document.getElementById("usarSubstituto").addEventListener("click", usarSubstituto);
+    document.getElementById("iniciarSerie").addEventListener("click", finalizarDescanso);
+    document.getElementById("exercicioAnterior").addEventListener("click", () => irParaExercicio(progresso.slotIndex - 1));
+    document.getElementById("exercicioProximo").addEventListener("click", () => irParaExercicio(progresso.slotIndex + 1));
+
+    iniciar();
+  </script>
+</body>
+</html>

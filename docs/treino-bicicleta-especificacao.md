@@ -8,6 +8,10 @@ especificação define como transformar o treino em um "motor" genérico, que
 recebe os parâmetros de fora (arquivo JSON), e como criar um menu que lista os
 treinos disponíveis para o usuário escolher antes de começar.
 
+Os parâmetros de cada treino de bicicleta vêm do dicionário `cardios` em
+`dados/dados_treinos.json` — não existe (nem nunca mais existirá) um
+arquivo `.json` próprio por treino de bicicleta (ver seção 4).
+
 ## 2. Parâmetros configuráveis
 
 Cada treino de bicicleta passa a ser descrito por 5 parâmetros:
@@ -44,81 +48,169 @@ O subtítulo da tela mostra qual fase é essa (`Recuperação` / `Estímulo`),
 enquanto a palavra grande mostra a intensidade (`LEVE` / `MÁXIMA`), já que é
 isso que dita o ritmo que a pessoa deve pedalar.
 
-## 4. Arquivo de treino (JSON)
+## 4. Fonte dos treinos: `cardios` em `dados/dados_treinos.json`
 
-Cada treino é um arquivo `.json` dentro da pasta `treinos-bicicleta/`, versionado
-no repositório (não é dado pessoal, então não entra no `.gitignore`).
-
-Esquema:
+Não existe um arquivo `.json` dedicado por treino de bicicleta. Cada treino
+de bicicleta é uma entrada do dicionário `cardios`, no mesmo
+`dados/dados_treinos.json` usado pelas páginas de exercícios (ver seção 3.6
+de
+[treino-exercicios-especificacao.md](./treino-exercicios-especificacao.md)
+para o esquema completo).
 
 ```json
-{
-  "id": "treino-1",
-  "nome": "Treino 1",
-  "series": 10,
-  "tempoEstimuloSegundos": 60,
-  "tempoRecuperacaoSegundos": 30,
-  "intensidadeEstimulo": "maxima",
-  "intensidadeRecuperacao": "leve"
+"cardios": {
+  "cardio-a": {
+    "nome": "Cardio A",
+    "exercicio": "Bicicleta",
+    "series": 15,
+    "tempoEstimulo": { "segundos": 30 },
+    "recuperacao": { "segundos": 30 },
+    "intensidadeEstimulo": "maxima",
+    "intensidadeRecuperacao": "leve"
+  }
 }
 ```
 
-### 4.1 Treinos definidos
+Isso quer dizer:
 
-| Arquivo                        | Séries | Tempo de Estímulo | Recuperação | Intensidade Estímulo | Intensidade Recuperação |
-|---------------------------------|--------|--------------------|-------------|------------------------|----------------------------|
-| `treinos-bicicleta/treino-1.json` | 10     | 60s                | 30s         | Máxima                 | Leve                       |
-| `treinos-bicicleta/treino-2.json` | 3      | 3min (180s)         | 2min (120s) | Máxima                 | Leve                       |
-| `treinos-bicicleta/treino-3.json` | 3      | 4min (240s)         | 60s         | Máxima                 | Leve                       |
+- `cardios` é um dicionário de referência, no mesmo padrão de `exercicios`
+  (seção 3.5 de
+  [treino-exercicios-especificacao.md](./treino-exercicios-especificacao.md)):
+  cada entrada tem `id` próprio (a chave, ex. `cardio-a`) e `nome` próprios,
+  **independentes** de qualquer treino de musculação.
+- Um treino de musculação pode referenciar um cardio via `treinoMusculacao.cardioId`
+  (seção 3.7.3 do mesmo documento) — mas essa referência é opcional e só
+  serve pra linkar "Fazer bicicleta →" a partir da tela do treino completo
+  (`treino_exercicios.html`). O menu de bicicleta (seção 5.1) **não**
+  depende dela: lê `cardios` direto.
+- `exercicio` (hoje sempre `"Bicicleta"`) é o campo usado pra filtrar quais
+  entradas de `cardios` aparecem no menu de bicicleta — deixa aberto pra um
+  dia ter outro tipo de cardio no mesmo dicionário sem aparecer aqui.
+- O JSON vem de `TreinosStorage.carregarDadosTreinos()`, que lê do
+  `localStorage` (sem `fetch` — ver
+  [armazenamento-local-especificacao.md](./armazenamento-local-especificacao.md)),
+  a mesma função usada pelas páginas de exercícios. Os dados só existem
+  ali depois que o aluno os carrega manualmente em
+  [importar_dados.html](../importar_dados.html).
 
-### 4.2 Índice de treinos
+### 4.1 Conversão `cardios[cardioId]` → parâmetros do motor
 
-Um arquivo `treinos-bicicleta/indice.json` lista os treinos disponíveis, para
-que o menu não precise ser editado manualmente a cada novo treino adicionado:
+O esquema de uma entrada de `cardios` (aninhado, com `tempoEstimulo.segundos`
+e `recuperacao.segundos`) é diferente da forma "achatada" que o motor espera
+(seção 2). A conversão é feita por uma função `extrairConfigBicicleta`,
+duplicada em `treino_bicicleta.html` e `treino_bicicleta_menu.html`:
 
-```json
-[
-  { "id": "treino-1", "arquivo": "treino-1.json" },
-  { "id": "treino-2", "arquivo": "treino-2.json" },
-  { "id": "treino-3", "arquivo": "treino-3.json" }
-]
+```js
+function extrairConfigBicicleta(cardioId, cardio) {
+  return {
+    id: cardioId,
+    nome: cardio.nome,
+    series: cardio.series,
+    tempoEstimuloSegundos: cardio.tempoEstimulo.segundos,
+    tempoRecuperacaoSegundos: cardio.recuperacao.segundos,
+    intensidadeEstimulo: cardio.intensidadeEstimulo,
+    intensidadeRecuperacao: cardio.intensidadeRecuperacao
+  };
+}
 ```
 
-Adicionar um treino novo = criar o `.json` do treino + acrescentar uma linha
-nesse índice. Nenhum código HTML/JS precisa mudar.
+### 4.2 Treinos hoje cadastrados
+
+| `cardioId` | Nome | Séries | Tempo de Estímulo | Recuperação | Intensidade Estímulo | Intensidade Recuperação |
+|---|---|---|---|---|---|---|
+| `cardio-a` | Cardio A | 15 | 30s | 30s | Máxima | Leve |
+| `cardio-b` | Cardio B | 3 | 3min (180s) | 2min (120s) | Máxima | Leve |
+| `cardio-c` | Cardio C | 3 | 4min (240s) | 60s | Máxima | Leve |
+
+Hoje `cardio-a`/`cardio-b`/`cardio-c` são referenciados por
+`treino-a`/`treino-b`/`treino-c` (via `cardioId`), mas isso é incidental —
+adicionar um treino de bicicleta novo = adicionar uma entrada em `cardios`
+em `dados/dados_treinos.json`, com ou sem algum treino de musculação
+apontando pra ela. Nenhum código HTML/JS precisa mudar — o menu (seção 5.1)
+lê a lista direto do JSON.
 
 ## 5. Telas / fluxo
 
 ```
 index.html
-   └─> treino_bicicleta_menu.html   (lista os treinos do indice.json)
-          └─> treino_bicicleta.html?treino=treino-1   (motor genérico)
+   └─> treino_bicicleta_menu.html   (lista dados.cardios com exercicio === "Bicicleta")
+          └─> treino_bicicleta.html?cardio=cardio-a   (motor genérico)
 ```
+
+Esse fluxo é independente do fluxo de exercícios
+(`treino_exercicios_menu.html` → `treino_exercicios.html` →
+`treino_execucao.html`) — dá para entrar direto no cronômetro de bicicleta
+sem passar pelo treino de musculação. O card "Cardio complementar" de
+`treino_exercicios.html` também linka pra cá
+(`treino_bicicleta.html?cardio=<cardioId>`), pra quem já está vendo o
+treino completo.
 
 ### 5.1 Menu (`treino_bicicleta_menu.html`)
 
-- Lê `treinos-bicicleta/indice.json`.
-- Para cada entrada, busca o respectivo `.json` e mostra um cartão com:
-  Nome do treino, Séries, Tempo de Estímulo, Recuperação, Intensidade do
+- Busca `dados/dados_treinos.json` via `TreinosStorage.carregarDadosTreinos()`.
+- Filtra as entradas de `dados.cardios` com `exercicio === "Bicicleta"`,
+  converte cada uma com `extrairConfigBicicleta` (seção 4.1) e mostra um
+  cartão com: Nome, Séries, Tempo de Estímulo, Recuperação, Intensidade do
   Estímulo, Intensidade de Recuperação.
-- Cada cartão é um link para `treino_bicicleta.html?treino=<id>`.
+- Cada cartão é um link para `treino_bicicleta.html?cardio=<cardioId>`.
+- Se não houver nenhuma entrada de bicicleta em `cardios`, mostra uma
+  mensagem ("Nenhum treino de bicicleta cadastrado ainda") em vez de lista
+  vazia.
 
 ### 5.2 Motor genérico (`treino_bicicleta.html`)
 
 - Antigo `treino_bicicleta_15_minutos_azul_vermelho.html`, renomeado.
-- Lê o parâmetro de query `?treino=<id>`.
-- Busca `treinos-bicicleta/<id>.json` (via `fetch`) e usa os 5 campos para
-  calcular fases, tempos e o mapeamento de intensidade descrito na seção 3.
-- Se não houver `treino` na URL ou o `fetch` falhar, mostra uma mensagem de
-  erro com link de volta para o menu (não assume mais um treino fixo).
+- Lê o parâmetro de query `?cardio=<cardioId>`.
+- Busca `dados/dados_treinos.json`, localiza `dados.cardios[cardioId]` e
+  converte com `extrairConfigBicicleta` (seção 4.1) para calcular fases,
+  tempos e o mapeamento de intensidade descrito na seção 3.
+- Se não houver `cardio` na URL, o `cardioId` não existir em `dados.cardios`,
+  ou o carregamento falhar, mostra uma mensagem de erro com link de volta
+  para o menu.
 
-## 6. Observação sobre hospedagem
+## 6. Histórico local (localStorage)
 
-O motor passa a depender de `fetch()` para carregar o JSON do treino. Isso
-exige que os arquivos sejam servidos por HTTP (GitHub Pages, `python3
-serve.py`, etc.). Abrir o `.html` diretamente do disco (`file://`) bloqueia
-o `fetch` de arquivos locais no Chrome/Edge por causa de CORS — deixar essa
-limitação documentada no rodapé do menu.
+Ver [armazenamento-local-especificacao.md](./armazenamento-local-especificacao.md)
+para a convenção geral de chaves e o script compartilhado `storage.js`.
+
+Diferente da musculação (seção 8 de
+[treino-exercicios-especificacao.md](./treino-exercicios-especificacao.md)),
+aqui não importa o progresso ciclo a ciclo — só o treino completo. O
+motor genérico grava um único tipo de registro, usando
+`TreinosStorage.adicionarAoHistorico`:
+
+### 6.1 Treino concluído — `historico.sessaoBicicleta.v1`
+
+Quando a última série termina (`elapsed` chega em `TOTAL_SECONDS`), é
+adicionado um resumo do treino inteiro:
+
+```json
+{
+  "cardioId": "cardio-a",
+  "cardioNome": "Cardio A",
+  "dataHora": "2026-07-15T18:47:10.482Z",
+  "duracaoSegundos": 900,
+  "series": 15
+}
+```
+
+`duracaoSegundos` é a duração planejada do treino
+(`series * (tempoEstimuloSegundos + tempoRecuperacaoSegundos)`), não o
+tempo de relógio real — pausas feitas com o botão "PAUSAR" não entram na
+conta, já que o cronômetro só avança enquanto `running` é verdadeiro.
+
+Nada é salvo se o treino for pausado/abandonado antes da última série —
+isso é uma limitação aceita por ora (ver seção 7 de
+[armazenamento-local-especificacao.md](./armazenamento-local-especificacao.md#7-fora-de-escopo)).
+
+## 7. Observação sobre hospedagem
+
+Como o motor não usa mais `fetch()` para os dados do treino (seção 4 —
+tudo vem do `localStorage`, carregado manualmente em
+[importar_dados.html](../importar_dados.html)), o site não depende mais
+de ser servido por HTTP por causa de CORS. Ainda é conveniente usar um
+servidor local (`serve.py`) durante o desenvolvimento, mas por outros
+motivos de praticidade, não por uma limitação técnica do `fetch`.
 
 Para testar localmente, use o script `serve.py` (stdlib, sem dependências):
 
@@ -127,8 +219,11 @@ python3 serve.py        # sobe em http://localhost:8000
 python3 serve.py 8934   # porta customizada
 ```
 
-## 7. Fora de escopo
+## 8. Fora de escopo
 
 - Intensidades além de `leve`/`maxima` (ex.: "moderada") — não usadas em
   nenhum dos 3 treinos definidos, não implementadas agora.
-- Edição dos treinos pela interface (os `.json` são editados manualmente).
+- Edição dos treinos pela interface (`dados/dados_treinos.json` continua
+  editado manualmente).
+- Salvar progresso de um treino pausado/abandonado antes da última série
+  (ver seção 6).

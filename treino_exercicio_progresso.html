@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Progresso do Exercício</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #ffffff;
+      background:
+        radial-gradient(circle at top, rgba(56, 189, 248, 0.24), transparent 34%),
+        linear-gradient(160deg, #020617, #0f172a 50%, #111827);
+      display: flex;
+      justify-content: center;
+      padding: max(18px, env(safe-area-inset-top)) 18px max(40px, env(safe-area-inset-bottom));
+    }
+
+    main {
+      width: min(760px, 100%);
+      padding-top: 8px;
+    }
+
+    .top {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .voltar-icon {
+      flex-shrink: 0;
+      text-decoration: none;
+      color: #cbd5e1;
+      background: rgba(148, 163, 184, 0.14);
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      border-radius: 14px;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: clamp(1.3rem, 6vw, 1.8rem);
+      letter-spacing: -0.03em;
+      font-weight: 1000;
+    }
+
+    .tag {
+      display: inline-block;
+      background: rgba(148, 163, 184, 0.16);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      color: #cbd5e1;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .estado {
+      text-align: center;
+      color: #94a3b8;
+      padding: 40px 10px;
+    }
+
+    .estado a {
+      color: #bef264;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin: 4px 0 18px;
+    }
+
+    .tab-btn {
+      appearance: none;
+      flex: 1;
+      background: rgba(148, 163, 184, 0.12);
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      color: #cbd5e1;
+      border-radius: 14px;
+      padding: 11px 10px;
+      font-size: 0.92rem;
+      font-weight: 850;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: #bef264;
+      border-color: #bef264;
+      color: #06110a;
+    }
+
+    .painel {
+      background: rgba(15, 23, 42, 0.86);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 20px;
+      padding: 18px;
+    }
+
+    .legenda {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 10px;
+      font-size: 0.84rem;
+      color: #cbd5e1;
+    }
+
+    .dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+
+    .dot.peso { background: #bef264; }
+    .dot.reps { background: #38bdf8; }
+
+    #grafico {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .hint-cor {
+      margin: 12px 0 0;
+      color: #64748b;
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    .tabela-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      padding: 9px 10px;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      color: #94a3b8;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+    }
+
+    tr.grupo-cabecalho td {
+      padding-top: 16px;
+      color: #e2e8f0;
+      font-size: 0.86rem;
+    }
+
+    tr.grupo-cabecalho strong {
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="top">
+      <a id="voltarLink" class="voltar-icon" href="treino_exercicios_menu.html" aria-label="Voltar">←</a>
+      <div>
+        <h1 id="titulo">Carregando…</h1>
+        <span id="totalTag" class="tag" hidden></span>
+      </div>
+    </header>
+
+    <div id="carregando" class="estado">Carregando histórico…</div>
+    <div id="vazio" class="estado" hidden>
+      Nenhuma série registrada ainda para este exercício. Registre séries pela execução guiada do treino.
+    </div>
+    <div id="erro" class="estado" hidden></div>
+
+    <div class="tabs" hidden>
+      <button type="button" class="tab-btn active" data-tab="grafico">Gráfico</button>
+      <button type="button" class="tab-btn" data-tab="tabela">Tabela</button>
+    </div>
+
+    <section id="painelGrafico" class="painel" hidden>
+      <div class="legenda">
+        <span><i class="dot peso"></i>Carga média do dia (kg) — eixo esquerdo</span>
+        <span><i class="dot reps"></i>Repetições médias do dia — eixo direito</span>
+      </div>
+      <svg id="grafico" viewBox="0 0 800 360" preserveAspectRatio="xMidYMid meet"></svg>
+      <p class="hint-cor">Cada ponto é a média do dia — várias séries no mesmo dia viram um único ponto na linha.</p>
+    </section>
+
+    <section id="painelTabela" class="painel" hidden>
+      <div class="tabela-wrap">
+        <table>
+          <thead>
+            <tr><th>Série</th><th>Carga (kg)</th><th>Repetições</th><th>Hora</th></tr>
+          </thead>
+          <tbody id="tabelaCorpo"></tbody>
+        </table>
+      </div>
+      <p class="hint-cor">As cores alternam a cada treino realizado (o mesmo treino em outro dia conta como novo).</p>
+    </section>
+  </main>
+
+  <script src="d3.v7.min.js"></script>
+  <script src="storage.js"></script>
+  <script>
+    const CORES_GRUPO = [
+      { peso: "rgba(190, 242, 100, 0.95)", reps: "rgba(56, 189, 248, 0.95)", borda: "#bef264", fundo: "rgba(190, 242, 100, 0.08)" },
+      { peso: "rgba(190, 242, 100, 0.45)", reps: "rgba(56, 189, 248, 0.45)", borda: "#38bdf8", fundo: "rgba(56, 189, 248, 0.08)" }
+    ];
+
+    function chaveDataLocal(iso) {
+      const d = new Date(iso);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+
+    function formatarDataExtenso(iso) {
+      const d = new Date(iso);
+      return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+    }
+
+    function formatarHora(iso) {
+      const d = new Date(iso);
+      return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+    }
+
+    function agruparPorSessao(entradas) {
+      const ordenadas = [...entradas].sort((a, b) => new Date(a.dataHora) - new Date(b.dataHora));
+      const grupos = [];
+      let chaveAnterior = null;
+
+      ordenadas.forEach((entrada) => {
+        const chave = `${entrada.treinoId}__${chaveDataLocal(entrada.dataHora)}`;
+        if (chave !== chaveAnterior) {
+          grupos.push({
+            chave,
+            treinoNome: entrada.treinoNome,
+            indiceCor: grupos.length % 2,
+            entradas: []
+          });
+          chaveAnterior = chave;
+        }
+        grupos[grupos.length - 1].entradas.push(entrada);
+      });
+
+      return grupos;
+    }
+
+    function media(valores) {
+      return valores.reduce((soma, v) => soma + v, 0) / valores.length;
+    }
+
+    function agruparPorDia(entradas) {
+      const porDia = new Map();
+
+      entradas.forEach((entrada) => {
+        const dia = chaveDataLocal(entrada.dataHora);
+        if (!porDia.has(dia)) porDia.set(dia, { pesos: [], reps: [] });
+        const grupo = porDia.get(dia);
+        if (entrada.cargaKg !== null && entrada.cargaKg !== undefined) grupo.pesos.push(entrada.cargaKg);
+        if (entrada.repeticoes !== null && entrada.repeticoes !== undefined) grupo.reps.push(entrada.repeticoes);
+      });
+
+      return [...porDia.entries()]
+        .map(([dia, grupo]) => ({
+          data: new Date(`${dia}T12:00:00`),
+          mediaCarga: grupo.pesos.length ? media(grupo.pesos) : null,
+          totalCarga: grupo.pesos.length,
+          mediaRepeticoes: grupo.reps.length ? media(grupo.reps) : null,
+          totalRepeticoes: grupo.reps.length
+        }))
+        .sort((a, b) => a.data - b.data);
+    }
+
+    function montarGrafico(diasAgregados) {
+      const W = 800;
+      const H = 360;
+      const margin = { top: 20, right: 46, bottom: 34, left: 46 };
+      const plotW = W - margin.left - margin.right;
+      const plotH = H - margin.top - margin.bottom;
+
+      const comPeso = diasAgregados.filter((d) => d.mediaCarga !== null);
+      const comReps = diasAgregados.filter((d) => d.mediaRepeticoes !== null);
+
+      const x = d3.scaleTime()
+        .domain(d3.extent(diasAgregados, (d) => d.data))
+        .range([0, plotW])
+        .nice();
+
+      const yPeso = d3.scaleLinear()
+        .domain([0, (d3.max(comPeso, (d) => d.mediaCarga) || 1) * 1.15])
+        .range([plotH, 0]);
+
+      const yReps = d3.scaleLinear()
+        .domain([0, (d3.max(comReps, (d) => d.mediaRepeticoes) || 1) * 1.15])
+        .range([plotH, 0]);
+
+      const svg = d3.select("#grafico");
+      svg.selectAll("*").remove();
+
+      const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+      g.append("g")
+        .call(d3.axisLeft(yPeso).ticks(4).tickSize(-plotW).tickFormat(""))
+        .call((sel) => sel.select(".domain").remove())
+        .call((sel) => sel.selectAll("line").attr("stroke", "rgba(148,163,184,0.16)"));
+
+      g.append("g")
+        .attr("transform", `translate(0,${plotH})`)
+        .call(d3.axisBottom(x).ticks(Math.min(6, diasAgregados.length)).tickFormat(d3.timeFormat("%d/%m")))
+        .call((sel) => sel.selectAll("text").attr("fill", "#94a3b8").attr("font-size", "11px"))
+        .call((sel) => sel.selectAll("line,.domain").attr("stroke", "rgba(148,163,184,0.3)"));
+
+      g.append("g")
+        .call(d3.axisLeft(yPeso).ticks(4))
+        .call((sel) => sel.selectAll("text").attr("fill", "#94a3b8").attr("font-size", "11px"))
+        .call((sel) => sel.selectAll("line,.domain").attr("stroke", "rgba(190,242,100,0.35)"));
+
+      g.append("g")
+        .attr("transform", `translate(${plotW},0)`)
+        .call(d3.axisRight(yReps).ticks(4))
+        .call((sel) => sel.selectAll("text").attr("fill", "#94a3b8").attr("font-size", "11px"))
+        .call((sel) => sel.selectAll("line,.domain").attr("stroke", "rgba(56,189,248,0.35)"));
+
+      g.append("text").attr("x", -margin.left + 4).attr("y", -8).attr("fill", "#bef264").attr("font-size", "11px").text("kg");
+      g.append("text").attr("x", plotW + margin.right - 4).attr("y", -8).attr("text-anchor", "end").attr("fill", "#38bdf8").attr("font-size", "11px").text("reps");
+
+      const linhaPeso = d3.line()
+        .defined((d) => d.mediaCarga !== null)
+        .x((d) => x(d.data))
+        .y((d) => yPeso(d.mediaCarga))
+        .curve(d3.curveMonotoneX);
+
+      const linhaReps = d3.line()
+        .defined((d) => d.mediaRepeticoes !== null)
+        .x((d) => x(d.data))
+        .y((d) => yReps(d.mediaRepeticoes))
+        .curve(d3.curveMonotoneX);
+
+      g.append("path")
+        .datum(diasAgregados)
+        .attr("fill", "none")
+        .attr("stroke", "#bef264")
+        .attr("stroke-width", 2.5)
+        .attr("d", linhaPeso);
+
+      g.append("path")
+        .datum(diasAgregados)
+        .attr("fill", "none")
+        .attr("stroke", "#38bdf8")
+        .attr("stroke-width", 2.5)
+        .attr("d", linhaReps);
+
+      g.selectAll("circle.ponto-peso")
+        .data(comPeso)
+        .join("circle")
+        .attr("class", "ponto-peso")
+        .attr("cx", (d) => x(d.data))
+        .attr("cy", (d) => yPeso(d.mediaCarga))
+        .attr("r", 6)
+        .attr("fill", "#bef264")
+        .attr("stroke", "#0f172a")
+        .attr("stroke-width", 1.5)
+        .append("title")
+        .text((d) => `${formatarDataExtenso(d.data.toISOString())} · média ${d.mediaCarga.toFixed(1)} kg (${d.totalCarga} série${d.totalCarga === 1 ? "" : "s"})`);
+
+      g.selectAll("circle.ponto-reps")
+        .data(comReps)
+        .join("circle")
+        .attr("class", "ponto-reps")
+        .attr("cx", (d) => x(d.data))
+        .attr("cy", (d) => yReps(d.mediaRepeticoes))
+        .attr("r", 3)
+        .attr("fill", "#38bdf8")
+        .attr("stroke", "#0f172a")
+        .attr("stroke-width", 1)
+        .append("title")
+        .text((d) => `${formatarDataExtenso(d.data.toISOString())} · média ${d.mediaRepeticoes.toFixed(1)} repetições (${d.totalRepeticoes} série${d.totalRepeticoes === 1 ? "" : "s"})`);
+    }
+
+    function montarTabela(grupos) {
+      const corpo = document.getElementById("tabelaCorpo");
+      corpo.innerHTML = "";
+
+      grupos.forEach((grupo) => {
+        const cor = CORES_GRUPO[grupo.indiceCor];
+
+        const trCabecalho = document.createElement("tr");
+        trCabecalho.className = "grupo-cabecalho";
+        trCabecalho.style.background = cor.fundo;
+        trCabecalho.style.borderLeft = `4px solid ${cor.borda}`;
+        trCabecalho.innerHTML = `<td colspan="4"><strong>${grupo.treinoNome}</strong> — ${formatarDataExtenso(grupo.entradas[0].dataHora)}</td>`;
+        corpo.appendChild(trCabecalho);
+
+        grupo.entradas.forEach((entrada) => {
+          const tr = document.createElement("tr");
+          tr.style.borderLeft = `4px solid ${cor.borda}`;
+          tr.innerHTML = `
+            <td>${entrada.serie}</td>
+            <td>${entrada.cargaKg ?? "—"}</td>
+            <td>${entrada.repeticoes ?? "—"}</td>
+            <td>${formatarHora(entrada.dataHora)}</td>
+          `;
+          corpo.appendChild(tr);
+        });
+      });
+    }
+
+    document.querySelectorAll(".tab-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        const alvo = btn.dataset.tab;
+        document.getElementById("painelGrafico").hidden = alvo !== "grafico";
+        document.getElementById("painelTabela").hidden = alvo !== "tabela";
+      });
+    });
+
+    function mostrarErro(mensagem) {
+      document.getElementById("carregando").hidden = true;
+      const erroEl = document.getElementById("erro");
+      erroEl.hidden = false;
+      erroEl.innerHTML = `${mensagem} Volte ao <a href="treino_exercicios_menu.html">menu de treinos</a>.`;
+      document.getElementById("titulo").textContent = "Progresso do Exercício";
+    }
+
+    async function iniciar() {
+      const params = new URLSearchParams(window.location.search);
+      const exercicioId = params.get("exercicio");
+      const treinoId = params.get("treino");
+
+      document.getElementById("voltarLink").href = treinoId
+        ? `treino_exercicios.html?treino=${encodeURIComponent(treinoId)}`
+        : "treino_exercicios_menu.html";
+
+      if (!exercicioId) {
+        mostrarErro("Nenhum exercício selecionado.");
+        return;
+      }
+
+      let dados;
+      try {
+        dados = await TreinosStorage.carregarDadosTreinos();
+      } catch (erro) {
+        mostrarErro('Nenhum dado de treino carregado ainda neste navegador. <a href="importar_dados.html">Carregue o arquivo dados_treinos.json</a> pra começar.');
+        return;
+      }
+
+      const exercicio = dados.exercicios[exercicioId];
+      const nomeExercicio = exercicio ? exercicio.nome : exercicioId;
+
+      document.title = `${nomeExercicio} — Progresso`;
+      document.getElementById("titulo").textContent = nomeExercicio;
+      document.getElementById("carregando").hidden = true;
+
+      const historico = TreinosStorage.lerJSON(TreinosStorage.chaves.historicoSerieMusculacao, []);
+      const entradas = historico.filter((e) => e.exercicioId === exercicioId);
+
+      if (!entradas.length) {
+        document.getElementById("vazio").hidden = false;
+        return;
+      }
+
+      const totalTagEl = document.getElementById("totalTag");
+      totalTagEl.hidden = false;
+      totalTagEl.textContent = `${entradas.length} série${entradas.length === 1 ? "" : "s"} registradas`;
+
+      document.querySelector(".tabs").hidden = false;
+      document.getElementById("painelGrafico").hidden = false;
+
+      montarGrafico(agruparPorDia(entradas));
+      montarTabela(agruparPorSessao(entradas));
+    }
+
+    iniciar();
+  </script>
+</body>
+</html>
