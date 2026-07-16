@@ -69,11 +69,20 @@ os dois `.js` compartilhados. **Não inclui** `dados/dados_treinos.json`
 repositório, nunca é publicado) nem `serve.py` (roda no servidor, o
 navegador nunca busca esse arquivo).
 
-No evento `install`, `cache.addAll(ARQUIVOS_PARA_CACHE)` busca e guarda
-todos de uma vez — se **qualquer um** desses arquivos não existir/retornar
-erro, o `install` inteiro falha (é assim que `cache.addAll` funciona:
-tudo ou nada). Por isso a lista precisa ficar em dia com os arquivos
-reais da raiz do projeto.
+No evento `install`, cada arquivo da lista é cacheado **individualmente**
+(`cache.add(arquivo)`, um por um, dentro de um `Promise.allSettled`) em vez
+de um `cache.addAll(ARQUIVOS_PARA_CACHE)` só. Isso é deliberado: a primeira
+versão usava `cache.addAll`, que é **tudo ou nada** — se um único arquivo
+da lista falhasse, **nenhum** entrava no cache, e o erro não aparecia em
+lugar nenhum visível. Na prática isso mordeu no Safari/Chrome do iOS: o
+pré-cache falhava inteiro (silenciosamente) e o app shell só ia sendo
+cacheado aos poucos, página por página, conforme a pessoa visitava cada
+uma (efeito colateral do `fetch` handler da seção 4) — dava a impressão de
+"só funciona offline a página que eu já abri antes". Com
+`Promise.allSettled`, uma falha isolada (ex.: um arquivo temporariamente
+inacessível) não derruba as outras — e o erro de cada falha vai pro
+console (`console.warn`) em vez de sumir. Ainda assim, a lista precisa
+ficar em dia com os arquivos reais da raiz do projeto.
 
 ## 4. Estratégia: rede primeiro, cache como reserva
 
@@ -121,7 +130,7 @@ cache como reserva de verdade, quando não tem escolha.
 ## 5. Versionamento do cache
 
 ```js
-const CACHE_NOME = "treinos-shell-v1";
+const CACHE_NOME = "treinos-shell-v2";
 ```
 
 No `activate`, todo cache do `CacheStorage` com nome diferente de
@@ -132,6 +141,9 @@ antiga, órfã, precisar sumir. Não é automático: quem edita `sw.js` decide
 quando vale a pena bumpar a versão (mesmo padrão de `.v1`/`.v2` já usado
 nas chaves de `localStorage`, seção 2 de
 [armazenamento-local-especificacao.md](./armazenamento-local-especificacao.md)).
+`v1` → `v2` foi bumpado junto com a correção do `cache.addAll` (seção 3),
+justamente pra forçar quem já tinha instalado a versão quebrada (cache
+vazio) a reinstalar do zero com a lógica resiliente.
 
 ## 6. Limitações
 

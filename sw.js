@@ -1,4 +1,4 @@
-const CACHE_NOME = "treinos-shell-v1";
+const CACHE_NOME = "treinos-shell-v2";
 
 const ARQUIVOS_PARA_CACHE = [
   "index.html",
@@ -13,9 +13,20 @@ const ARQUIVOS_PARA_CACHE = [
   "d3.v7.min.js"
 ];
 
+// cache.addAll é tudo-ou-nada: se um único arquivo falhar, nenhum entra no
+// cache. Cacheando um por um com Promise.allSettled, uma falha isolada não
+// derruba o pré-cache inteiro — os demais arquivos continuam sendo salvos.
 self.addEventListener("install", (evento) => {
   evento.waitUntil(
-    caches.open(CACHE_NOME).then((cache) => cache.addAll(ARQUIVOS_PARA_CACHE))
+    caches.open(CACHE_NOME).then((cache) =>
+      Promise.allSettled(
+        ARQUIVOS_PARA_CACHE.map((arquivo) =>
+          cache.add(arquivo).catch((erro) => {
+            console.warn(`sw.js: falhou ao pré-cachear "${arquivo}"`, erro);
+          })
+        )
+      )
+    )
   );
   self.skipWaiting();
 });
