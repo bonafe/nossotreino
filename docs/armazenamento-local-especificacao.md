@@ -19,6 +19,11 @@ navegador para dois propósitos:
    séries de musculação com carga/repetições), para no futuro gerar totais
    e relatórios.
 
+Isso cobre a parte de **dados** funcionando offline. A outra metade — as
+**páginas em si** (HTML/CSS/JS) abrindo sem internet, inclusive num link
+publicado — é responsabilidade do service worker, ver
+[pwa-offline-especificacao.md](./pwa-offline-especificacao.md).
+
 É usado por [index.html](../index.html),
 [importar_dados.html](../importar_dados.html),
 [treino_bicicleta.html](../treino_bicicleta.html),

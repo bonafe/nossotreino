@@ -101,3 +101,16 @@ const TreinosStorage = (() => {
     }
   };
 })();
+
+// Registra o service worker (sw.js) que guarda o app shell em cache pra
+// funcionar offline depois do primeiro acesso — ver docs/pwa-offline-especificacao.md.
+// storage.js é carregado em toda página, então isso cobre o site inteiro
+// sem precisar repetir a chamada em cada .html.
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(() => {
+      // Sem HTTPS/localhost, ou navegador sem suporte — o site continua
+      // funcionando, só sem o cache offline do app shell.
+    });
+  });
+}
