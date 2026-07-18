@@ -190,13 +190,23 @@ minutos.
     mostra o período inteiro, não só os dias com treino.
 - **Tooltip**: passar o mouse/tocar numa barra mostra a data (ou mês) e o
   tempo total formatado (`"32min"`, `"1h15"`, ou `"sem treino"` se zero).
+- **Rótulo em cima da barra**: além do tooltip, o valor formatado
+  (`"32min"`, `"1h15"`) aparece direto acima de cada barra com treino
+  (`totalSegundos > 0` — barra vazia não ganha rótulo, já é óbvia pela
+  altura zero), pra não depender de passar o mouse pra ler o tempo. Só é
+  desenhado quando a banda de cada barra tem pelo menos 20px de largura
+  (`x.bandwidth() >= 20`) — em **30 dias** as barras ficam finas demais
+  pro texto caber sem sobrepor a barra vizinha, então esse período fica só
+  com o tooltip; em **7 dias** e **Meses**, com poucas barras mais largas,
+  o rótulo sempre aparece.
 - **Estado vazio**: se `historico.sessaoBicicleta.v1` não tiver nenhum
   registro (nenhum treino de bike concluído ainda neste navegador), o
   gráfico e os botões de período não aparecem — no lugar, uma mensagem
   ("Nenhum treino de bicicleta registrado ainda.") é mostrada, no mesmo
   estilo das outras mensagens de estado vazio da tela.
 - Cor da barra: `#bef264` (mesmo verde-lima usado no resto da UI), única
-  série — sem legenda necessária.
+  série — sem legenda necessária. Rótulo de valor em `#e2e8f0` (texto
+  claro, não a cor da série — o rótulo é texto, não marca).
 
 ### 5.2 Motor genérico (`treino_bicicleta.html`)
 

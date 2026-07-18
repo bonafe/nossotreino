@@ -242,8 +242,9 @@ index.html
 
 ### 6.1 Menu (`treino_exercicios_menu.html`)
 
-A primeira coisa exibida na tela, antes da lista de treinos, é o gráfico de
-histórico (seção 6.1.1). A lista de treinos vem depois.
+A ordem de exibição na tela é: botão "Continuar de onde parou" (seção
+6.1.1, se houver alguma execução em andamento), gráfico de histórico
+(seção 6.1.2) e só depois a lista de treinos.
 
 - Lê `dados/dados_treinos.json` (arquivo único; diferente da bicicleta, não
   precisa de um `indice.json` separado — a lista de treinos já está em
@@ -252,7 +253,40 @@ histórico (seção 6.1.1). A lista de treinos vem depois.
   qual treino é o de hoje usando `distribuicaoSemanal` + dia atual.
 - Cada cartão é um link para `treino_exercicios.html?treino=<id>`.
 
-#### 6.1.1 Gráfico de histórico (tempo total de exercícios)
+#### 6.1.1 Botão "Continuar de onde parou"
+
+O botão "Continuar treino →" que já existe em `treino_exercicios.html`
+(seção 6.2) só aparece depois de entrar no treino específico que está em
+andamento — útil quando é o treino do dia, mas obriga a lembrar/adivinhar
+qual treino estava pendente quando não é. Este botão resolve isso: acessa
+diretamente a execução em andamento **de qualquer treino**, direto do
+menu, sem passar por `treino_exercicios.html`.
+
+- Ao carregar a tela, busca todas as chaves com prefixo
+  `execucao.musculacao.` via `TreinosStorage.listarChavesComPrefixo(...)`
+  (mesma função usada por `TreinosStorage.montarBackup()`) — uma por
+  treino com progresso salvo (seção 8.3). Extrai o `treinoId` de cada
+  chave (formato `execucao.musculacao.<treinoId>.v1`).
+- Considera "em andamento" o mesmo critério já usado em
+  `treino_exercicios.html` (seção 6.2): `progresso.slotIndex >= 0 &&
+  progresso.serieAtual >= 1`.
+- **Vários treinos em andamento ao mesmo tempo** (caso raro, mas
+  possível — nada impede começar um treino diferente sem finalizar o
+  anterior): mostra só **um** botão, para a execução com `iniciadoEm`
+  (seção 8.3) mais recente. As demais ficam acessíveis normalmente
+  entrando em cada treino específico — não há, por ora, uma lista de
+  "todas as execuções em andamento".
+- O botão mostra o nome do treino (`dados.treinos[].nome`, buscado via
+  `TreinosStorage.carregarDadosTreinos()`; se os dados ainda não
+  estiverem carregados nesse navegador, mostra o `treinoId` cru em vez do
+  nome — degradação aceita, não bloqueia o botão) e leva direto para
+  `treino_execucao.html?treino=<treinoId>` — a própria tela de execução
+  já retoma do estado salvo (seção 8.3), sem precisar de mais nenhum
+  parâmetro na URL.
+- Se não houver nenhuma execução em andamento (nenhuma chave
+  `execucao.musculacao.*` válida), o botão não aparece.
+
+#### 6.1.2 Gráfico de histórico (tempo total de exercícios)
 
 Mesmo esquema do gráfico de bike (seção 5.1.1 de
 [treino-bicicleta-especificacao.md](./treino-bicicleta-especificacao.md#511-gráfico-de-histórico-tempo-de-bicicleta)),
@@ -272,10 +306,13 @@ dia ou mês.
   (padrão), **30 dias**, **Meses** (últimos 6 meses). Dias/meses sem
   sessão concluída aparecem como barra vazia — o eixo sempre cobre o
   período inteiro.
-- **Tooltip** e **estado vazio** ("Nenhum treino de exercícios registrado
-  ainda.") seguem exatamente o mesmo comportamento descrito na seção
-  5.1.1 da bike, só trocando a fonte do histórico.
-- Mesma cor de barra (`#bef264`), única série.
+- **Tooltip**, **rótulo em cima da barra** (some quando a banda fica
+  abaixo de 20px, ou seja, em **30 dias**) e **estado vazio** ("Nenhum
+  treino de exercícios registrado ainda.") seguem exatamente o mesmo
+  comportamento descrito na seção 5.1.1 da bike, só trocando a fonte do
+  histórico.
+- Mesma cor de barra (`#bef264`) e mesma cor de rótulo (`#e2e8f0`), única
+  série.
 
 ### 6.2 Página do treino (`treino_exercicios.html`)
 

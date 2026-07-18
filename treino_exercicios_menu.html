@@ -44,6 +44,39 @@
       font-size: clamp(0.95rem, 3.5vw, 1.05rem);
     }
 
+    .continuar {
+      display: block;
+      text-decoration: none;
+      color: #06110a;
+      background: #bef264;
+      border: 2px solid #ecfccb;
+      border-radius: 22px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 16px 42px rgba(190, 242, 100, 0.22);
+    }
+
+    .continuar:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
+    .continuar-rotulo {
+      display: block;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 850;
+      opacity: 0.7;
+      margin-bottom: 2px;
+    }
+
+    .continuar-nome {
+      display: block;
+      font-size: 1.15rem;
+      font-weight: 1000;
+      letter-spacing: -0.02em;
+    }
+
     .grafico-secao {
       background: rgba(15, 23, 42, 0.86);
       border: 1px solid rgba(148, 163, 184, 0.25);
@@ -189,6 +222,11 @@
     <h1>🏋️ Treino de Exercícios</h1>
     <p class="subtitle">Escolha um treino para começar.</p>
 
+    <a id="continuarBtn" class="continuar" href="#" hidden>
+      <span class="continuar-rotulo">Continuar de onde parou</span>
+      <span id="continuarNome" class="continuar-nome">—</span>
+    </a>
+
     <section id="graficoSecao" class="grafico-secao" hidden>
       <div class="grafico-topo">
         <h2>Tempo total de exercícios</h2>
@@ -326,18 +364,37 @@
         .call((sel) => sel.selectAll("text").attr("fill", "#94a3b8").attr("font-size", "11px"))
         .call((sel) => sel.selectAll("line,.domain").attr("stroke", "rgba(148,163,184,0.3)"));
 
+      const alturaBarra = (d) => Math.max(2, plotH - y(d.totalSegundos / 60));
+      const topoBarra = (d) => plotH - alturaBarra(d);
+
       g.selectAll("rect.barra")
         .data(dados)
         .join("rect")
         .attr("class", "barra")
         .attr("x", (d) => x(d.rotulo))
         .attr("width", x.bandwidth())
-        .attr("y", (d) => plotH - Math.max(2, plotH - y(d.totalSegundos / 60)))
-        .attr("height", (d) => Math.max(2, plotH - y(d.totalSegundos / 60)))
+        .attr("y", topoBarra)
+        .attr("height", alturaBarra)
         .attr("rx", 3)
         .attr("fill", "#bef264")
         .append("title")
         .text((d) => `${d.rotulo} · ${d.totalSegundos > 0 ? formatarMinutos(d.totalSegundos / 60) : "sem treino"}`);
+
+      // Rótulo direto só cabe com banda larga o bastante (poucos dias/meses);
+      // em 30 dias as barras ficam finas demais e o valor vira tooltip só.
+      if (x.bandwidth() >= 20) {
+        g.selectAll("text.valor-barra")
+          .data(dados.filter((d) => d.totalSegundos > 0))
+          .join("text")
+          .attr("class", "valor-barra")
+          .attr("x", (d) => x(d.rotulo) + x.bandwidth() / 2)
+          .attr("y", (d) => topoBarra(d) - 6)
+          .attr("text-anchor", "middle")
+          .attr("fill", "#e2e8f0")
+          .attr("font-size", "10px")
+          .attr("font-weight", "700")
+          .text((d) => formatarMinutos(d.totalSegundos / 60));
+      }
     }
 
     function renderizarGrafico(periodo, historico) {
@@ -368,6 +425,34 @@
           renderizarGrafico(periodoAtual, historico);
         });
       });
+    }
+
+    async function iniciarBotaoContinuar() {
+      const emAndamento = TreinosStorage.listarChavesComPrefixo("execucao.musculacao.")
+        .map((chave) => ({
+          treinoId: chave.replace(/^execucao\.musculacao\./, "").replace(/\.v1$/, ""),
+          progresso: TreinosStorage.lerJSON(chave, null)
+        }))
+        .filter(({ progresso }) => progresso && progresso.slotIndex >= 0 && progresso.serieAtual >= 1)
+        .sort((a, b) => new Date(b.progresso.iniciadoEm) - new Date(a.progresso.iniciadoEm));
+
+      if (!emAndamento.length) return;
+
+      const { treinoId } = emAndamento[0];
+      const btnEl = document.getElementById("continuarBtn");
+      const nomeEl = document.getElementById("continuarNome");
+
+      btnEl.href = `treino_execucao.html?treino=${encodeURIComponent(treinoId)}`;
+      btnEl.hidden = false;
+      nomeEl.textContent = treinoId;
+
+      try {
+        const dados = await TreinosStorage.carregarDadosTreinos();
+        const treino = dados.treinos.find((t) => t.id === treinoId);
+        if (treino) nomeEl.textContent = treino.nome;
+      } catch (erro) {
+        // Sem dados carregados — mantém o treinoId como rótulo.
+      }
     }
 
     function contarExercicios(treino) {
@@ -420,6 +505,7 @@
       }
     }
 
+    iniciarBotaoContinuar();
     iniciarGraficoHistorico();
     carregarTreinos();
   </script>

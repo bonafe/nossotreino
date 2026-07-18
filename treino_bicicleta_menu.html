@@ -329,18 +329,37 @@
         .call((sel) => sel.selectAll("text").attr("fill", "#94a3b8").attr("font-size", "11px"))
         .call((sel) => sel.selectAll("line,.domain").attr("stroke", "rgba(148,163,184,0.3)"));
 
+      const alturaBarra = (d) => Math.max(2, plotH - y(d.totalSegundos / 60));
+      const topoBarra = (d) => plotH - alturaBarra(d);
+
       g.selectAll("rect.barra")
         .data(dados)
         .join("rect")
         .attr("class", "barra")
         .attr("x", (d) => x(d.rotulo))
         .attr("width", x.bandwidth())
-        .attr("y", (d) => plotH - Math.max(2, plotH - y(d.totalSegundos / 60)))
-        .attr("height", (d) => Math.max(2, plotH - y(d.totalSegundos / 60)))
+        .attr("y", topoBarra)
+        .attr("height", alturaBarra)
         .attr("rx", 3)
         .attr("fill", "#bef264")
         .append("title")
         .text((d) => `${d.rotulo} · ${d.totalSegundos > 0 ? formatarMinutos(d.totalSegundos / 60) : "sem treino"}`);
+
+      // Rótulo direto só cabe com banda larga o bastante (poucos dias/meses);
+      // em 30 dias as barras ficam finas demais e o valor vira tooltip só.
+      if (x.bandwidth() >= 20) {
+        g.selectAll("text.valor-barra")
+          .data(dados.filter((d) => d.totalSegundos > 0))
+          .join("text")
+          .attr("class", "valor-barra")
+          .attr("x", (d) => x(d.rotulo) + x.bandwidth() / 2)
+          .attr("y", (d) => topoBarra(d) - 6)
+          .attr("text-anchor", "middle")
+          .attr("fill", "#e2e8f0")
+          .attr("font-size", "10px")
+          .attr("font-weight", "700")
+          .text((d) => formatarMinutos(d.totalSegundos / 60));
+      }
     }
 
     function renderizarGrafico(periodo, historico) {

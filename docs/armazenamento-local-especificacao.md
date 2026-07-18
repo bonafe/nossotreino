@@ -174,8 +174,8 @@ funcionando, só o histórico daquela sessão não é salvo.
   (`historico.sessaoBicicleta.v1` e `historico.sessaoMusculacao.v1`) já
   existem, ver seção 5.1.1 de
   [treino-bicicleta-especificacao.md](./treino-bicicleta-especificacao.md#511-gráfico-de-histórico-tempo-de-bicicleta)
-  e seção 6.1.1 de
-  [treino-exercicios-especificacao.md](./treino-exercicios-especificacao.md#611-gráfico-de-histórico-tempo-total-de-exercícios).
+  e seção 6.1.2 de
+  [treino-exercicios-especificacao.md](./treino-exercicios-especificacao.md#612-gráfico-de-histórico-tempo-total-de-exercícios).
 - Exportar/importar ou sincronizar **histórico** entre aparelhos (os
   dados de treino em si já são importáveis, via `importar_dados.html`
   — seção 3.1 — mas isso é diferente do histórico de execução).
