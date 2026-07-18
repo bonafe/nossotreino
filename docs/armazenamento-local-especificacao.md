@@ -165,11 +165,17 @@ funcionando, só o histórico daquela sessão não é salvo.
 
 ## 7. Fora de escopo
 
-- Tela de totais/relatórios que consome `historico.serieMusculacao.v1` /
-  `historico.sessaoMusculacao.v1` (musculação) — os dados já ficam salvos;
-  a visualização fica para depois. Para bike, o gráfico de barras de
-  `historico.sessaoBicicleta.v1` já existe, ver seção 5.1.1 de
-  [treino-bicicleta-especificacao.md](./treino-bicicleta-especificacao.md#511-gráfico-de-histórico-tempo-de-bicicleta).
+- Painel consolidado por exercício (volume, carga, recordes pessoais a
+  partir de `historico.serieMusculacao.v1`) — a visualização por
+  exercício individual já existe (seção 9 de
+  [treino-exercicios-especificacao.md](./treino-exercicios-especificacao.md#9-progresso-do-exercício-treino_exercicio_progressohtml)),
+  mas um painel agregando *todos* os exercícios fica para depois (ver
+  seção 10 do mesmo documento). Os gráficos de tempo total por sessão
+  (`historico.sessaoBicicleta.v1` e `historico.sessaoMusculacao.v1`) já
+  existem, ver seção 5.1.1 de
+  [treino-bicicleta-especificacao.md](./treino-bicicleta-especificacao.md#511-gráfico-de-histórico-tempo-de-bicicleta)
+  e seção 6.1.1 de
+  [treino-exercicios-especificacao.md](./treino-exercicios-especificacao.md#611-gráfico-de-histórico-tempo-total-de-exercícios).
 - Exportar/importar ou sincronizar **histórico** entre aparelhos (os
   dados de treino em si já são importáveis, via `importar_dados.html`
   — seção 3.1 — mas isso é diferente do histórico de execução).

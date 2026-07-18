@@ -44,6 +44,59 @@
       font-size: clamp(0.95rem, 3.5vw, 1.05rem);
     }
 
+    .grafico-secao {
+      background: rgba(15, 23, 42, 0.86);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 24px;
+      padding: 18px;
+      margin-bottom: 22px;
+    }
+
+    .grafico-topo {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .grafico-topo h2 {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 950;
+      letter-spacing: -0.02em;
+    }
+
+    .periodo-botoes {
+      display: flex;
+      gap: 6px;
+    }
+
+    .periodo-btn {
+      appearance: none;
+      background: rgba(148, 163, 184, 0.12);
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      color: #cbd5e1;
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 0.8rem;
+      font-weight: 850;
+      cursor: pointer;
+    }
+
+    .periodo-btn.active {
+      background: #bef264;
+      border-color: #bef264;
+      color: #06110a;
+    }
+
+    #graficoExercicios {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
     .lista {
       display: flex;
       flex-direction: column;
@@ -136,6 +189,19 @@
     <h1>🏋️ Treino de Exercícios</h1>
     <p class="subtitle">Escolha um treino para começar.</p>
 
+    <section id="graficoSecao" class="grafico-secao" hidden>
+      <div class="grafico-topo">
+        <h2>Tempo total de exercícios</h2>
+        <div class="periodo-botoes" role="group" aria-label="Período do gráfico">
+          <button type="button" class="periodo-btn active" data-periodo="7d">7 dias</button>
+          <button type="button" class="periodo-btn" data-periodo="30d">30 dias</button>
+          <button type="button" class="periodo-btn" data-periodo="meses">Meses</button>
+        </div>
+      </div>
+      <svg id="graficoExercicios" viewBox="0 0 800 240" preserveAspectRatio="xMidYMid meet"></svg>
+    </section>
+    <div id="graficoVazio" class="estado" hidden>Nenhum treino de exercícios registrado ainda.</div>
+
     <div id="lista" class="lista">
       <div class="estado">Carregando treinos…</div>
     </div>
@@ -143,6 +209,7 @@
     <a class="voltar" href="index.html">← Voltar</a>
   </main>
 
+  <script src="d3.v7.min.js"></script>
   <script src="storage.js"></script>
   <script>
     const DIAS_SEMANA = ["domingo", "segunda", "terca", "quarta", "quinta", "sexta", "sabado"];
@@ -153,6 +220,155 @@
       funcional: "Funcional",
       flexibilidade: "Flexibilidade"
     };
+
+    const MESES_ABREV = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+
+    function chaveDataLocal(iso) {
+      const d = new Date(iso);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+
+    function chaveMesLocal(iso) {
+      const d = new Date(iso);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    }
+
+    function formatarDataCurta(data) {
+      return `${String(data.getDate()).padStart(2, "0")}/${String(data.getMonth() + 1).padStart(2, "0")}`;
+    }
+
+    function formatarMesCurto(data) {
+      return `${MESES_ABREV[data.getMonth()]}/${String(data.getFullYear()).slice(2)}`;
+    }
+
+    function formatarMinutos(minutos) {
+      const totalMin = Math.round(minutos);
+      if (totalMin < 60) return `${totalMin}min`;
+      const h = Math.floor(totalMin / 60);
+      const m = totalMin % 60;
+      return m ? `${h}h${String(m).padStart(2, "0")}` : `${h}h`;
+    }
+
+    function agruparPorDia(historico, dias) {
+      const porDia = new Map();
+      historico.forEach((s) => {
+        const chave = chaveDataLocal(s.concluidoEm);
+        porDia.set(chave, (porDia.get(chave) || 0) + s.duracaoSegundos);
+      });
+
+      const hoje = new Date();
+      hoje.setHours(12, 0, 0, 0);
+      const resultado = [];
+      for (let i = dias - 1; i >= 0; i--) {
+        const data = new Date(hoje);
+        data.setDate(data.getDate() - i);
+        const chave = chaveDataLocal(data.toISOString());
+        resultado.push({ rotulo: formatarDataCurta(data), totalSegundos: porDia.get(chave) || 0 });
+      }
+      return resultado;
+    }
+
+    function agruparPorMes(historico, meses) {
+      const porMes = new Map();
+      historico.forEach((s) => {
+        const chave = chaveMesLocal(s.concluidoEm);
+        porMes.set(chave, (porMes.get(chave) || 0) + s.duracaoSegundos);
+      });
+
+      const hoje = new Date();
+      const resultado = [];
+      for (let i = meses - 1; i >= 0; i--) {
+        const data = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+        const chave = `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, "0")}`;
+        resultado.push({ rotulo: formatarMesCurto(data), totalSegundos: porMes.get(chave) || 0 });
+      }
+      return resultado;
+    }
+
+    function montarGraficoBarras(dados) {
+      const W = 800;
+      const H = 240;
+      const margin = { top: 12, right: 12, bottom: 26, left: 42 };
+      const plotW = W - margin.left - margin.right;
+      const plotH = H - margin.top - margin.bottom;
+
+      const x = d3.scaleBand()
+        .domain(dados.map((d) => d.rotulo))
+        .range([0, plotW])
+        .padding(dados.length > 15 ? 0.3 : 0.45);
+
+      const maxMin = d3.max(dados, (d) => d.totalSegundos / 60) || 1;
+      const y = d3.scaleLinear()
+        .domain([0, maxMin * 1.15])
+        .range([plotH, 0]);
+
+      const svg = d3.select("#graficoExercicios");
+      svg.selectAll("*").remove();
+
+      const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+      g.append("g")
+        .call(d3.axisLeft(y).ticks(4).tickSize(-plotW).tickFormat(""))
+        .call((sel) => sel.select(".domain").remove())
+        .call((sel) => sel.selectAll("line").attr("stroke", "rgba(148,163,184,0.16)"));
+
+      g.append("g")
+        .call(d3.axisLeft(y).ticks(4).tickFormat((v) => formatarMinutos(v)))
+        .call((sel) => sel.selectAll("text").attr("fill", "#94a3b8").attr("font-size", "11px"))
+        .call((sel) => sel.selectAll("line,.domain").attr("stroke", "rgba(148,163,184,0.3)"));
+
+      const passo = Math.max(1, Math.ceil(dados.length / 8));
+      const ticksEixoX = x.domain().filter((_, i) => i % passo === 0);
+
+      g.append("g")
+        .attr("transform", `translate(0,${plotH})`)
+        .call(d3.axisBottom(x).tickValues(ticksEixoX))
+        .call((sel) => sel.selectAll("text").attr("fill", "#94a3b8").attr("font-size", "11px"))
+        .call((sel) => sel.selectAll("line,.domain").attr("stroke", "rgba(148,163,184,0.3)"));
+
+      g.selectAll("rect.barra")
+        .data(dados)
+        .join("rect")
+        .attr("class", "barra")
+        .attr("x", (d) => x(d.rotulo))
+        .attr("width", x.bandwidth())
+        .attr("y", (d) => plotH - Math.max(2, plotH - y(d.totalSegundos / 60)))
+        .attr("height", (d) => Math.max(2, plotH - y(d.totalSegundos / 60)))
+        .attr("rx", 3)
+        .attr("fill", "#bef264")
+        .append("title")
+        .text((d) => `${d.rotulo} · ${d.totalSegundos > 0 ? formatarMinutos(d.totalSegundos / 60) : "sem treino"}`);
+    }
+
+    function renderizarGrafico(periodo, historico) {
+      if (periodo === "7d") montarGraficoBarras(agruparPorDia(historico, 7));
+      else if (periodo === "30d") montarGraficoBarras(agruparPorDia(historico, 30));
+      else montarGraficoBarras(agruparPorMes(historico, 6));
+    }
+
+    function iniciarGraficoHistorico() {
+      const historico = TreinosStorage.lerJSON(TreinosStorage.chaves.historicoSessaoMusculacao, []);
+      const secaoEl = document.getElementById("graficoSecao");
+      const vazioEl = document.getElementById("graficoVazio");
+
+      if (!historico.length) {
+        vazioEl.hidden = false;
+        return;
+      }
+
+      secaoEl.hidden = false;
+      let periodoAtual = "7d";
+      renderizarGrafico(periodoAtual, historico);
+
+      secaoEl.querySelectorAll(".periodo-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          if (btn.dataset.periodo === periodoAtual) return;
+          periodoAtual = btn.dataset.periodo;
+          secaoEl.querySelectorAll(".periodo-btn").forEach((b) => b.classList.toggle("active", b === btn));
+          renderizarGrafico(periodoAtual, historico);
+        });
+      });
+    }
 
     function contarExercicios(treino) {
       return treino.blocos.reduce((total, bloco) => total + bloco.itens.length, 0);
@@ -204,6 +420,7 @@
       }
     }
 
+    iniciarGraficoHistorico();
     carregarTreinos();
   </script>
 </body>

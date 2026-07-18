@@ -242,12 +242,40 @@ index.html
 
 ### 6.1 Menu (`treino_exercicios_menu.html`)
 
+A primeira coisa exibida na tela, antes da lista de treinos, é o gráfico de
+histórico (seção 6.1.1). A lista de treinos vem depois.
+
 - Lê `dados/dados_treinos.json` (arquivo único; diferente da bicicleta, não
   precisa de um `indice.json` separado — a lista de treinos já está em
   `treinos`).
 - Mostra um cartão por treino com `nome` e `tipo`; opcionalmente pode marcar
   qual treino é o de hoje usando `distribuicaoSemanal` + dia atual.
 - Cada cartão é um link para `treino_exercicios.html?treino=<id>`.
+
+#### 6.1.1 Gráfico de histórico (tempo total de exercícios)
+
+Mesmo esquema do gráfico de bike (seção 5.1.1 de
+[treino-bicicleta-especificacao.md](./treino-bicicleta-especificacao.md#511-gráfico-de-histórico-tempo-de-bicicleta)),
+aplicado a `historico.sessaoMusculacao.v1` em vez de
+`historico.sessaoBicicleta.v1`: um gráfico de barras (D3.js,
+`d3.v7.min.js` vendorizado) logo abaixo do título da tela, com o tempo
+total de treino de exercícios (musculação/peso do corpo/funcional/
+flexibilidade — qualquer `treino.tipo`, o histórico não distingue) por
+dia ou mês.
+
+- **Fonte dos dados**: `historico.sessaoMusculacao.v1`, lido direto com
+  `TreinosStorage.lerJSON(...)` — cada barra soma o `duracaoSegundos`
+  (seção 8.7) das sessões concluídas naquele dia/mês. Independe de
+  `dados/dados_treinos.json` estar carregado, mesma lógica da seção 5.1.1
+  da bike.
+- **Três períodos**, mesmos botões e mesmos defaults da bike: **7 dias**
+  (padrão), **30 dias**, **Meses** (últimos 6 meses). Dias/meses sem
+  sessão concluída aparecem como barra vazia — o eixo sempre cobre o
+  período inteiro.
+- **Tooltip** e **estado vazio** ("Nenhum treino de exercícios registrado
+  ainda.") seguem exatamente o mesmo comportamento descrito na seção
+  5.1.1 da bike, só trocando a fonte do histórico.
+- Mesma cor de barra (`#bef264`), única série.
 
 ### 6.2 Página do treino (`treino_exercicios.html`)
 
