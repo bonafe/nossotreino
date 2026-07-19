@@ -88,3 +88,139 @@ p {
 .aviso-dados:active {
   transform: translateY(1px) scale(0.99);
 }
+
+.config-icon {
+  position: fixed;
+  top: max(18px, env(safe-area-inset-top));
+  right: 18px;
+  z-index: 20;
+  appearance: none;
+  cursor: pointer;
+  color: #cbd5e1;
+  background: rgba(148, 163, 184, 0.14);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 14px;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.config-icon:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.config-menu {
+  position: fixed;
+  top: calc(max(18px, env(safe-area-inset-top)) + 50px);
+  right: 18px;
+  z-index: 20;
+  background: rgba(15, 23, 42, 0.96);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 16px;
+  padding: 6px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  min-width: 240px;
+}
+
+.config-menu-item {
+  appearance: none;
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 10px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  cursor: pointer;
+}
+
+.config-menu-item:active {
+  background: rgba(148, 163, 184, 0.14);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: rgba(2, 6, 23, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+
+.overlay[hidden] {
+  display: none;
+}
+
+.confirm-card {
+  background: rgba(15, 23, 42, 0.98);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 20px;
+  padding: 20px;
+  width: min(360px, 100%);
+  text-align: left;
+}
+
+.confirm-card p {
+  margin: 0 0 18px;
+  max-width: none;
+  color: #e2e8f0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.confirm-botoes {
+  display: flex;
+  gap: 10px;
+}
+
+.confirm-botoes button {
+  appearance: none;
+  flex: 1;
+  border-radius: 14px;
+  padding: 13px 10px;
+  font-size: 0.95rem;
+  font-weight: 900;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.confirm-botoes .secondary {
+  background: rgba(148, 163, 184, 0.14);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  color: #e2e8f0;
+}
+
+.confirm-botoes .danger {
+  background: #fb7185;
+  border: 1px solid #fda4af;
+  color: #1a0508;
+}
+
+.confirm-botoes button:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.toast {
+  position: fixed;
+  bottom: max(24px, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  background: rgba(190, 242, 100, 0.16);
+  border: 1px solid rgba(190, 242, 100, 0.45);
+  color: #bef264;
+  font-weight: 800;
+  font-size: 0.9rem;
+  border-radius: 14px;
+  padding: 12px 18px;
+  max-width: min(420px, calc(100% - 36px));
+  text-align: center;
+}

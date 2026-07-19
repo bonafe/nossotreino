@@ -8,6 +8,25 @@
   <link rel="stylesheet" href="css/paginas/index.css" />
 </head>
 <body>
+  <button id="configBtn" class="config-icon" type="button" aria-label="Configurações" aria-haspopup="true" aria-expanded="false">⚙️</button>
+
+  <div id="configMenu" class="config-menu" hidden>
+    <button type="button" class="config-menu-item" data-acao="reset-musculacao">🏋️ Resetar dados de musculação</button>
+    <button type="button" class="config-menu-item" data-acao="reset-bicicleta">🚴‍♂️ Resetar dados de bicicleta</button>
+  </div>
+
+  <div id="confirmOverlay" class="overlay" hidden>
+    <div class="confirm-card">
+      <p id="confirmTexto"></p>
+      <div class="confirm-botoes">
+        <button id="confirmCancelar" class="secondary" type="button">Cancelar</button>
+        <button id="confirmOk" class="danger" type="button">Resetar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+
   <main>
     <section class="card">
       <h1>Meus Treinos</h1>

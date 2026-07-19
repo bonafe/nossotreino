@@ -92,6 +92,16 @@ export class TreinosStorage {
     };
   }
 
+  static resetarMusculacao() {
+    removerChave(TreinosStorage.chaves.historicoSerieMusculacao);
+    removerChave(TreinosStorage.chaves.historicoSessaoMusculacao);
+    TreinosStorage.listarChavesComPrefixo("execucao.musculacao.").forEach((chave) => removerChave(chave));
+  }
+
+  static resetarBicicleta() {
+    removerChave(TreinosStorage.chaves.historicoSessaoBicicleta);
+  }
+
   static restaurarBackup(backup) {
     if (backup.dadosTreinos) TreinosStorage.definirDadosTreinos(backup.dadosTreinos);
     salvarJSON("historico.sessaoBicicleta.v1", backup.historicoSessaoBicicleta || []);
