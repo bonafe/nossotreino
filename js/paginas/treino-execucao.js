@@ -133,9 +133,37 @@ class TreinoExecucaoController {
     if (valido) {
       this.#progresso = salvo;
     } else {
-      this.#progresso = { slotIndex: 0, opcaoIndex: 0, serieAtual: 1, iniciadoEm: new Date().toISOString() };
+      this.#progresso = { slotIndex: 0, opcaoIndex: 0, serieAtual: 1, iniciadoEm: new Date().toISOString(), tempoAcumuladoSegundos: 0 };
       this.#salvarProgresso();
     }
+  }
+
+  // Tempo (série + descanso) acumulado no exercício atual, persistido em
+  // progresso pra sobreviver a um reload no meio do exercício.
+  #tempoAcumuladoExercicio() {
+    return this.#progresso.tempoAcumuladoSegundos || 0;
+  }
+
+  #adicionarTempoExercicio(segundos) {
+    this.#progresso.tempoAcumuladoSegundos = this.#tempoAcumuladoExercicio() + segundos;
+    this.#salvarProgresso();
+  }
+
+  // Registra o tempo (séries + descansos) do exercício que acabou de ser
+  // concluído — um evento por exercício, não por treino inteiro, pra
+  // exercícios avulsos (feitos sem terminar o treino todo) também contarem.
+  #registrarExercicioConcluido(item, exercicio) {
+    const duracaoSegundos = this.#tempoAcumuladoExercicio();
+    if (duracaoSegundos <= 0) return;
+
+    TreinosStorage.adicionarAoHistorico(TreinosStorage.chaves.historicoSessaoMusculacao, {
+      treinoId: this.#treino.id,
+      treinoNome: this.#treino.nome,
+      exercicioId: item.exercicioId,
+      exercicioNome: exercicio ? exercicio.nome : item.exercicioId,
+      concluidoEm: new Date().toISOString(),
+      duracaoSegundos
+    });
   }
 
   #itemAtual() {
@@ -232,6 +260,8 @@ class TreinoExecucaoController {
     this.#progresso.slotIndex = novoSlotIndex;
     this.#progresso.opcaoIndex = 0;
     this.#progresso.serieAtual = 1;
+    // Pulou pro exercício sem concluir o atual — descarta o tempo parcial.
+    this.#progresso.tempoAcumuladoSegundos = 0;
     this.#salvarProgresso();
     this.#renderExercicioAtual();
   }
@@ -299,7 +329,9 @@ class TreinoExecucaoController {
   }
 
   #finalizarDescanso() {
+    const descansoSegundos = this.#cronometroDescanso.segundos();
     this.#cronometroDescanso.pausar();
+    this.#adicionarTempoExercicio(descansoSegundos);
 
     this.#descansoEl.hidden = true;
     this.#execucaoEl.hidden = false;
@@ -316,8 +348,10 @@ class TreinoExecucaoController {
     const cargaKg = cargaRaw === "" ? null : Number(cargaRaw);
     const repeticoes = (item.repeticoes.modo === "tempo" || repeticoesRaw === "") ? null : Number(repeticoesRaw);
 
-    const duracaoSegundos = this.#serieJaIniciada ? this.#cronometroSerie.segundos() : null;
+    const serieFoiIniciada = this.#serieJaIniciada;
+    const duracaoSerieSegundos = serieFoiIniciada ? this.#cronometroSerie.segundos() : 0;
     this.#cronometroSerie.pausar();
+    this.#adicionarTempoExercicio(duracaoSerieSegundos);
 
     this.#ajusteCargaAtual = null;
     if (item.repeticoes.modo === "faixa" && repeticoes !== null) {
@@ -336,7 +370,7 @@ class TreinoExecucaoController {
       serie: this.#progresso.serieAtual,
       cargaKg,
       repeticoes,
-      duracaoSegundos,
+      duracaoSegundos: serieFoiIniciada ? duracaoSerieSegundos : null,
       dataHora: new Date().toISOString()
     });
 
@@ -347,10 +381,16 @@ class TreinoExecucaoController {
       return;
     }
 
+    // Última série do exercício atual — registra o tempo dele antes de seguir.
+    this.#registrarExercicioConcluido(item, exercicio);
+
     if (this.#progresso.slotIndex < this.#slots.length - 1) {
       this.#progresso.slotIndex += 1;
       this.#progresso.opcaoIndex = 0;
       this.#progresso.serieAtual = 1;
+      // O descanso que vem agora é antes da primeira série do PRÓXIMO
+      // exercício, então zera o acumulador pra contar a favor dele.
+      this.#progresso.tempoAcumuladoSegundos = 0;
       this.#salvarProgresso();
       this.#iniciarDescanso();
       return;
@@ -363,22 +403,23 @@ class TreinoExecucaoController {
     const slot = this.#slots[this.#progresso.slotIndex];
     this.#progresso.opcaoIndex = (this.#progresso.opcaoIndex + 1) % slot.opcoes.length;
     this.#progresso.serieAtual = 1;
+    // Descarta o tempo parcial do exercício trocado — ele não foi concluído.
+    this.#progresso.tempoAcumuladoSegundos = 0;
     this.#salvarProgresso();
     this.#renderExercicioAtual();
   }
 
   #concluirTreino() {
-    const concluidoEm = new Date();
-    const duracaoSegundos = Math.round((concluidoEm - new Date(this.#progresso.iniciadoEm)) / 1000);
+    const item = this.#itemAtual();
+    const exercicio = this.#exercicios[item.exercicioId];
+    this.#registrarExercicioConcluido(item, exercicio);
 
-    TreinosStorage.adicionarAoHistorico(TreinosStorage.chaves.historicoSessaoMusculacao, {
-      treinoId: this.#treino.id,
-      treinoNome: this.#treino.nome,
-      iniciadoEm: this.#progresso.iniciadoEm,
-      concluidoEm: concluidoEm.toISOString(),
-      duracaoSegundos,
-      totalSlots: this.#slots.length
-    });
+    // Soma os exercícios concluídos nesta execução (podem vir de antes de um
+    // reload, já que cada um foi salvo no histórico assim que terminou).
+    const historico = TreinosStorage.lerJSON(TreinosStorage.chaves.historicoSessaoMusculacao, []);
+    const duracaoSegundos = historico
+      .filter((e) => e.treinoId === this.#treino.id && e.concluidoEm >= this.#progresso.iniciadoEm)
+      .reduce((soma, e) => soma + e.duracaoSegundos, 0);
 
     TreinosStorage.removerChave(this.#chaveExecucao());
 
@@ -409,6 +450,7 @@ class TreinoExecucaoController {
     this.#progresso.slotIndex = slotAlvo;
     this.#progresso.opcaoIndex = opcaoValida;
     this.#progresso.serieAtual = 1;
+    this.#progresso.tempoAcumuladoSegundos = 0;
     this.#salvarProgresso();
 
     const url = `treino_execucao.html?treino=${encodeURIComponent(this.#treino.id)}`;
