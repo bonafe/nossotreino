@@ -143,7 +143,7 @@ lê a lista direto do JSON.
 ## 5. Telas / fluxo
 
 ```
-index.html
+sistema.html
    └─> treino_bicicleta_menu.html   (lista dados.cardios com exercicio === "Bicicleta")
           └─> treino_bicicleta.html?cardio=cardio-a   (motor genérico)
 ```

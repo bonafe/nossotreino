@@ -51,6 +51,7 @@ if ("serviceWorker" in navigator) {
 ```js
 const ARQUIVOS_PARA_CACHE = [
   "index.html",
+  "sistema.html",
   "importar_dados.html",
   "treino_bicicleta_menu.html",
   "treino_bicicleta.html",

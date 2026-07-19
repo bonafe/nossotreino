@@ -3,54 +3,79 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Meus Treinos</title>
+  <title>Nosso Treino — treinos gratuitos e de código aberto</title>
   <link rel="stylesheet" href="css/base.css" />
   <link rel="stylesheet" href="css/paginas/index.css" />
 </head>
 <body>
-  <button id="configBtn" class="config-icon" type="button" aria-label="Configurações" aria-haspopup="true" aria-expanded="false">⚙️</button>
-
-  <div id="configMenu" class="config-menu" hidden>
-    <button type="button" class="config-menu-item" data-acao="reset-musculacao">🏋️ Resetar dados de musculação</button>
-    <button type="button" class="config-menu-item" data-acao="reset-bicicleta">🚴‍♂️ Resetar dados de bicicleta</button>
-  </div>
-
-  <div id="confirmOverlay" class="overlay" hidden>
-    <div class="confirm-card">
-      <p id="confirmTexto"></p>
-      <div class="confirm-botoes">
-        <button id="confirmCancelar" class="secondary" type="button">Cancelar</button>
-        <button id="confirmOk" class="danger" type="button">Resetar</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="toast" class="toast" hidden></div>
-
   <main>
-    <section class="card">
-      <h1>Meus Treinos</h1>
-      <p>Escolha um treino para começar.</p>
+    <header class="hero">
+      <p class="marca">nossotreino.com.br</p>
+      <h1>Treino de verdade, sem custar nada.</h1>
+      <p class="tagline">
+        Uma plataforma gratuita e de código aberto para treinos —
+        musculação, aeróbico e outros — que funciona mesmo sem internet.
+        Acreditamos que treino de qualidade deveria estar ao alcance de
+        todo mundo.
+      </p>
+      <a class="entrar" href="sistema.html">Entrar no sistema de treino →</a>
+    </header>
 
-      <a id="avisoDados" class="aviso-dados" href="importar_dados.html" hidden>
-        ⚠️ Primeiro acesso — carregue os dados do treino
-      </a>
+    <section class="painel principios">
+      <h2>Nossos princípios</h2>
+      <ul>
+        <li><strong>Gratuito.</strong> Sem mensalidade, sem versão paga, sem funcionalidade trancada atrás de assinatura.</li>
+        <li><strong>Código aberto.</strong> Qualquer pessoa pode ver, usar, modificar e redistribuir o código — nada de caixa-preta.</li>
+        <li><strong>Funciona offline.</strong> Depois do primeiro carregamento, o sistema roda inteiro no seu aparelho — sem depender de internet nem de servidor pra treinar.</li>
+        <li><strong>Seus dados são só seus.</strong> Tudo fica salvo no seu próprio navegador. Ninguém mais tem acesso.</li>
+      </ul>
+    </section>
 
-      <a class="workout" href="treino_bicicleta_menu.html">
-        🚴‍♂️ Entrar no treino de bicicleta
-        <span>Escolha entre os treinos disponíveis</span>
-      </a>
-
-      <a class="workout" href="treino_exercicios_menu.html" style="margin-top: 14px;">
-        🏋️ Entrar no treino de musculação
-        <span>Musculação, peso do corpo e funcional</span>
-      </a>
-
-      <div class="small">
-        Funciona offline depois de carregado.
-        <br />
-        <a href="importar_dados.html">Carregar/atualizar dados do treino</a>
+    <section class="painel">
+      <h2>Apoie o projeto</h2>
+      <p>
+        O Nosso Treino é mantido de forma independente e vai continuar
+        gratuito para sempre. Se o sistema te ajudou e você quiser
+        contribuir com o desenvolvimento, doações são muito bem-vindas —
+        mas nunca serão necessárias para usar qualquer parte do sistema.
+      </p>
+      <div class="doacao">
+        <p>Pix: <code>chave pix a definir</code></p>
+        <p><a href="#">Apoiar pelo GitHub Sponsors →</a></p>
       </div>
+    </section>
+
+    <section class="painel">
+      <h2>Código aberto</h2>
+      <p>
+        Todo o código roda no seu navegador e está disponível publicamente
+        no GitHub, sob a licença AGPL-3.0. Sugestões, correções e
+        contribuições de qualquer pessoa são bem-vindas.
+      </p>
+      <p><a href="https://github.com/bonafe/treinos">Ver o código no GitHub →</a></p>
+    </section>
+
+    <section class="painel">
+      <h2>Privacidade</h2>
+      <p>
+        O Nosso Treino não tem servidor guardando os seus dados. O plano de
+        treino e o histórico de execução ficam salvos exclusivamente no
+        armazenamento local do seu navegador, no seu próprio aparelho — não
+        trafegam pela internet nem chegam até nós. Limpar os dados do
+        navegador apaga tudo permanentemente.
+      </p>
+    </section>
+
+    <section class="painel aviso-legal">
+      <h2>Aviso importante</h2>
+      <p>
+        O Nosso Treino é uma ferramenta para acompanhar treinos — não
+        substitui avaliação médica, física ou de um profissional de
+        educação física. Consulte um profissional qualificado antes de
+        iniciar qualquer programa de exercícios, especialmente se você tem
+        alguma condição de saúde preexistente. O uso do sistema é de
+        responsabilidade de cada pessoa.
+      </p>
     </section>
   </main>
 

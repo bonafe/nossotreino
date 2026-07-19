@@ -1,7 +1,8 @@
-const CACHE_NOME = "treinos-shell-v3";
+const CACHE_NOME = "treinos-shell-v4";
 
 const ARQUIVOS_PARA_CACHE = [
   "index.html",
+  "sistema.html",
   "importar_dados.html",
   "treino_bicicleta_menu.html",
   "treino_bicicleta.html",
@@ -14,6 +15,7 @@ const ARQUIVOS_PARA_CACHE = [
   "css/componentes.css",
   "css/graficos.css",
   "css/paginas/index.css",
+  "css/paginas/sistema.css",
   "css/paginas/importar-dados.css",
   "css/paginas/treino-bicicleta-menu.css",
   "css/paginas/treino-bicicleta.css",
@@ -29,6 +31,7 @@ const ARQUIVOS_PARA_CACHE = [
   "js/grafico-barras.js",
   "js/grafico-linha.js",
   "js/paginas/index.js",
+  "js/paginas/sistema.js",
   "js/paginas/importar-dados.js",
   "js/paginas/treino-bicicleta-menu.js",
   "js/paginas/treino-bicicleta.js",

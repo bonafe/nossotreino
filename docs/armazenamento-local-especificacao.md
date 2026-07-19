@@ -24,7 +24,7 @@ Isso cobre a parte de **dados** funcionando offline. A outra metade — as
 publicado — é responsabilidade do service worker, ver
 [pwa-offline-especificacao.md](./pwa-offline-especificacao.md).
 
-É usado por [index.html](../index.html),
+É usado por [sistema.html](../sistema.html),
 [importar_dados.html](../importar_dados.html),
 [treino_bicicleta.html](../treino_bicicleta.html),
 [treino_bicicleta_menu.html](../treino_bicicleta_menu.html),

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Meus Treinos</title>
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/componentes.css" />
+  <link rel="stylesheet" href="css/paginas/sistema.css" />
+</head>
+<body>
+  <a href="index.html" class="voltar-icon voltar-fixo" aria-label="Voltar para a página inicial">←</a>
+
+  <button id="configBtn" class="config-icon" type="button" aria-label="Configurações" aria-haspopup="true" aria-expanded="false">⚙️</button>
+
+  <div id="configMenu" class="config-menu" hidden>
+    <button type="button" class="config-menu-item" data-acao="reset-musculacao">🏋️ Resetar dados de musculação</button>
+    <button type="button" class="config-menu-item" data-acao="reset-bicicleta">🚴‍♂️ Resetar dados de bicicleta</button>
+  </div>
+
+  <div id="confirmOverlay" class="overlay" hidden>
+    <div class="confirm-card">
+      <p id="confirmTexto"></p>
+      <div class="confirm-botoes">
+        <button id="confirmCancelar" class="secondary" type="button">Cancelar</button>
+        <button id="confirmOk" class="danger" type="button">Resetar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <main>
+    <section class="card">
+      <h1>Meus Treinos</h1>
+      <p>Escolha um treino para começar.</p>
+
+      <a id="avisoDados" class="aviso-dados" href="importar_dados.html" hidden>
+        ⚠️ Primeiro acesso — carregue os dados do treino
+      </a>
+
+      <a class="workout" href="treino_bicicleta_menu.html">
+        🚴‍♂️ Entrar no treino de bicicleta
+        <span>Escolha entre os treinos disponíveis</span>
+      </a>
+
+      <a class="workout" href="treino_exercicios_menu.html" style="margin-top: 14px;">
+        🏋️ Entrar no treino de musculação
+        <span>Musculação, peso do corpo e funcional</span>
+      </a>
+
+      <div class="small">
+        Funciona offline depois de carregado.
+        <br />
+        <a href="importar_dados.html">Carregar/atualizar dados do treino</a>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="js/paginas/sistema.js"></script>
+</body>
+</html>

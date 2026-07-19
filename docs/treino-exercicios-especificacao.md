@@ -238,7 +238,7 @@ sem quebrar.
 ## 6. Telas / fluxo propostas
 
 ```
-index.html
+sistema.html
    └─> treino_exercicios_menu.html   (lista treinos de dados/dados_treinos.json)
           └─> treino_exercicios.html?treino=<id>   (exibe aquecimento, blocos e itens do treino)
                  └─> treino_execucao.html?treino=<id>   (execução guiada, um exercício por vez — ver seção 8)
