@@ -45,14 +45,18 @@
 >
 > As imagens são geradas fora do site
 > (`src/python/gerar_imagens_treino.py`, gera as duas categorias — flag
-> `--categoria`) e nomeadas por convenção —
-> `imagens/<categoria>/<id>__<genero>.png`, `genero` sendo `masculino` ou
-> `feminino` — em vez de referenciadas por um campo no JSON. Não existe
-> registro de quais itens já têm imagem gerada, então o código sempre
-> tenta carregar e trata a ausência como "sem imagem ainda"
-> (`js/imagem-exercicio.js`). A variante exibida vem da preferência
+> `--categoria`) e nomeadas por convenção — `imagens/<categoria>/<id>.png`
+> — em vez de referenciadas por um campo no JSON. Só existe **uma**
+> imagem por item: o script sorteia gênero e etnia do personagem a cada
+> geração (em vez de gerar uma variante por gênero), pra a biblioteca de
+> imagens representar uma variedade de pessoas ao longo do tempo — ver
+> `src/python/openai_imagens.py` (`GENEROS_VALIDOS`/`ETNIAS_VALIDAS`).
+> Não existe registro de quais itens já têm imagem gerada, então o código
+> sempre tenta carregar e trata a ausência como "sem imagem ainda"
+> (`js/imagem-exercicio.js`). A preferência
 > `preferencias.generoImagem.v1` (engrenagem de configurações em
-> `sistema.html`), ver seção 2 de
+> `sistema.html`) continua existindo, mas não influencia mais qual
+> imagem é exibida — ver seção 2 de
 > [armazenamento-local-especificacao.md](./armazenamento-local-especificacao.md).
 
 ---

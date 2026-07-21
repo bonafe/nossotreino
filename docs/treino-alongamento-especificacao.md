@@ -148,12 +148,13 @@ essas opções, seção 2):
   `Cronometro`/`SinalSonoro` da musculação), botão "Ver vídeo"
   (`ligarBotaoVideo`, a partir de `bibliotecas.alongamentos[id].midia`) e
   imagem sempre visível (`ligarImagemExercicio(..., "alongamento")`, mesmo
-  helper genérico por id+gênero de `js/imagem-exercicio.js`, passando o
-  domínio `"alongamento"` pra resolver em `imagens/alongamento/` em vez de
-  `imagens/musculacao/` — hoje nenhum alongamento tem imagem gerada ainda,
-  então fica oculta até existir uma seguindo a convenção
-  `biblioteca-exercicios/imagens/alongamento/<alongamentoId>__<genero>.png`,
-  gerável com `src/python/gerar_imagens_treino.py --categoria alongamentos`).
+  helper genérico por id de `js/imagem-exercicio.js`, passando o domínio
+  `"alongamento"` pra resolver em `imagens/alongamento/<alongamentoId>.png`
+  em vez de `imagens/musculacao/` — fica oculta pros alongamentos que
+  ainda não têm imagem gerada, gerável com
+  `src/python/gerar_imagens_treino.py --categoria alongamentos`, que
+  sorteia gênero/etnia do personagem a cada imagem, ver seção 2.1 de
+  [especificacao-biblioteca-exercicios.md](./especificacao-biblioteca-exercicios.md)).
 - Descanso entre séries/alongamentos: mesma tela/cronômetro da musculação,
   alvo min/máx a partir de `prescricao.descansoSegundos` do item, ou um
   padrão de 15–30s quando ausente (treino de alongamento não tem
@@ -224,5 +225,6 @@ musculação de origem quando veio de um card "Alongamento complementar".
 - Anexar/desanexar treinos de cardio ou alongamento a um treino de
   musculação pela interface — continua manual, editando
   `treino.alongamento[]`/`treino.cardio[]` no plano (seção 4.2).
-- Imagens geradas especificamente para alongamentos — o mecanismo já
-  suporta (seção 5), só falta gerar as imagens.
+- Cobertura completa de imagens pra todo o catálogo de alongamentos — o
+  mecanismo já suporta (seção 5) e parte do catálogo já tem imagem
+  gerada, mas ainda não é a biblioteca inteira.

@@ -2,6 +2,13 @@
 """CLI para gerar imagens de exercício e de alongamento (biblioteca, com ou
 sem plano de treino) via API de imagens da OpenAI.
 
+Cada imagem sorteia gênero e etnia do personagem (ver
+`openai_imagens.GENEROS_VALIDOS`/`ETNIAS_VALIDAS`) — não é mais escolha do
+aluno nem argumento fixo: a ideia é que a biblioteca de imagens, no
+conjunto, represente uma variedade de pessoas em vez de sempre a mesma
+aparência. Por isso só existe **uma** imagem por item (`<id>.png`, sem
+sufixo de gênero no nome) — quem já existir não é regerada.
+
 `--plano` é opcional:
 - **Com** `--plano`, gera só os itens prescritos nele (exercícios de
   `treinos[]`/`treinosAlongamento[]`, opcionalmente filtrados por
@@ -9,8 +16,8 @@ sem plano de treino) via API de imagens da OpenAI.
   aquele aluno usa.
 - **Sem** `--plano`, gera a partir da biblioteca inteira
   (`bibliotecas.exercicios`/`bibliotecas.alongamentos`) — cobre tudo, mas
-  são ~350 exercícios + ~120 alongamentos × 2 gêneros; use `--limite`
-  pra não gerar tudo de uma vez e estourar custo sem querer.
+  são ~350 exercícios + ~120 alongamentos; use `--limite` pra não gerar
+  tudo de uma vez e estourar custo sem querer.
 
 Uso:
     # A partir de um plano específico (só o que está prescrito nele):
@@ -20,7 +27,7 @@ Uso:
         --saida ../../biblioteca-exercicios/imagens \\
         [--categoria ambas|exercicios|alongamentos] \\
         [--treino-id treino-a] [--treino-alongamento-id mobilidade-quadril-pos-treino] \\
-        [--genero ambos|masculino|feminino] \\
+        [--genero sorteio|masculino|feminino] [--etnia sorteio|branca|preta|parda|amarela|indigena] \\
         [--tamanho 1024x1024] [--qualidade auto] [--fundo auto] \\
         [--limite N] [--dry-run]
 
@@ -34,12 +41,13 @@ Uso:
 import argparse
 import json
 import os
+import random
 import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
 
-from openai_imagens import GENEROS_VALIDOS, gerar_imagem_exercicio
+from openai_imagens import ETNIAS_VALIDAS, GENEROS_VALIDOS, gerar_imagem_exercicio
 
 DIRETORIO_SCRIPT = Path(__file__).resolve().parent
 
@@ -86,7 +94,18 @@ def analisar_argumentos():
         type=Path,
         help="Diretório-base onde salvar as imagens (uma subpasta por categoria: musculacao/, alongamento/)",
     )
-    parser.add_argument("--genero", choices=("ambos", *GENEROS_VALIDOS), default="ambos")
+    parser.add_argument(
+        "--genero",
+        choices=("sorteio", *GENEROS_VALIDOS),
+        default="sorteio",
+        help="Fixa o gênero do personagem em vez de sortear por imagem (default: sorteio)",
+    )
+    parser.add_argument(
+        "--etnia",
+        choices=("sorteio", *ETNIAS_VALIDAS),
+        default="sorteio",
+        help="Fixa a etnia do personagem em vez de sortear por imagem (default: sorteio)",
+    )
     parser.add_argument("--tamanho", default="1024x1024", help="Ex.: 1024x1024, 1024x1536, 1536x1024, auto")
     parser.add_argument("--qualidade", default="auto", help="low, medium, high ou auto")
     parser.add_argument("--fundo", default="auto", help="transparent, opaque ou auto")
@@ -154,13 +173,15 @@ def coletar_alongamento_ids(treinos_alongamento: list) -> list:
     return vistos
 
 
-def generos_selecionados(genero_arg: str) -> list:
-    if genero_arg == "ambos":
-        return list(GENEROS_VALIDOS)
-    return [genero_arg]
+def sortear_genero(genero_arg: str) -> str:
+    return genero_arg if genero_arg != "sorteio" else random.choice(GENEROS_VALIDOS)
 
 
-def gerar_para_categoria(rotulo_catalogo, ids, catalogo, pasta_saida, generos, cliente, modelo, args, contadores):
+def sortear_etnia(etnia_arg: str) -> str:
+    return etnia_arg if etnia_arg != "sorteio" else random.choice(ETNIAS_VALIDAS)
+
+
+def gerar_para_categoria(rotulo_catalogo, ids, catalogo, pasta_saida, cliente, modelo, args, contadores):
     pasta_saida.mkdir(parents=True, exist_ok=True)
 
     for item_id in ids:
@@ -170,45 +191,48 @@ def gerar_para_categoria(rotulo_catalogo, ids, catalogo, pasta_saida, generos, c
             contadores["ausentes"] += 1
             continue
 
-        for genero in generos:
-            destino = pasta_saida / f"{item_id}__{genero}.png"
-            nome_relativo = f"{pasta_saida.name}/{destino.name}"
+        destino = pasta_saida / f"{item_id}.png"
+        nome_relativo = f"{pasta_saida.name}/{destino.name}"
 
-            if destino.exists():
-                print(f"[já existe] {nome_relativo}")
-                contadores["puladas"] += 1
-                continue
+        if destino.exists():
+            print(f"[já existe] {nome_relativo}")
+            contadores["puladas"] += 1
+            continue
 
-            # Conta tentativa (sucesso ou falha), não só sucesso — se a API
-            # estiver rejeitando tudo (limite de faturamento, chave
-            # inválida etc.), --limite ainda precisa parar rápido em vez de
-            # esgotar a lista inteira tentando de novo pra cada item.
-            if args.limite is not None and contadores["tentativas"] >= args.limite:
-                print(f"[limite atingido] {nome_relativo} não gerada nesta execução.")
-                continue
+        # Conta tentativa (sucesso ou falha), não só sucesso — se a API
+        # estiver rejeitando tudo (limite de faturamento, chave inválida
+        # etc.), --limite ainda precisa parar rápido em vez de esgotar a
+        # lista inteira tentando de novo pra cada item.
+        if args.limite is not None and contadores["tentativas"] >= args.limite:
+            print(f"[limite atingido] {nome_relativo} não gerada nesta execução.")
+            continue
 
-            if args.dry_run:
-                print(f"[geraria] {nome_relativo}")
-                contadores["tentativas"] += 1
-                continue
+        genero = sortear_genero(args.genero)
+        etnia = sortear_etnia(args.etnia)
 
+        if args.dry_run:
+            print(f"[geraria] {nome_relativo} ({genero}, {etnia})")
             contadores["tentativas"] += 1
-            try:
-                imagem_bytes = gerar_imagem_exercicio(
-                    item,
-                    genero,
-                    tamanho=args.tamanho,
-                    qualidade=args.qualidade,
-                    fundo=args.fundo,
-                    modelo=modelo,
-                    cliente=cliente,
-                )
-                destino.write_bytes(imagem_bytes)
-                print(f"[gerada] {nome_relativo}")
-                contadores["geradas"] += 1
-            except Exception as erro:
-                print(f"[falha] {nome_relativo}: {erro}", file=sys.stderr)
-                contadores["falhas"] += 1
+            continue
+
+        contadores["tentativas"] += 1
+        try:
+            imagem_bytes = gerar_imagem_exercicio(
+                item,
+                genero,
+                etnia,
+                tamanho=args.tamanho,
+                qualidade=args.qualidade,
+                fundo=args.fundo,
+                modelo=modelo,
+                cliente=cliente,
+            )
+            destino.write_bytes(imagem_bytes)
+            print(f"[gerada] {nome_relativo} ({genero}, {etnia})")
+            contadores["geradas"] += 1
+        except Exception as erro:
+            print(f"[falha] {nome_relativo}: {erro}", file=sys.stderr)
+            contadores["falhas"] += 1
 
 
 def main():
@@ -223,7 +247,6 @@ def main():
     biblioteca = carregar_json(args.biblioteca)
     plano = carregar_json(args.plano) if args.plano else None
 
-    generos = generos_selecionados(args.genero)
     args.saida.mkdir(parents=True, exist_ok=True)
 
     cliente = None
@@ -253,7 +276,6 @@ def main():
             exercicio_ids,
             exercicios_biblioteca,
             args.saida / PASTA_POR_CATEGORIA["exercicios"],
-            generos,
             cliente,
             modelo,
             args,
@@ -272,7 +294,6 @@ def main():
             alongamento_ids,
             alongamentos_biblioteca,
             args.saida / PASTA_POR_CATEGORIA["alongamentos"],
-            generos,
             cliente,
             modelo,
             args,

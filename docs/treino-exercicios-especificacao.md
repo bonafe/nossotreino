@@ -369,8 +369,10 @@ diretamente para montar o link de cada card — ver seção 6.2.
 
 Assim que os slots são montados, a página dispara
 `prefetchImagensDoTreino` (`js/imagem-exercicio.js`) com o `exercicioId`
-de toda opção (item principal + alternativas) do treino, pro gênero
-escolhido nas configurações — cada imagem vira uma requisição que o
+de toda opção (item principal + alternativas) do treino — cada imagem
+(uma só por `exercicioId`, sem variante de gênero, ver seção 2.1 de
+[especificacao-biblioteca-exercicios.md](./especificacao-biblioteca-exercicios.md))
+vira uma requisição que o
 `sw.js` intercepta e guarda no cache (rede-primeiro-com-reserva-em-cache,
 mesmo mecanismo do app shell, ver
 [pwa-offline-especificacao.md](./pwa-offline-especificacao.md#4-estratégia-rede-primeiro-cache-como-reserva)).
@@ -458,8 +460,8 @@ Para a opção atual do slot atual, mostrar:
   **sempre visível** na tela (não atrás de um botão, diferente do vídeo) —
   atualizada a cada troca de exercício/opção/slot e também na tela de
   descanso (mostra a imagem do próximo exercício, seção 8.6). Fica oculta
-  quando não existe imagem gerada para aquele `exercicioId`/gênero, e
-  também na tela de conclusão do treino (seção 8.7).
+  quando não existe imagem gerada para aquele `exercicioId`, e também na
+  tela de conclusão do treino (seção 8.7).
 - "Série `serieAtual` de `prescricao.series`".
 - Alvo da série, formatado conforme `prescricao.metrica` (mesma regra
   da seção 3.4.2 deste documento).

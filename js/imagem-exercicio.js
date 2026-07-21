@@ -2,16 +2,13 @@ import { TreinosStorage } from "./storage.js";
 
 const GENERO_PADRAO = "masculino";
 
-// As imagens são geradas fora do site (src/python/gerar_imagens_treino.py)
-// e salvas com nome previsível — não há campo na biblioteca apontando pra
-// elas, então o caminho é sempre montado por convenção a partir do
-// id (exercicioId ou alongamentoId) e do gênero escolhido pelo aluno
-// (configurações). Cada categoria tem sua própria subpasta dentro de
-// `imagens/` (`musculacao/`, `alongamento/` — mesmo domínio usado por
-// `bibliotecas.exercicios`/`bibliotecas.alongamentos`), já que os dois
-// catálogos podem ter ids repetidos entre si. Nem todo item tem imagem
-// gerada ainda, então quem usa isso precisa tratar o caso de a imagem não
-// existir (ver `ligarBotaoImagem`/`ligarImagemExercicio`).
+// Preferência de gênero nas configurações — hoje não influencia mais qual
+// imagem é exibida (imagens deixaram de ter gênero fixo no nome desde que
+// a geração passou a sortear gênero/etnia por conta própria, ver
+// src/python/gerar_imagens_treino.py e docs/estrutura-biblioteca-alongamentos.md).
+// A opção continua existindo em sistema.html só porque ainda não foi
+// decidido remover a UI; nenhuma leitura daqui influencia mais o caminho
+// da imagem.
 export function obterGeneroImagem() {
   return TreinosStorage.lerJSON(TreinosStorage.chaves.generoImagem, GENERO_PADRAO);
 }
@@ -20,8 +17,17 @@ export function definirGeneroImagem(genero) {
   TreinosStorage.salvarJSON(TreinosStorage.chaves.generoImagem, genero);
 }
 
-export function caminhoImagemExercicio(id, genero = obterGeneroImagem(), dominio = "musculacao") {
-  return `biblioteca-exercicios/imagens/${dominio}/${id}__${genero}.png`;
+// As imagens são geradas fora do site (src/python/gerar_imagens_treino.py)
+// e salvas com nome previsível — não há campo na biblioteca apontando pra
+// elas, então o caminho é sempre montado por convenção a partir do id
+// (exercicioId ou alongamentoId). Cada categoria tem sua própria subpasta
+// dentro de `imagens/` (`musculacao/`, `alongamento/` — mesmo domínio
+// usado por `bibliotecas.exercicios`/`bibliotecas.alongamentos`), já que
+// os dois catálogos podem ter ids repetidos entre si. Nem todo item tem
+// imagem gerada ainda, então quem usa isso precisa tratar o caso de a
+// imagem não existir (ver `ligarBotaoImagem`/`ligarImagemExercicio`).
+export function caminhoImagemExercicio(id, dominio = "musculacao") {
+  return `biblioteca-exercicios/imagens/${dominio}/${id}.png`;
 }
 
 // Modal simples (mesmo padrão de #videoOverlay/criarVideoPlayerModal em
@@ -63,9 +69,9 @@ export function criarImagemModal() {
  * uma vez seria desperdício. O cache em si é o do service worker (`sw.js`,
  * rede-primeiro-com-reserva-em-cache), então basta disparar o request.
  */
-export function prefetchImagensDoTreino(ids, genero = obterGeneroImagem(), dominio = "musculacao") {
+export function prefetchImagensDoTreino(ids, dominio = "musculacao") {
   [...new Set(ids)].forEach((id) => {
-    new Image().src = caminhoImagemExercicio(id, genero, dominio);
+    new Image().src = caminhoImagemExercicio(id, dominio);
   });
 }
 
@@ -78,7 +84,7 @@ export function ligarBotaoImagem(botaoEl, exercicioId, nomeExercicio, imagemModa
   botaoEl.hidden = true;
   if (!exercicioId) return;
 
-  const src = caminhoImagemExercicio(exercicioId, undefined, dominio);
+  const src = caminhoImagemExercicio(exercicioId, dominio);
   const probe = new Image();
   probe.onload = () => {
     botaoEl.hidden = false;
@@ -103,7 +109,7 @@ export function ligarImagemExercicio(imgEl, exercicioId, nomeExercicio, deveAtua
   imgEl.hidden = true;
   if (!exercicioId) return;
 
-  const src = caminhoImagemExercicio(exercicioId, undefined, dominio);
+  const src = caminhoImagemExercicio(exercicioId, dominio);
   const probe = new Image();
   probe.onload = () => {
     if (!deveAtualizar()) return;

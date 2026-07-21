@@ -5,6 +5,21 @@ import re
 
 GENEROS_VALIDOS = ("masculino", "feminino")
 
+# Categorias de cor/raça do IBGE (branca, preta, parda, amarela, indígena),
+# usadas aqui pra sortear a etnia do personagem em cada imagem gerada —
+# mesmo espírito do sorteio de gênero: em vez de fixar sempre a mesma
+# aparência, cada exercício/alongamento acaba representado por uma
+# variedade de pessoas ao longo da biblioteca, sem escolha manual.
+ETNIAS_VALIDAS = ("branca", "preta", "parda", "amarela", "indigena")
+
+_DESCRITOR_ETNIA = {
+    "branca": "branco",
+    "preta": "negro",
+    "parda": "pardo",
+    "amarela": "asiático",
+    "indigena": "indígena",
+}
+
 # `descricao` na biblioteca vem sempre estruturada assim (ver
 # docs/especificacao-biblioteca-exercicios.md), o que encaixa direto nos
 # dois quadros do prompt (início/fim) e resolve ambiguidades que o nome do
@@ -20,10 +35,21 @@ def humanizar_id(identificador: str) -> str:
     return identificador.replace("-", " ")
 
 
-def montar_prompt(exercicio: dict, genero: str) -> str:
+def _descrever_pessoa(genero: str, etnia: str) -> str:
+    artigo = "um homem" if genero == "masculino" else "uma mulher"
+    descritor = _DESCRITOR_ETNIA[etnia]
+    # Concordância de gênero do descritor de etnia (negro/negra, pardo/parda
+    # etc.) — só "asiático"/"indígena" não variam com -o/-a de forma trivial,
+    # tratados à parte.
+    if genero == "feminino" and descritor.endswith("o"):
+        descritor = descritor[:-1] + "a"
+    return f"{artigo} {descritor}"
+
+
+def montar_prompt(exercicio: dict, genero: str, etnia: str) -> str:
     """Monta o prompt de imagem a partir do nome, dos grupos musculares e da
     `descricao` do exercício na biblioteca."""
-    pessoa = "um homem" if genero == "masculino" else "uma mulher"
+    pessoa = _descrever_pessoa(genero, etnia)
     nome = exercicio.get("nome") or exercicio.get("id", "exercício")
     grupos = exercicio.get("gruposMusculares", {}).get("principais", [])
     descricao = exercicio.get("descricao") or ""
@@ -64,6 +90,7 @@ def montar_prompt(exercicio: dict, genero: str) -> str:
 def gerar_imagem_exercicio(
     exercicio: dict,
     genero: str,
+    etnia: str,
     *,
     tamanho: str = "1024x1024",
     qualidade: str = "auto",
@@ -77,8 +104,10 @@ def gerar_imagem_exercicio(
     de onde a chave veio (facilita reusar/testar isolado)."""
     if genero not in GENEROS_VALIDOS:
         raise ValueError(f"genero inválido: {genero!r} (use 'masculino' ou 'feminino')")
+    if etnia not in ETNIAS_VALIDAS:
+        raise ValueError(f"etnia inválida: {etnia!r} (use um de {ETNIAS_VALIDAS!r})")
 
-    prompt = montar_prompt(exercicio, genero)
+    prompt = montar_prompt(exercicio, genero, etnia)
 
     resposta = cliente.images.generate(
         model=modelo,

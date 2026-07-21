@@ -391,7 +391,7 @@ class TreinoAlongamentoController {
       return;
     }
 
-    prefetchImagensDoTreino(this.#slots.map((slot) => slot.alongamentoId), undefined, "alongamento");
+    prefetchImagensDoTreino(this.#slots.map((slot) => slot.alongamentoId), "alongamento");
     this.#carregarOuIniciarProgresso();
 
     document.title = `${this.#treinoAlongamento.nome} — Execução`;
