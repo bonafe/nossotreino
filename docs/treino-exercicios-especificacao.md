@@ -354,6 +354,25 @@ declara a própria (ver seção 10.10 de
 `treino_exercicios.html` usa o `exercicioId` de cada item/alternativa
 diretamente para montar o link de cada card — ver seção 6.2.
 
+Assim que os slots são montados, a página dispara
+`prefetchImagensDoTreino` (`js/imagem-exercicio.js`) com o `exercicioId`
+de toda opção (item principal + alternativas) do treino, pro gênero
+escolhido nas configurações — cada imagem vira uma requisição que o
+`sw.js` intercepta e guarda no cache (rede-primeiro-com-reserva-em-cache,
+mesmo mecanismo do app shell, ver
+[pwa-offline-especificacao.md](./pwa-offline-especificacao.md#4-estratégia-rede-primeiro-cache-como-reserva)).
+Sem isso, só a imagem do exercício exibido no momento carregava (seção
+8.4) — as dos exercícios seguintes só seriam buscadas quando o aluno
+chegasse neles, o que falha se a rede cair no meio do treino. Diferente
+do pré-carregamento de vídeo (biblioteca inteira, seção 8 de
+[torrent-videos-especificacao.md](./torrent-videos-especificacao.md)),
+aqui o escopo é só os exercícios deste treino — a pasta de imagens já
+passa de 40 MB, então baixar a biblioteca inteira de uma vez seria
+desperdício. `treino_exercicios.html` (seção 6.2) já cobre isso hoje sem
+precisar dessa função: como monta um card por item/alternativa de uma
+vez, cada `ligarBotaoImagem` já dispara o carregamento daquela imagem
+como efeito colateral.
+
 ### 8.2.1 Pular direto para um exercício (`?exercicio=` e `?opcao=`)
 
 Além de `?treino=<id>`, a página aceita `?exercicio=<exercicioId>` e,

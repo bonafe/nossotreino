@@ -5,7 +5,7 @@ import { Formatadores } from "../formatadores.js";
 import { SinalSonoro } from "../sinal-sonoro.js";
 import { Cronometro } from "../cronometro.js";
 import { criarVideoPlayerModal, ligarBotaoVideo } from "../video-player-modal.js";
-import { ligarImagemExercicio } from "../imagem-exercicio.js";
+import { ligarImagemExercicio, prefetchImagensDoTreino } from "../imagem-exercicio.js";
 
 class TreinoExecucaoController {
   #sinal = new SinalSonoro();
@@ -551,6 +551,8 @@ class TreinoExecucaoController {
       this.#mostrarErro("Este treino ainda não tem exercícios cadastrados.");
       return;
     }
+
+    prefetchImagensDoTreino(this.#slots.flatMap((slot) => slot.opcoes.map((opcao) => opcao.exercicioId)));
 
     this.#carregarOuIniciarProgresso();
     this.#aplicarSaltoParaExercicio(params);

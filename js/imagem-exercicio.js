@@ -47,6 +47,25 @@ export function criarImagemModal() {
 }
 
 /**
+ * Dispara o carregamento de todas as imagens de um treino (item principal
+ * + alternativas) de uma vez, assim que o treino é aberto — evita
+ * depender só do carregamento incidental de cada `<img>`/botão conforme a
+ * tela avança (o gargalo que motivou isto: em treino_execucao.html só a
+ * imagem do exercício atual carregava, deixando as seguintes pra buscar
+ * na hora, o que falha se a rede cair no meio do treino). Ao contrário do
+ * pré-carregamento de vídeo (biblioteca inteira, ver
+ * docs/torrent-videos-especificacao.md seção 8), aqui é só os exercícios
+ * deste treino — a pasta de imagens já passa de 40 MB, cachear tudo de
+ * uma vez seria desperdício. O cache em si é o do service worker (`sw.js`,
+ * rede-primeiro-com-reserva-em-cache), então basta disparar o request.
+ */
+export function prefetchImagensDoTreino(exercicioIds, genero = obterGeneroImagem()) {
+  [...new Set(exercicioIds)].forEach((exercicioId) => {
+    new Image().src = caminhoImagemExercicio(exercicioId, genero);
+  });
+}
+
+/**
  * Liga um botão "Ver imagem" a um exercício: só aparece quando a imagem
  * existe de fato (não há como saber isso a partir da biblioteca, então
  * tenta carregar e reage ao sucesso/falha).
