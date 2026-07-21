@@ -27,9 +27,11 @@
 - `midia.videoUrl` passou a ser admitido;
 - valores desconhecidos devem ser `null` ou omitidos, em vez de novos valores artificiais de enumeração.
 
-> **Modelo implementado pelo código.** `biblioteca-exercicios.json` fica na
-> raiz do repositório (versionado, buscado por `fetch` — não é dado
-> pessoal, ver seção 2.1) e o plano de treino é carregado manualmente em
+> **Modelo implementado pelo código.** `biblioteca-exercicios.json` fica em
+> `biblioteca-exercicios/biblioteca-exercicios.json` (versionado, buscado
+> por `fetch` — não é dado pessoal, ver seção 2.1; a mesma pasta
+> `biblioteca-exercicios/` guarda as imagens de exercício geradas em
+> `imagens-exercicios/`) e o plano de treino é carregado manualmente em
 > [importar_dados.html](../importar_dados.html) como sempre foi (dado
 > pessoal, só em `localStorage`). Ver
 > [treino-exercicios-especificacao.md](./treino-exercicios-especificacao.md) e
@@ -133,7 +135,7 @@ exercício ou modalidade é repetido aqui, só o `exercicioId`/`modalidadeId`:
   "schemaVersion": "1.2",
 
   "biblioteca": {
-    "arquivo": "biblioteca-exercicios.json"
+    "arquivo": "biblioteca-exercicios/biblioteca-exercicios.json"
   },
 
   "origem": {

@@ -25,8 +25,9 @@ Existem dois documentos JSON, carregados de formas opostas (ver
 `docs/especificacao-biblioteca-exercicios.md` seção 2 para o esquema
 completo):
 
-- **Biblioteca de exercícios** (`biblioteca-exercicios.json`, raiz do
-  repo, versionada, não é dado pessoal): buscada por `fetch` a cada
+- **Biblioteca de exercícios** (`biblioteca-exercicios/biblioteca-exercicios.json`,
+  versionada, não é dado pessoal — a pasta `biblioteca-exercicios/` também
+  guarda as imagens geradas por exercício em `imagens-exercicios/`): buscada por `fetch` a cada
   página via `carregarBiblioteca()` (`js/biblioteca-exercicios.js`),
   cacheada pelo service worker pra funcionar offline. Nunca passa por
   `localStorage`.
@@ -77,7 +78,7 @@ Vídeos de exercício (`bibliotecas.exercicios[id].midia.videoMagnet`, magnet UR
 - `js/paginas/*.js` — um controller por página HTML (`treino-execucao.js` ↔ `treino_execucao.html`), carregado via `<script type="module">`.
 - `js/*.js` (fora de `paginas/`) — utilitários compartilhados entre páginas: `storage.js` (localStorage), `biblioteca-exercicios.js` (fetch da biblioteca), `prescricao-formatadores.js`, `formatadores.js`, `cronometro.js`, `sinal-sonoro.js`, `grafico-barras.js`/`grafico-linha.js` (D3), `videos-torrent.js`/`video-player-modal.js` (vídeos por torrent).
 - `css/paginas/*.css` — estilos específicos de cada página; `css/base.css` e `css/componentes.css` são compartilhados.
-- `biblioteca-exercicios.json`/`d3.v7.min.js`/`webtorrent.min.js` — vendorizados/versionados na raiz (não CDN, não gitignorado), pra continuar funcionando offline.
+- `biblioteca-exercicios/` (json + `imagens-exercicios/`) / `d3.v7.min.js` / `webtorrent.min.js` — vendorizados/versionados na raiz (não CDN, não gitignorado), pra continuar funcionando offline.
 - `docs/*-especificacao.md` — as specs vivas de cada área (armazenamento local, PWA/offline, bike, exercícios, biblioteca de exercícios). Ao mudar comportamento coberto por uma spec, atualize o documento junto.
 
 ### Convenções

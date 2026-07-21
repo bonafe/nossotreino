@@ -17,7 +17,7 @@ padrão de "motor genérico + JSON de dados" já usado no
 
 ## 2. Fonte de dados
 
-- **Biblioteca** (`biblioteca-exercicios.json`, raiz do repositório,
+- **Biblioteca** (`biblioteca-exercicios/biblioteca-exercicios.json`,
   versionada): exercícios, grupos musculares, equipamentos e técnicas. Não é
   dado pessoal — é buscada por `fetch` (`js/biblioteca-exercicios.js#carregarBiblioteca()`),
   cacheada pelo service worker pra funcionar offline, e mantida em memória

@@ -4,9 +4,9 @@ API de imagens da OpenAI.
 
 Uso:
     python3 gerar_imagens_treino.py \\
-        --biblioteca ../../biblioteca-exercicios.json \\
+        --biblioteca ../../biblioteca-exercicios/biblioteca-exercicios.json \\
         --plano ../../dados/treino-bonafe-v1.json \\
-        --saida ../../dados/imagens-exercicios \\
+        --saida ../../biblioteca-exercicios/imagens-exercicios \\
         [--treino-id treino-a] [--genero ambos|masculino|feminino] \\
         [--tamanho 1024x1024] [--qualidade auto] [--fundo auto] \\
         [--limite N] [--dry-run]

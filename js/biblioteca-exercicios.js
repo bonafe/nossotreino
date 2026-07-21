@@ -10,7 +10,7 @@ let bibliotecaCache = null;
 export async function carregarBiblioteca() {
   if (bibliotecaCache) return bibliotecaCache;
 
-  const resposta = await fetch("biblioteca-exercicios.json");
+  const resposta = await fetch("biblioteca-exercicios/biblioteca-exercicios.json");
   if (!resposta.ok) {
     throw new Error("Não foi possível carregar a biblioteca de exercícios.");
   }

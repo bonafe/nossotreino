@@ -1,4 +1,4 @@
-const CACHE_NOME = "treinos-shell-v7";
+const CACHE_NOME = "treinos-shell-v8";
 
 const ARQUIVOS_PARA_CACHE = [
   "index.html",
@@ -11,7 +11,7 @@ const ARQUIVOS_PARA_CACHE = [
   "treino_execucao.html",
   "treino_exercicio_progresso.html",
   "treino_novo.html",
-  "biblioteca-exercicios.json",
+  "biblioteca-exercicios/biblioteca-exercicios.json",
   "d3.v7.min.js",
   "webtorrent.min.js",
   "css/base.css",
