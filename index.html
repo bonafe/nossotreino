@@ -31,7 +31,7 @@
       </ul>
     </section>
 
-    <section class="painel">
+    <section class="painel" id="apoio">
       <h2>Apoie o projeto</h2>
       <p>
         O Nosso Treino é mantido de forma independente e vai continuar
@@ -39,10 +39,36 @@
         contribuir com o desenvolvimento, doações são muito bem-vindas —
         mas nunca serão necessárias para usar qualquer parte do sistema.
       </p>
-      <div class="doacao">
-        <p>Pix: <code>chave pix a definir</code></p>
-        <p><a href="#">Apoiar pelo GitHub Sponsors →</a></p>
+
+      <div class="pix-painel">
+        <div id="pixValores" class="pix-valores" hidden></div>
+        <div id="pixQr" class="pix-qr" hidden></div>
+        <button type="button" id="pixCopiarBtn" class="pix-copiar" hidden>Copiar código Pix</button>
+        <input type="text" id="pixCopiaManualInput" class="pix-copia-manual" readonly hidden />
+        <div id="pixIndisponivel" class="estado" hidden>
+          Chave Pix ainda sendo configurada — volte em breve.
+        </div>
       </div>
+
+      <p class="apoio-destino-titulo"><strong>Sua contribuição ajuda a financiar:</strong></p>
+      <ul class="apoio-destino-lista">
+        <li>manutenção do site e do domínio;</li>
+        <li>criação e revisão da biblioteca de exercícios;</li>
+        <li>imagens didáticas de execução;</li>
+        <li>testes em celulares e navegadores;</li>
+        <li>melhorias de acessibilidade;</li>
+        <li>desenvolvimento de novos tipos de treino.</li>
+      </ul>
+    </section>
+
+    <section class="painel">
+      <h2>Quem faz o Nosso Treino?</h2>
+      <p>
+        Sou Bonafé, programador desde 2000. Quero fazer software que
+        ajude as pessoas de verdade — o Nosso Treino nasceu disso:
+        acredito que organizar e acompanhar treino não deveria depender
+        de mensalidade, anúncio ou venda de dados.
+      </p>
     </section>
 
     <section class="painel">
@@ -79,6 +105,7 @@
     </section>
   </main>
 
+  <script src="qrcode.min.js"></script>
   <script type="module" src="js/paginas/index.js"></script>
 </body>
 </html>

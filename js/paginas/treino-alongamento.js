@@ -7,6 +7,7 @@ import { Cronometro } from "../cronometro.js";
 import { criarVideoPlayerModal, ligarBotaoVideo } from "../video-player-modal.js";
 import { ligarImagemExercicio, prefetchImagensDoTreino } from "../imagem-exercicio.js";
 import { criarDetalhesModal } from "../detalhes-modal.js";
+import { deveExibirPedidoApoio, renderizarPedidoApoio } from "../apoio.js";
 
 // Motor sequencial simplificado, modelado em treino-execucao.js (musculação)
 // — sem carga, repetições realizadas, ajuste de carga ou substituto, já
@@ -60,6 +61,7 @@ class TreinoAlongamentoController {
   #iniciarSerieEl = document.getElementById("iniciarSerie");
   #concluidoEl = document.getElementById("concluido");
   #resumoConclusaoEl = document.getElementById("resumoConclusao");
+  #apoioContainerEl = document.getElementById("apoioContainer");
 
   iniciar() {
     this.#comecarSerieEl.addEventListener("click", () => this.#alternarSerie());
@@ -335,6 +337,8 @@ class TreinoAlongamentoController {
     this.#imagemAlongamentoEl.hidden = true;
     this.#resumoConclusaoEl.textContent =
       `${this.#treinoAlongamento.nome} — ${this.#slots.length} alongamentos em ${Formatadores.duracaoExtensa(duracaoSegundos)}.`;
+
+    if (deveExibirPedidoApoio()) renderizarPedidoApoio(this.#apoioContainerEl);
   }
 
   #mostrarErro(mensagem) {

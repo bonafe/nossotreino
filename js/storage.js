@@ -33,7 +33,10 @@ export class TreinosStorage {
     historicoSessaoAlongamento: "historico.sessaoAlongamento.v1",
     execucaoMusculacao: (treinoId) => `execucao.musculacao.${treinoId}.v2`,
     execucaoAlongamento: (treinoId) => `execucao.alongamento.${treinoId}.v1`,
-    generoImagem: "preferencias.generoImagem.v1"
+    generoImagem: "preferencias.generoImagem.v1",
+    apoioUltimaExibicaoContador: "apoio.ultimaExibicaoContador.v1",
+    apoioUltimaExibicaoData: "apoio.ultimaExibicaoData.v1",
+    apoioDispensadoPermanentemente: "apoio.dispensadoPermanentemente.v1"
   };
 
   static lerJSON(chave, padrao) {

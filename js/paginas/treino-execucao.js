@@ -7,6 +7,7 @@ import { Cronometro } from "../cronometro.js";
 import { criarVideoPlayerModal, ligarBotaoVideo } from "../video-player-modal.js";
 import { ligarImagemExercicio, prefetchImagensDoTreino } from "../imagem-exercicio.js";
 import { criarDetalhesModal } from "../detalhes-modal.js";
+import { deveExibirPedidoApoio, renderizarPedidoApoio } from "../apoio.js";
 
 class TreinoExecucaoController {
   #sinal = new SinalSonoro();
@@ -62,6 +63,7 @@ class TreinoExecucaoController {
   #iniciarSerieEl = document.getElementById("iniciarSerie");
   #concluidoEl = document.getElementById("concluido");
   #resumoConclusaoEl = document.getElementById("resumoConclusao");
+  #apoioContainerEl = document.getElementById("apoioContainer");
 
   iniciar() {
     this.#comecarSerieEl.addEventListener("click", () => this.#alternarSerie());
@@ -488,6 +490,8 @@ class TreinoExecucaoController {
     this.#imagemExercicioEl.hidden = true;
     this.#resumoConclusaoEl.textContent =
       `${this.#treino.nome} — ${this.#slots.length} exercícios em ${Formatadores.duracaoExtensa(duracaoSegundos)}.`;
+
+    if (deveExibirPedidoApoio()) renderizarPedidoApoio(this.#apoioContainerEl);
   }
 
   #mostrarErro(mensagem) {

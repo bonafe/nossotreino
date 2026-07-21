@@ -3,6 +3,7 @@ import { carregarBiblioteca } from "../biblioteca-exercicios.js";
 import { SinalSonoro } from "../sinal-sonoro.js";
 import { Cronometro } from "../cronometro.js";
 import { Formatadores } from "../formatadores.js";
+import { deveExibirPedidoApoio, renderizarPedidoApoio } from "../apoio.js";
 
 class TreinoBicicletaController {
   #sinal = new SinalSonoro();
@@ -27,6 +28,7 @@ class TreinoBicicletaController {
   #startPauseBtn = document.getElementById("startPause");
   #resetBtn = document.getElementById("reset");
   #hintEl = document.getElementById("hint");
+  #apoioContainerEl = document.getElementById("apoioContainer");
 
   #estilosIntensidade = {
     leve: { label: "LEVE", instructionPrefix: "Recuperação leve", som: () => this.#somLeve() },
@@ -159,6 +161,7 @@ class TreinoBicicletaController {
       this.#render();
       this.#somConcluido();
       this.#registrarSessaoConcluida();
+      if (deveExibirPedidoApoio()) renderizarPedidoApoio(this.#apoioContainerEl);
       return;
     }
 
