@@ -107,7 +107,7 @@ def main():
 
         cliente = OpenAI(api_key=chave)
 
-    geradas = puladas = ausentes = falhas = 0
+    geradas = puladas = ausentes = falhas = tentativas = 0
 
     for exercicio_id in exercicio_ids:
         exercicio = exercicios_biblioteca.get(exercicio_id)
@@ -124,14 +124,20 @@ def main():
                 puladas += 1
                 continue
 
-            if args.limite is not None and geradas >= args.limite:
+            # Conta tentativa (sucesso ou falha), não só sucesso — se a API
+            # estiver rejeitando tudo (limite de faturamento, chave
+            # inválida etc.), --limite ainda precisa parar rápido em vez de
+            # esgotar a lista inteira tentando de novo pra cada exercício.
+            if args.limite is not None and tentativas >= args.limite:
                 print(f"[limite atingido] {destino.name} não gerada nesta execução.")
                 continue
 
             if args.dry_run:
                 print(f"[geraria] {destino.name}")
+                tentativas += 1
                 continue
 
+            tentativas += 1
             try:
                 imagem_bytes = gerar_imagem_exercicio(
                     exercicio,
