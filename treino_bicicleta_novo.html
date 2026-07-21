@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Novo Treino de Bicicleta</title>
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/componentes.css" />
+  <link rel="stylesheet" href="css/paginas/treino-novo.css" />
+</head>
+<body>
+  <main>
+    <header class="top">
+      <a class="voltar-icon" href="treino_bicicleta_menu.html" aria-label="Voltar">←</a>
+      <div>
+        <h1>Novo treino de bicicleta</h1>
+      </div>
+    </header>
+
+    <div id="carregando" class="estado">Carregando…</div>
+
+    <div id="erro" class="estado" hidden></div>
+
+    <form id="formTreino" hidden>
+      <div class="campo">
+        <label for="nomeInput">Nome</label>
+        <input type="text" id="nomeInput" placeholder="Ex.: Treino D" autocomplete="off" />
+      </div>
+
+      <div class="campo">
+        <label for="modalidadeInput">Modalidade</label>
+        <select id="modalidadeInput"></select>
+      </div>
+
+      <div class="campo">
+        <label for="seriesInput">Séries</label>
+        <input type="number" id="seriesInput" min="1" value="10" />
+      </div>
+
+      <div class="campo-linha">
+        <div class="campo">
+          <label for="tempoEstimuloInput">Tempo de estímulo (s)</label>
+          <input type="number" id="tempoEstimuloInput" min="1" value="30" />
+        </div>
+        <div class="campo">
+          <label for="intensidadeEstimuloInput">Intensidade do estímulo</label>
+          <select id="intensidadeEstimuloInput">
+            <option value="maxima">Máxima</option>
+            <option value="leve">Leve</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="campo-linha">
+        <div class="campo">
+          <label for="tempoRecuperacaoInput">Tempo de recuperação (s)</label>
+          <input type="number" id="tempoRecuperacaoInput" min="1" value="30" />
+        </div>
+        <div class="campo">
+          <label for="intensidadeRecuperacaoInput">Intensidade da recuperação</label>
+          <select id="intensidadeRecuperacaoInput">
+            <option value="leve">Leve</option>
+            <option value="maxima">Máxima</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="button" id="salvarBtn" class="primary">Salvar treino</button>
+
+      <div id="mensagem" class="mensagem" hidden></div>
+    </form>
+  </main>
+
+  <script type="module" src="js/paginas/treino-bicicleta-novo.js"></script>
+</body>
+</html>

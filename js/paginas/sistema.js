@@ -25,7 +25,9 @@ const TEXTOS_CONFIRMACAO = {
   "reset-musculacao":
     "Isso vai apagar todo o histórico de séries e sessões de musculação, além do progresso de treinos em andamento. Não dá pra desfazer. Continuar?",
   "reset-bicicleta":
-    "Isso vai apagar todo o histórico de sessões de bicicleta. Não dá pra desfazer. Continuar?"
+    "Isso vai apagar todo o histórico de sessões de bicicleta. Não dá pra desfazer. Continuar?",
+  "reset-alongamento":
+    "Isso vai apagar todo o histórico de alongamento, além do progresso de treinos em andamento. Não dá pra desfazer. Continuar?"
 };
 
 class ConfiguracoesController {
@@ -93,6 +95,9 @@ class ConfiguracoesController {
     } else if (this.#acaoConfirmada === "reset-bicicleta") {
       TreinosStorage.resetarBicicleta();
       this.#mostrarToast("Dados de bicicleta resetados.");
+    } else if (this.#acaoConfirmada === "reset-alongamento") {
+      TreinosStorage.resetarAlongamento();
+      this.#mostrarToast("Dados de alongamento resetados.");
     }
     this.#fecharConfirmacao();
   }

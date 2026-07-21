@@ -142,7 +142,7 @@ exercício ou modalidade é repetido aqui, só o `exercicioId`/`modalidadeId`:
 ```json
 {
   "schema": "plano-de-treino",
-  "schemaVersion": "1.2",
+  "schemaVersion": "1.3",
 
   "biblioteca": {
     "arquivo": "biblioteca-exercicios/biblioteca-exercicios.json"
@@ -165,7 +165,9 @@ exercício ou modalidade é repetido aqui, só o `exercicioId`/`modalidadeId`:
   "distribuicaoSemanal": [],
   "regraContinuidade": "...",
   "orientacoesGerais": {},
-  "treinos": []
+  "treinos": [],
+  "treinosCardio": [],
+  "treinosAlongamento": []
 }
 ```
 
@@ -176,7 +178,22 @@ Campos:
 | `biblioteca.arquivo` | Nome do arquivo de biblioteca que este plano espera. Não é um lock de conteúdo — a biblioteca pode crescer; a aplicação valida a referência no carregamento (seção 14.5), não a versão exata. |
 | `origem` | Proveniência do plano (de onde veio, quando foi convertido) — opcional, útil quando o plano nasceu de um PDF/planilha externo. |
 | `metadata`, `distribuicaoSemanal`, `regraContinuidade`, `orientacoesGerais` | Específicos deste aluno/período; ver `treino-exercicios-especificacao.md` para a semântica de cada um (mantida sem alteração, só movida para este documento separado). |
-| `treinos` | Lista de treinos deste plano, no formato da seção 12. |
+| `treinos` | Lista de treinos de musculação/calistenia/condicionamento/flexibilidade deste plano, no formato da seção 12. |
+| `treinosCardio` | Lista de treinos de cardio (bike, etc.) deste plano, **entidades de primeira classe** com `id`/`nome` próprios — ver seção 11.4. Opcional (`[]`/ausente se o plano não tiver nenhum). |
+| `treinosAlongamento` | Lista de treinos de alongamento deste plano, mesma ideia — ver seção 11.5. Opcional. |
+
+**Desde a versão 1.3**, cardio e alongamento deixaram de ser prescrições
+embutidas dentro de um treino de musculação e passaram a ser coleções
+irmãs de `treinos`, cada entrada com `id`/`nome` próprios — um treino de
+musculação passa a **referenciar** essas entradas por id (seção 11.4/11.5),
+em vez de embutir a prescrição inteira. Isso permite: um treino de cardio
+ou de alongamento existir avulso (sem precisar de um treino de musculação
+"dono"), ser reutilizado por mais de um treino de musculação, e ser criado
+pela interface (`treino_bicicleta_novo.html`/`treino_alongamento_novo.html`)
+do mesmo jeito que `treino_novo.html` já cria treinos de musculação. Planos
+no formato `1.2` (cardio embutido em `treino.cardio[].treino`) não são mais
+lidos — mesma convenção de "mudança de formato = nova versão, sem migração
+automática" já usada no resto do projeto.
 
 Decisões de modelagem específicas de uma conversão (ex.: como um PDF
 ambíguo foi interpretado) não pertencem a nenhum dos dois documentos —
@@ -1861,12 +1878,13 @@ Cardio possui biblioteca e prescrição próprias. Não é cadastrado como exerc
 }
 ```
 
-#### Treino de bicicleta ergométrica
+#### Entrada de `treinosCardio[]` (entidade de primeira classe, seção 2.2)
 
 ```json
 {
+  "id": "bike-intervalado-15x30-30",
+  "nome": "Treino A",
   "modalidadeId": "bicicleta-ergometrica",
-  "momento": "apos-musculacao",
   "treino": {
     "tipo": "intervalado",
     "series": 15,
@@ -1885,17 +1903,80 @@ Cardio possui biblioteca e prescrição próprias. Não é cadastrado como exerc
       }
     }
   },
-  "observacao": null
+  "observacao": null,
+  "status": "ativo",
+  "versao": 1
 }
 ```
 
-Outros exemplos possíveis:
+Um treino de musculação que quiser esse cardio como complemento referencia
+o `id` acima (não embute a prescrição) — ver seção 12.3:
+
+```json
+{
+  "cardio": [
+    { "treinoCardioId": "bike-intervalado-15x30-30", "momento": "apos-musculacao" }
+  ]
+}
+```
+
+`momento` fica na referência, não na entidade: é uma propriedade do vínculo
+com aquele treino de musculação específico (o mesmo treino de cardio pode,
+em tese, ser referenciado em momentos diferentes por treinos diferentes).
+
+Outros exemplos possíveis de `treino` (dentro da entidade `treinosCardio[]`):
 
 - bicicleta ergométrica contínua por tempo;
 - esteira intervalada por velocidade;
 - remo ergométrico por distância;
 - treino por zona de frequência cardíaca;
 - treino por potência em watts.
+
+(O motor implementado, `treino_bicicleta.html`, hoje só sabe tocar
+`tipo: "intervalado"` com `estimulo`/`recuperacao` — ver seção 8 de
+[treino-bicicleta-especificacao.md](./treino-bicicleta-especificacao.md).)
+
+### 11.5. Alongamento — treino de alongamento
+
+Mesmo padrão de entidade de primeira classe, em `treinosAlongamento[]`
+(seção 2.2), referenciando alongamentos de `bibliotecas.alongamentos`
+(ver `docs/estrutura-biblioteca-alongamentos.md`) por `alongamentoId`:
+
+```json
+{
+  "id": "mobilidade-quadril-pos-treino",
+  "nome": "Mobilidade de quadril pós-treino",
+  "alongamentos": [
+    {
+      "alongamentoId": "alongamento-de-posteriores-em-pe",
+      "ordem": 10,
+      "prescricao": {
+        "series": 2,
+        "metrica": { "tipo": "tempo", "modo": "fixo", "valor": 30, "unidade": "segundos" },
+        "descansoSegundos": null
+      },
+      "observacao": null
+    }
+  ],
+  "status": "ativo",
+  "versao": 1
+}
+```
+
+Referenciado por um treino de musculação da mesma forma que cardio:
+
+```json
+{
+  "alongamento": [
+    { "treinoAlongamentoId": "mobilidade-quadril-pos-treino", "momento": "apos-musculacao" }
+  ]
+}
+```
+
+`alongamentos[]` é sempre lista plana e sequencial — **sem** `superset`,
+`circuito`, `alternativas` nem `tecnicas` (não fazem sentido pra composição
+de alongamento, ver seção 5 de
+[treino-alongamento-especificacao.md](./treino-alongamento-especificacao.md)).
 
 ## 12. Estrutura de treino
 
@@ -1979,28 +2060,11 @@ O treino possui uma lista plana de exercícios e, opcionalmente, uma lista próp
   ],
 
   "cardio": [
-    {
-      "modalidadeId": "bicicleta-ergometrica",
-      "momento": "apos-musculacao",
-      "treino": {
-        "tipo": "intervalado",
-        "series": 15,
-        "estimulo": {
-          "duracaoSegundos": 30,
-          "intensidade": {
-            "modo": "percepcao-livre",
-            "valor": "maxima"
-          }
-        },
-        "recuperacao": {
-          "duracaoSegundos": 30,
-          "intensidade": {
-            "modo": "percepcao-livre",
-            "valor": "leve"
-          }
-        }
-      }
-    }
+    { "treinoCardioId": "bike-intervalado-15x30-30", "momento": "apos-musculacao" }
+  ],
+
+  "alongamento": [
+    { "treinoAlongamentoId": "mobilidade-quadril-pos-treino", "momento": "apos-musculacao" }
   ],
 
   "status": "ativo",
@@ -2030,6 +2094,32 @@ O aquecimento deve possuir estrutura própria, sem ser misturado às séries efe
   }
 }
 ```
+
+### 12.3. `cardio`/`alongamento`: referência, não embutido
+
+Desde a versão 1.3 do schema (seção 2.2), `cardio` e `alongamento` são
+arrays de **referências leves**, nunca a prescrição inteira:
+
+```json
+{
+  "cardio": [{ "treinoCardioId": "bike-intervalado-15x30-30", "momento": "apos-musculacao" }],
+  "alongamento": [{ "treinoAlongamentoId": "mobilidade-quadril-pos-treino", "momento": "apos-musculacao" }]
+}
+```
+
+- `treinoCardioId`/`treinoAlongamentoId` apontam para uma entrada de
+  `treinosCardio[]`/`treinosAlongamento[]` (seção 2.2/11.4/11.5) **do
+  mesmo documento de plano** — diferente de `exercicioId`/`modalidadeId`,
+  que apontam pro documento da biblioteca (validação em seção 14.5, esta é
+  uma validação intra-documento, seção 14.3).
+- `momento` (ex. `"antes-musculacao"`, `"apos-musculacao"`) descreve
+  quando, dentro *deste* treino de musculação, aquele complemento deve ser
+  feito — é uma propriedade do vínculo, por isso fica na referência e não
+  na entidade `treinosCardio`/`treinosAlongamento` (que pode, em tese, ser
+  referenciada por mais de um treino de musculação, cada um com seu
+  próprio `momento`).
+- Ambos os arrays são opcionais — um treino de musculação sem cardio nem
+  alongamento complementar simplesmente omite o campo ou usa `[]`.
 
 ## 13. Agrupamentos de exercícios
 
@@ -2134,16 +2224,30 @@ A estrutura aninhada de blocos pode existir futuramente para protocolos que real
 14. RIR deve estar normalmente entre 0 e 10.
 15. RPE deve estar normalmente entre 1 e 10.
 
-### 14.3. Cardio
+### 14.3. Cardio e alongamento
 
-1. `modalidadeId` deve existir em `bibliotecas.cardio.modalidades`.
-2. Cardio não usa `exercicioId`.
-3. `treino.tipo` deve estar em `tiposTreinoPermitidos` da modalidade.
-4. `series` deve ser inteiro positivo quando informado.
+1. `modalidadeId` (dentro de uma entrada de `treinosCardio[]`) deve existir
+   em `bibliotecas.cardio.modalidades`.
+2. Cardio não usa `exercicioId`; alongamento usa `alongamentoId`,
+   referenciando `bibliotecas.alongamentos` (nunca `bibliotecas.exercicios`).
+3. `treino.tipo` (de uma entrada de `treinosCardio[]`) deve estar em
+   `tiposTreinoPermitidos` da modalidade.
+4. `series` deve ser inteiro positivo quando informado (cardio e
+   alongamento).
 5. Durações não podem ser negativas.
-6. Um treino intervalado deve informar ao menos `estimulo`.
+6. Um treino de cardio intervalado deve informar ao menos `estimulo`.
 7. A recuperação pode ser omitida em protocolos sem fase recuperativa.
-8. As métricas utilizadas devem ser permitidas pela modalidade.
+8. As métricas utilizadas devem ser permitidas pela modalidade (cardio) ou
+   pelo alongamento (`alongamento.metricas.permitidas`, mesma regra da
+   seção 14.2 pra exercícios).
+9. `treinoCardioId`/`treinoAlongamentoId` referenciados em `treino.cardio`/
+   `treino.alongamento` (seção 12.3) devem existir em
+   `treinosCardio`/`treinosAlongamento` **do mesmo documento de plano** —
+   integridade intra-documento, diferente da integridade entre os dois
+   documentos descrita na seção 14.5.
+10. `id` de cada entrada de `treinosCardio[]`/`treinosAlongamento[]` deve
+    ser único dentro da respectiva coleção (mesma regra de unicidade da
+    seção 14.1 pra exercícios).
 
 ### 14.4. Integridade referencial
 
@@ -2155,8 +2259,11 @@ Treinos históricos devem continuar exibindo exercícios e modalidades cardiovas
 
 1. Todo `exercicioId` usado em `treino.exercicios` (e em `alternativas`) deve
    existir em `bibliotecas.exercicios` do documento de biblioteca carregado.
-2. Todo `modalidadeId` usado em `treino.cardio` deve existir em
-   `bibliotecas.cardio.modalidades` do documento de biblioteca carregado.
+2. Todo `modalidadeId` usado numa entrada de `treinosCardio[]` deve existir
+   em `bibliotecas.cardio.modalidades` do documento de biblioteca
+   carregado; todo `alongamentoId` usado numa entrada de
+   `treinosAlongamento[].alongamentos` deve existir em
+   `bibliotecas.alongamentos`.
 3. A aplicação deve carregar o documento de biblioteca antes de validar um
    plano de treino; um plano não é válido sozinho, sem a biblioteca que ele
    referencia.

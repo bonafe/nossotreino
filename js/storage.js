@@ -30,7 +30,9 @@ export class TreinosStorage {
     historicoSessaoBicicleta: "historico.sessaoBicicleta.v1",
     historicoSerieMusculacao: "historico.serieMusculacao.v1",
     historicoSessaoMusculacao: "historico.sessaoMusculacao.v1",
+    historicoSessaoAlongamento: "historico.sessaoAlongamento.v1",
     execucaoMusculacao: (treinoId) => `execucao.musculacao.${treinoId}.v2`,
+    execucaoAlongamento: (treinoId) => `execucao.alongamento.${treinoId}.v1`,
     generoImagem: "preferencias.generoImagem.v1"
   };
 
@@ -80,6 +82,9 @@ export class TreinosStorage {
     TreinosStorage.listarChavesComPrefixo("execucao.musculacao.").forEach((chave) => {
       execucoesEmAndamento[chave] = lerJSON(chave, null);
     });
+    TreinosStorage.listarChavesComPrefixo("execucao.alongamento.").forEach((chave) => {
+      execucoesEmAndamento[chave] = lerJSON(chave, null);
+    });
 
     return {
       tipo: "backup-treinos",
@@ -89,6 +94,7 @@ export class TreinosStorage {
       historicoSessaoBicicleta: lerJSON("historico.sessaoBicicleta.v1", []),
       historicoSerieMusculacao: lerJSON("historico.serieMusculacao.v1", []),
       historicoSessaoMusculacao: lerJSON("historico.sessaoMusculacao.v1", []),
+      historicoSessaoAlongamento: lerJSON("historico.sessaoAlongamento.v1", []),
       execucoesEmAndamento
     };
   }
@@ -103,11 +109,17 @@ export class TreinosStorage {
     removerChave(TreinosStorage.chaves.historicoSessaoBicicleta);
   }
 
+  static resetarAlongamento() {
+    removerChave(TreinosStorage.chaves.historicoSessaoAlongamento);
+    TreinosStorage.listarChavesComPrefixo("execucao.alongamento.").forEach((chave) => removerChave(chave));
+  }
+
   static restaurarBackup(backup) {
     if (backup.dadosTreinos) TreinosStorage.definirDadosTreinos(backup.dadosTreinos);
     salvarJSON("historico.sessaoBicicleta.v1", backup.historicoSessaoBicicleta || []);
     salvarJSON("historico.serieMusculacao.v1", backup.historicoSerieMusculacao || []);
     salvarJSON("historico.sessaoMusculacao.v1", backup.historicoSessaoMusculacao || []);
+    salvarJSON("historico.sessaoAlongamento.v1", backup.historicoSessaoAlongamento || []);
     Object.entries(backup.execucoesEmAndamento || {}).forEach(([chave, valor]) => {
       salvarJSON(chave, valor);
     });

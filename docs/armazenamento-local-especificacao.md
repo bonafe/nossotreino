@@ -31,12 +31,17 @@ publicado — é responsabilidade do service worker, ver
 [importar_dados.html](../importar_dados.html),
 [treino_bicicleta.html](../treino_bicicleta.html),
 [treino_bicicleta_menu.html](../treino_bicicleta_menu.html),
+[treino_bicicleta_novo.html](../treino_bicicleta_novo.html),
 [treino_exercicios_menu.html](../treino_exercicios_menu.html),
 [treino_exercicios.html](../treino_exercicios.html),
-[treino_execucao.html](../treino_execucao.html) e
-[treino_exercicio_progresso.html](../treino_exercicio_progresso.html) (ver
-[treino-exercicios-especificacao.md](./treino-exercicios-especificacao.md)
-e [treino-bicicleta-especificacao.md](./treino-bicicleta-especificacao.md)),
+[treino_execucao.html](../treino_execucao.html),
+[treino_exercicio_progresso.html](../treino_exercicio_progresso.html),
+[treino_alongamento_menu.html](../treino_alongamento_menu.html),
+[treino_alongamento.html](../treino_alongamento.html) e
+[treino_alongamento_novo.html](../treino_alongamento_novo.html) (ver
+[treino-exercicios-especificacao.md](./treino-exercicios-especificacao.md),
+[treino-bicicleta-especificacao.md](./treino-bicicleta-especificacao.md) e
+[treino-alongamento-especificacao.md](./treino-alongamento-especificacao.md)),
 através de um script único e compartilhado:
 [`storage.js`](../storage.js).
 
@@ -54,7 +59,9 @@ sem ter que migrar dados antigos — se o formato mudar, cria-se uma
 | `historico.sessaoBicicleta.v1` | Array — um registro por treino de bike concluído por inteiro (bike não registra ciclo a ciclo, só o treino completo) |
 | `historico.serieMusculacao.v1` | Array — um registro por série de exercício concluída (carga/repetições) |
 | `historico.sessaoMusculacao.v1` | Array — um registro por treino de exercícios concluído por inteiro |
+| `historico.sessaoAlongamento.v1` | Array — um registro por alongamento concluído por inteiro (mesmo padrão de `historico.sessaoMusculacao.v1`), ver seção 7 de [treino-alongamento-especificacao.md](./treino-alongamento-especificacao.md) |
 | `execucao.musculacao.<treinoId>.v2` | Estado do treino de exercícios em andamento (para retomar após fechar a página) — endereçado por `exercicioId`, não por índice posicional |
+| `execucao.alongamento.<treinoId>.v1` | Estado do treino de alongamento em andamento — mesmo princípio de `execucao.musculacao.<treinoId>.v2`, endereçado por `alongamentoId` |
 | `preferencias.generoImagem.v1` | `"masculino"` ou `"feminino"` — escolhido na engrenagem de configurações (`sistema.html`), define qual variante das imagens de exercício (`biblioteca-exercicios/imagens-exercicios/<exercicioId>__<genero>.png`) é exibida |
 
 `dadosTreinos.v1`/`execucao.musculacao.<treinoId>.v1` (formato anterior,

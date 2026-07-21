@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Treino de Bicicleta — Escolher treino</title>
+  <title>Treino de Alongamento — Escolher treino</title>
   <link rel="stylesheet" href="css/base.css" />
   <link rel="stylesheet" href="css/componentes.css" />
   <link rel="stylesheet" href="css/graficos.css" />
@@ -14,24 +14,24 @@
     <header class="top">
       <a class="voltar-icon" href="sistema.html" aria-label="Voltar">←</a>
       <div>
-        <h1>🚴‍♂️ Treino de Bicicleta</h1>
+        <h1>🧘 Treino de Alongamento</h1>
         <p class="subtitle">Escolha um treino para começar.</p>
       </div>
-      <a class="icon-btn" href="treino_bicicleta_novo.html" aria-label="Novo treino">+</a>
+      <a class="icon-btn" href="treino_alongamento_novo.html" aria-label="Novo treino">+</a>
     </header>
 
     <section id="graficoSecao" class="grafico-secao" hidden>
       <div class="grafico-topo">
-        <h2>Tempo de bicicleta</h2>
+        <h2>Tempo de alongamento</h2>
         <div class="periodo-botoes" role="group" aria-label="Período do gráfico">
           <button type="button" class="periodo-btn active" data-periodo="7d">7 dias</button>
           <button type="button" class="periodo-btn" data-periodo="30d">30 dias</button>
           <button type="button" class="periodo-btn" data-periodo="meses">Meses</button>
         </div>
       </div>
-      <svg id="graficoBicicleta" viewBox="0 0 800 240" preserveAspectRatio="xMidYMid meet"></svg>
+      <svg id="graficoAlongamento" viewBox="0 0 800 240" preserveAspectRatio="xMidYMid meet"></svg>
     </section>
-    <div id="graficoVazio" class="estado" hidden>Nenhum treino de bicicleta registrado ainda.</div>
+    <div id="graficoVazio" class="estado" hidden>Nenhum treino de alongamento registrado ainda.</div>
 
     <div id="lista" class="lista">
       <div class="estado">Carregando treinos…</div>
@@ -39,6 +39,6 @@
   </main>
 
   <script src="d3.v7.min.js"></script>
-  <script type="module" src="js/paginas/treino-bicicleta-menu.js"></script>
+  <script type="module" src="js/paginas/treino-alongamento-menu.js"></script>
 </body>
 </html>

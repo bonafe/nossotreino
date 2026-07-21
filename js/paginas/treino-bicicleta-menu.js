@@ -30,12 +30,12 @@ class TreinoBicicletaMenuController {
     grafico.inicializar(document.getElementById("graficoSecao"), document.getElementById("graficoVazio"));
   }
 
-  #cartaoTreino(treino, entrada, nomeModalidade) {
+  #cartaoTreino(treinoCardio, nomeModalidade) {
     const a = document.createElement("a");
     a.className = "treino";
-    a.href = `treino_bicicleta.html?treino=${encodeURIComponent(treino.id)}&modalidade=${encodeURIComponent(entrada.modalidadeId)}`;
+    a.href = `treino_bicicleta.html?treino=${encodeURIComponent(treinoCardio.id)}`;
 
-    const cfg = entrada.treino;
+    const cfg = treinoCardio.treino;
     const campos = [
       { titulo: "Tipo", valor: cfg.tipo === "intervalado" ? "Intervalado" : "Contínuo" },
       cfg.series != null && { titulo: "Séries", valor: cfg.series },
@@ -54,7 +54,7 @@ class TreinoBicicletaMenuController {
     ].filter(Boolean);
 
     a.innerHTML = `
-      <h2>${treino.nome} — ${nomeModalidade}</h2>
+      <h2>${treinoCardio.nome} — ${nomeModalidade}</h2>
       <div class="campos">
         ${campos.map((c) => `<div class="campo"><strong>${c.titulo}</strong><span>${c.valor}</span></div>`).join("")}
       </div>
@@ -82,12 +82,10 @@ class TreinoBicicletaMenuController {
     }
 
     const cartoes = [];
-    dados.treinos.forEach((treino) => {
-      (treino.cardio || []).forEach((entrada) => {
-        const modalidade = bibliotecaExercicios.bibliotecas.cardio.modalidades[entrada.modalidadeId];
-        if (!modalidade || !ehModalidadeBicicleta(modalidade)) return;
-        cartoes.push(this.#cartaoTreino(treino, entrada, modalidade.nome));
-      });
+    (dados.treinosCardio || []).forEach((treinoCardio) => {
+      const modalidade = bibliotecaExercicios.bibliotecas.cardio.modalidades[treinoCardio.modalidadeId];
+      if (!modalidade || !ehModalidadeBicicleta(modalidade)) return;
+      cartoes.push(this.#cartaoTreino(treinoCardio, modalidade.nome));
     });
 
     this.#listaEl.innerHTML = "";

@@ -53,19 +53,23 @@ Toda leitura/escrita de `localStorage` passa por `js/storage.js` — nunca chama
 
 ### Motor genérico + JSON de dados
 
-Tanto bicicleta quanto musculação seguem o padrão "motor genérico recebe parâmetros de um JSON": nenhum treino específico tem HTML/JS próprio. Novo treino de bike = nova entrada em `treino.cardio[]` no plano (referenciando uma modalidade já cadastrada na biblioteca); novo treino de musculação = nova entrada em `treinos`. Ver `docs/treino-bicicleta-especificacao.md` e `docs/treino-exercicios-especificacao.md` para o esquema completo (`metadata`, `orientacoesGerais`, `treinos`, lista plana de exercícios com `superset`/`circuito`).
+Bicicleta, alongamento e musculação seguem o padrão "motor genérico recebe parâmetros de um JSON": nenhum treino específico tem HTML/JS próprio. Novo treino de bike = nova entrada em `treinosCardio` no plano (referenciando uma modalidade já cadastrada na biblioteca); novo treino de alongamento = nova entrada em `treinosAlongamento` (referenciando alongamentos de `bibliotecas.alongamentos`); novo treino de musculação = nova entrada em `treinos`. As três telas de criação (`treino_bicicleta_novo.html`, `treino_alongamento_novo.html`, `treino_novo.html`) escrevem nessas coleções pela interface, sem precisar editar o JSON à mão. Um treino de musculação pode referenciar treinos de cardio/alongamento existentes como complemento via `treino.cardio[]`/`treino.alongamento[]` (arrays de `{ treinoCardioId|treinoAlongamentoId, momento }`) — ver seção 12.3 de `docs/especificacao-biblioteca-exercicios.md`. Ver `docs/treino-bicicleta-especificacao.md`, `docs/treino-alongamento-especificacao.md` e `docs/treino-exercicios-especificacao.md` para o esquema completo (`metadata`, `orientacoesGerais`, `treinos`, lista plana de exercícios com `superset`/`circuito`).
 
 ### Fluxos de tela
 
 ```
 index.html (institucional)
    └─> sistema.html
-          ├─> treino_bicicleta_menu.html → treino_bicicleta.html?treino=<id>&modalidade=<id>
-          └─> treino_exercicios_menu.html → treino_exercicios.html?treino=<id> → treino_execucao.html?treino=<id>
-                                                                                     └─> treino_exercicio_progresso.html?exercicio=<id>&treino=<id>
+          ├─> treino_bicicleta_menu.html → treino_bicicleta_novo.html
+          │                              └─> treino_bicicleta.html?treino=<treinoCardioId>[&origem=<id>]
+          ├─> treino_alongamento_menu.html → treino_alongamento_novo.html
+          │                                └─> treino_alongamento.html?treino=<treinoAlongamentoId>[&origem=<id>]
+          └─> treino_exercicios_menu.html → treino_novo.html
+                                          └─> treino_exercicios.html?treino=<id> → treino_execucao.html?treino=<id>
+                                                                                       └─> treino_exercicio_progresso.html?exercicio=<id>&treino=<id>
 ```
 
-Os dois fluxos (bike / musculação) são independentes, mas um treino de musculação pode ter entradas em `cardio[]` complementares que linkam para `treino_bicicleta.html?treino=<id>&modalidade=<modalidadeId>` — `treino=` é obrigatório (identifica qual prescrição usar, já que a mesma modalidade pode ser usada por vários treinos com parâmetros diferentes) e também serve pro botão de voltar (ver seção 5.2.1 de `docs/treino-bicicleta-especificacao.md`).
+Os três fluxos (bike / alongamento / musculação) são independentes — cada um tem seu próprio menu, motor e tela de criação. Cardio e alongamento são "treinos" de primeira classe (coleções `treinosCardio`/`treinosAlongamento` no plano, irmãs de `treinos`, cada uma com `id`/`nome` próprios) que também podem ser **referenciados** como complemento de um treino de musculação via `treino.cardio[]`/`treino.alongamento[]` (arrays de `{ treinoCardioId|treinoAlongamentoId, momento }`) — o card complementar linka para `treino_bicicleta.html?treino=<treinoCardioId>&origem=<id>` / `treino_alongamento.html?treino=<treinoAlongamentoId>&origem=<id>`, onde `origem` é o treino de musculação de onde veio (usado só pro botão de voltar, ver seção 5.2.1 de `docs/treino-bicicleta-especificacao.md` e seção 5.3 de `docs/treino-alongamento-especificacao.md`).
 
 `treino_execucao.html` é a tela mais complexa do projeto: monta uma fila sequencial de "slots" a partir da lista plana `treino.exercicios` (superset/circuito não são respeitados ainda, tudo roda sequencial — simplificação deliberada, ver seção 8.1 da especificação de exercícios), trata exercício substituto (`alternativas[]`), cronômetro de série/descanso, sinal sonoro e persiste o progresso — endereçado por `exercicioId`, não por índice posicional — a cada passo para poder retomar depois de fechar o navegador.
 
@@ -79,7 +83,7 @@ Vídeos de exercício (`bibliotecas.exercicios[id].midia.videoMagnet`, magnet UR
 - `js/*.js` (fora de `paginas/`) — utilitários compartilhados entre páginas: `storage.js` (localStorage), `biblioteca-exercicios.js` (fetch da biblioteca), `prescricao-formatadores.js`, `formatadores.js`, `cronometro.js`, `sinal-sonoro.js`, `grafico-barras.js`/`grafico-linha.js` (D3), `videos-torrent.js`/`video-player-modal.js` (vídeos por torrent), `imagem-exercicio.js` (imagens de exercício geradas por IA).
 - `css/paginas/*.css` — estilos específicos de cada página; `css/base.css` e `css/componentes.css` são compartilhados.
 - `biblioteca-exercicios/` (json + `imagens-exercicios/`) / `d3.v7.min.js` / `webtorrent.min.js` — vendorizados/versionados na raiz (não CDN, não gitignorado), pra continuar funcionando offline.
-- `docs/*-especificacao.md` — as specs vivas de cada área (armazenamento local, PWA/offline, bike, exercícios, biblioteca de exercícios). Ao mudar comportamento coberto por uma spec, atualize o documento junto.
+- `docs/*-especificacao.md` — as specs vivas de cada área (armazenamento local, PWA/offline, bike, alongamento, exercícios, biblioteca de exercícios). Ao mudar comportamento coberto por uma spec, atualize o documento junto.
 
 ### Convenções
 

@@ -260,17 +260,23 @@ class TreinoExerciciosController {
     });
   }
 
-  #montarCardio(cardioEntradas, bibliotecaExercicios, treinoId) {
-    if (!cardioEntradas || !cardioEntradas.length) return;
+  // `treino.cardio[]` é lista de referências ({treinoCardioId, momento}),
+  // não mais a prescrição embutida — resolve cada uma contra
+  // `dados.treinosCardio` (seção 12.3 de especificacao-biblioteca-exercicios.md).
+  #montarCardio(cardioReferencias, dados, bibliotecaExercicios, treinoId) {
+    if (!cardioReferencias || !cardioReferencias.length) return;
 
     document.getElementById("cardio").hidden = false;
     const listaEl = document.getElementById("cardioLista");
     listaEl.innerHTML = "";
 
-    cardioEntradas.forEach((entrada) => {
-      const modalidade = bibliotecaExercicios.bibliotecas.cardio.modalidades[entrada.modalidadeId];
-      const nomeModalidade = modalidade ? modalidade.nome : entrada.modalidadeId;
-      const cfg = entrada.treino;
+    cardioReferencias.forEach((referencia) => {
+      const treinoCardio = (dados.treinosCardio || []).find((t) => t.id === referencia.treinoCardioId);
+      if (!treinoCardio) return;
+
+      const modalidade = bibliotecaExercicios.bibliotecas.cardio.modalidades[treinoCardio.modalidadeId];
+      const nomeModalidade = modalidade ? modalidade.nome : treinoCardio.modalidadeId;
+      const cfg = treinoCardio.treino;
 
       const campos = [
         { titulo: "Tipo", valor: cfg.tipo === "intervalado" ? "Intervalado" : "Contínuo" },
@@ -292,11 +298,38 @@ class TreinoExerciciosController {
       const divEl = document.createElement("div");
       divEl.className = "cardio-entrada";
       divEl.innerHTML = `
-        <h3>${nomeModalidade}</h3>
+        <h3>${treinoCardio.nome} — ${nomeModalidade}</h3>
         <div class="campos">
           ${campos.map((c) => `<div class="campo"><strong>${c.titulo}</strong><span>${c.valor}</span></div>`).join("")}
         </div>
-        <a class="iniciar" href="treino_bicicleta.html?treino=${encodeURIComponent(treinoId)}&modalidade=${encodeURIComponent(entrada.modalidadeId)}" style="margin-top: 14px;">Fazer bicicleta →</a>
+        <a class="iniciar" href="treino_bicicleta.html?treino=${encodeURIComponent(treinoCardio.id)}&origem=${encodeURIComponent(treinoId)}" style="margin-top: 14px;">Fazer bicicleta →</a>
+      `;
+      listaEl.appendChild(divEl);
+    });
+  }
+
+  // Mesmo princípio de #montarCardio, pra `treino.alongamento[]` contra
+  // `dados.treinosAlongamento`.
+  #montarAlongamentoComplementar(alongamentoReferencias, dados, treinoId) {
+    if (!alongamentoReferencias || !alongamentoReferencias.length) return;
+
+    document.getElementById("alongamento").hidden = false;
+    const listaEl = document.getElementById("alongamentoLista");
+    listaEl.innerHTML = "";
+
+    alongamentoReferencias.forEach((referencia) => {
+      const treinoAlongamento = (dados.treinosAlongamento || []).find((t) => t.id === referencia.treinoAlongamentoId);
+      if (!treinoAlongamento) return;
+
+      const quantidade = treinoAlongamento.alongamentos.length;
+      const divEl = document.createElement("div");
+      divEl.className = "cardio-entrada";
+      divEl.innerHTML = `
+        <h3>${treinoAlongamento.nome}</h3>
+        <div class="campos">
+          <div class="campo"><strong>Alongamentos</strong><span>${quantidade}</span></div>
+        </div>
+        <a class="iniciar" href="treino_alongamento.html?treino=${encodeURIComponent(treinoAlongamento.id)}&origem=${encodeURIComponent(treinoId)}" style="margin-top: 14px;">Fazer alongamento →</a>
       `;
       listaEl.appendChild(divEl);
     });
@@ -334,7 +367,8 @@ class TreinoExerciciosController {
 
     this.#montarAquecimento(treino);
     this.#montarExercicios(treino, bibliotecaExercicios);
-    this.#montarCardio(treino.cardio, bibliotecaExercicios, treino.id);
+    this.#montarCardio(treino.cardio, dados, bibliotecaExercicios, treino.id);
+    this.#montarAlongamentoComplementar(treino.alongamento, dados, treino.id);
 
     if (treino.exercicios.length) {
       const iniciarEl = document.getElementById("iniciarTreino");

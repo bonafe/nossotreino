@@ -82,7 +82,8 @@ Array de treinos. Cada treino:
 | `tipo` | `"musculacao"` \| `"calistenia"` \| `"condicionamento"` \| `"flexibilidade"` | Ver seção 4 |
 | `aquecimento` | `null` \| `{ protocolos: [...] }` | Se `null`, treino não tem tela de aquecimento — ver 3.4.1 |
 | `exercicios` | array plana de item (3.4.2) | Pode ser `[]` (treino ainda sem exercícios definidos) |
-| `cardio` | array | Prescrições cardiovasculares complementares — ver 3.4.3 |
+| `cardio` | array | Referências a treinos de cardio complementares — ver 3.4.3 |
+| `alongamento` | array | Referências a treinos de alongamento complementares — mesmo formato de `cardio`, ver 3.4.3 |
 | `configuracaoCircuito` | objeto, opcional | Presente em treinos de circuito (`tipo: "condicionamento"`) |
 
 #### 3.4.1 `aquecimento.protocolos[]`
@@ -127,19 +128,25 @@ Renderização de `prescricao.metrica` conforme `modo`:
 `unidade` default é `"repetições"` para `tipo: "repeticoes"` e `"segundos"`
 para `tipo: "tempo"` quando o campo não vem explícito.
 
-#### 3.4.3 `cardio[]`
+#### 3.4.3 `cardio[]` / `alongamento[]`
 
-Cada entrada: `{ modalidadeId, momento, treino: {tipo, series, estimulo, recuperacao}, observacao }`
-— ver seção 11.4 e 14.3 de
-[especificacao-biblioteca-exercicios.md](./especificacao-biblioteca-exercicios.md).
-Quando presente, o treino tem cardio complementar; a página busca o nome da
-modalidade em `bibliotecas.cardio.modalidades[modalidadeId]` e monta um
-botão "Fazer bicicleta →" por entrada (ver seção 6.2). Diferente do modelo
-anterior, um treino pode ter zero, uma ou mais entradas de cardio, e cada
-uma tem seus próprios parâmetros — não existe mais uma coleção `cardios`
-independente do treino (o motor de bicicleta hoje só sabe tocar
-`treino.tipo === "intervalado"`; outros tipos ficam fora de escopo, ver
-seção 5.3 de [treino-bicicleta-especificacao.md](./treino-bicicleta-especificacao.md)).
+Cada entrada de `cardio[]`: `{ treinoCardioId, momento }` — referência a
+uma entrada de `treinosCardio[]` (coleção de primeira classe no topo do
+plano, ver seção 2.2/11.4/12.3 de
+[especificacao-biblioteca-exercicios.md](./especificacao-biblioteca-exercicios.md)),
+não mais a prescrição embutida. Cada entrada de `alongamento[]`:
+`{ treinoAlongamentoId, momento }`, mesmo princípio, referenciando
+`treinosAlongamento[]` (seção 11.5 do mesmo documento).
+
+Quando presente, o treino tem cardio/alongamento complementar; a página
+resolve a referência em `dados.treinosCardio`/`dados.treinosAlongamento` e
+monta um botão "Fazer bicicleta →"/"Fazer alongamento →" por entrada (ver
+seção 6.2). Um treino pode ter zero, uma ou mais entradas de cada — e a
+mesma entrada de `treinosCardio`/`treinosAlongamento` pode, em tese, ser
+referenciada por mais de um treino de musculação (o motor de bicicleta
+hoje só sabe tocar `treino.tipo === "intervalado"`; outros tipos ficam
+fora de escopo, ver seção 8 de
+[treino-bicicleta-especificacao.md](./treino-bicicleta-especificacao.md)).
 
 ## 4. Tipos de treino (`tipo`)
 
@@ -269,11 +276,17 @@ distingue) por dia ou mês.
 - Carrega o plano (`TreinosStorage.carregarDadosTreinos()`) e a biblioteca
   (`carregarBiblioteca()`, fetch), localiza o treino pelo `id` em
   `treinos` e renderiza aquecimento (se houver), a lista de exercícios
-  agrupada por `superset`/`circuito` (seção 5) e, para cada entrada de
-  `treino.cardio[]`, um card com um botão "Fazer bicicleta →" que leva a
-  `treino_bicicleta.html?treino=<id>&modalidade=<modalidadeId>` (ver
-  3.4.3, e seção 4 de
-  [treino-bicicleta-especificacao.md](./treino-bicicleta-especificacao.md)).
+  agrupada por `superset`/`circuito` (seção 5) e:
+  - para cada entrada de `treino.cardio[]`, um card com um botão "Fazer
+    bicicleta →" que leva a
+    `treino_bicicleta.html?treino=<treinoCardioId>&origem=<id>` (ver 3.4.3,
+    e seção 4/5.2.1 de
+    [treino-bicicleta-especificacao.md](./treino-bicicleta-especificacao.md));
+  - para cada entrada de `treino.alongamento[]`, um card equivalente com
+    botão "Fazer alongamento →" que leva a
+    `treino_alongamento.html?treino=<treinoAlongamentoId>&origem=<id>` (ver
+    3.4.3, e seção 4/5.2.1 de
+    [treino-alongamento-especificacao.md](./treino-alongamento-especificacao.md)).
 - Se não houver `treino` na URL, o `id` não existir, o plano não estiver
   carregado, ou a biblioteca não puder ser buscada, mostra mensagem de
   erro com link de volta para o menu (e para `importar_dados.html`, se

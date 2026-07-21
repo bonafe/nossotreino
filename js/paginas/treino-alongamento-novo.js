@@ -1,7 +1,7 @@
 import { TreinosStorage } from "../storage.js";
 import { carregarBiblioteca } from "../biblioteca-exercicios.js";
 import { PrescricaoFormatadores } from "../prescricao-formatadores.js";
-import { LABEL_CATEGORIA_EXERCICIO } from "../constantes.js";
+import { LABEL_TIPO_ALONGAMENTO } from "../constantes.js";
 import { normalizar, gerarIdUnico } from "../identificadores.js";
 
 const LABEL_METRICA = {
@@ -9,21 +9,24 @@ const LABEL_METRICA = {
   tempo: "Tempo"
 };
 
-class TreinoNovoController {
+// Mesmo padrão de treino-novo.js (picker com busca/filtro + formulário de
+// prescrição), trocando a fonte pra bibliotecas.alongamentos e sem
+// isometria/agrupamento (não se aplicam a alongamento).
+class TreinoAlongamentoNovoController {
   #dados = null;
   #bibliotecaExercicios = null;
-  #exercicios = [];
+  #alongamentos = [];
   #editandoIndex = null;
-  #exercicioEscolhidoId = null;
+  #alongamentoEscolhidoId = null;
 
   #carregandoEl = document.getElementById("carregando");
   #erroEl = document.getElementById("erro");
   #formEl = document.getElementById("formTreino");
   #nomeInputEl = document.getElementById("nomeInput");
-  #tipoInputEl = document.getElementById("tipoInput");
-  #exercicioListaEl = document.getElementById("exercicioLista");
-  #exercicioVazioEl = document.getElementById("exercicioVazio");
-  #adicionarExercicioBtnEl = document.getElementById("adicionarExercicioBtn");
+  #momentoInputEl = document.getElementById("momentoInput");
+  #alongamentoListaEl = document.getElementById("alongamentoLista");
+  #alongamentoVazioEl = document.getElementById("alongamentoVazio");
+  #adicionarAlongamentoBtnEl = document.getElementById("adicionarAlongamentoBtn");
   #salvarBtnEl = document.getElementById("salvarBtn");
   #mensagemEl = document.getElementById("mensagem");
 
@@ -38,10 +41,8 @@ class TreinoNovoController {
 
   #filtroGrupoBtnEl = document.getElementById("filtroGrupoBtn");
   #filtroGrupoOpcoesEl = document.getElementById("filtroGrupoOpcoes");
-  #filtroEquipamentoBtnEl = document.getElementById("filtroEquipamentoBtn");
-  #filtroEquipamentoOpcoesEl = document.getElementById("filtroEquipamentoOpcoes");
-  #filtroCategoriaBtnEl = document.getElementById("filtroCategoriaBtn");
-  #filtroCategoriaOpcoesEl = document.getElementById("filtroCategoriaOpcoes");
+  #filtroTipoBtnEl = document.getElementById("filtroTipoBtn");
+  #filtroTipoOpcoesEl = document.getElementById("filtroTipoOpcoes");
 
   #pickerPrescricaoEl = document.getElementById("pickerPrescricao");
   #prescricaoSeriesInputEl = document.getElementById("prescricaoSeriesInput");
@@ -53,18 +54,10 @@ class TreinoNovoController {
   #prescricaoFixoCampoEl = document.getElementById("prescricaoFixoCampo");
   #prescricaoValorInputEl = document.getElementById("prescricaoValorInput");
   #prescricaoDescansoInputEl = document.getElementById("prescricaoDescansoInput");
-  #prescricaoIsometriaInputEl = document.getElementById("prescricaoIsometriaInput");
-  #prescricaoIsometriaCamposEl = document.getElementById("prescricaoIsometriaCampos");
-  #isometriaDuracaoInputEl = document.getElementById("isometriaDuracaoInput");
-  #isometriaUltimasSeriesInputEl = document.getElementById("isometriaUltimasSeriesInput");
-  #isometriaPosicaoInputEl = document.getElementById("isometriaPosicaoInput");
-  #isometriaMomentoInputEl = document.getElementById("isometriaMomentoInput");
-  #prescricaoAgrupamentoTipoInputEl = document.getElementById("prescricaoAgrupamentoTipoInput");
-  #prescricaoAgrupamentoNumeroInputEl = document.getElementById("prescricaoAgrupamentoNumeroInput");
   #prescricaoConfirmarBtnEl = document.getElementById("prescricaoConfirmarBtn");
 
   iniciar() {
-    this.#adicionarExercicioBtnEl.addEventListener("click", () => this.#abrirPickerBusca());
+    this.#adicionarAlongamentoBtnEl.addEventListener("click", () => this.#abrirPickerBusca());
     this.#pickerFecharBtnEl.addEventListener("click", () => this.#fecharPicker());
     this.#pickerVoltarBtnEl.addEventListener("click", () => this.#abrirPickerBusca());
     this.#salvarBtnEl.addEventListener("click", () => this.#salvarTreino());
@@ -75,16 +68,11 @@ class TreinoNovoController {
     this.#filtroGrupoBtnEl.addEventListener("click", () => {
       this.#filtroGrupoOpcoesEl.hidden = !this.#filtroGrupoOpcoesEl.hidden;
     });
-    this.#filtroEquipamentoBtnEl.addEventListener("click", () => {
-      this.#filtroEquipamentoOpcoesEl.hidden = !this.#filtroEquipamentoOpcoesEl.hidden;
-    });
-    this.#filtroCategoriaBtnEl.addEventListener("click", () => {
-      this.#filtroCategoriaOpcoesEl.hidden = !this.#filtroCategoriaOpcoesEl.hidden;
+    this.#filtroTipoBtnEl.addEventListener("click", () => {
+      this.#filtroTipoOpcoesEl.hidden = !this.#filtroTipoOpcoesEl.hidden;
     });
 
     this.#prescricaoModoInputEl.addEventListener("change", () => this.#atualizarVisibilidadeModo());
-    this.#prescricaoIsometriaInputEl.addEventListener("change", () => this.#atualizarVisibilidadeIsometria());
-    this.#prescricaoAgrupamentoTipoInputEl.addEventListener("change", () => this.#atualizarVisibilidadeAgrupamento());
     this.#prescricaoConfirmarBtnEl.addEventListener("click", () => this.#confirmarPrescricao());
 
     this.#carregarDados();
@@ -93,7 +81,7 @@ class TreinoNovoController {
   #mostrarErro(mensagem) {
     this.#carregandoEl.hidden = true;
     this.#erroEl.hidden = false;
-    this.#erroEl.innerHTML = `${mensagem} Volte ao <a href="treino_exercicios_menu.html">menu de treinos</a>.`;
+    this.#erroEl.innerHTML = `${mensagem} Volte ao <a href="treino_alongamento_menu.html">menu de alongamento</a>.`;
   }
 
   async #carregarDados() {
@@ -124,22 +112,12 @@ class TreinoNovoController {
       .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
     this.#construirFiltroCheckbox(this.#filtroGrupoOpcoesEl, grupos, this.#filtroGrupoBtnEl, "Grupo muscular");
 
-    const equipamentos = Object.entries(this.#bibliotecaExercicios.equipamentos)
-      .map(([id, e]) => ({ id, nome: e.nome }))
-      .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
-    this.#construirFiltroCheckbox(this.#filtroEquipamentoOpcoesEl, equipamentos, this.#filtroEquipamentoBtnEl, "Equipamento");
-
-    const categorias = [
-      ...new Set(Object.values(this.#bibliotecaExercicios.bibliotecas.exercicios).map((e) => e.classificacao.categoria))
-    ]
-      .sort((a, b) => (LABEL_CATEGORIA_EXERCICIO[a] || a).localeCompare(LABEL_CATEGORIA_EXERCICIO[b] || b, "pt-BR"))
-      .map((categoria) => ({ id: categoria, nome: LABEL_CATEGORIA_EXERCICIO[categoria] || categoria }));
-    this.#construirFiltroCheckbox(this.#filtroCategoriaOpcoesEl, categorias, this.#filtroCategoriaBtnEl, "Categoria");
+    const tipos = [...new Set(Object.values(this.#bibliotecaExercicios.bibliotecas.alongamentos).map((a) => a.classificacao.tipo))]
+      .sort((a, b) => (LABEL_TIPO_ALONGAMENTO[a] || a).localeCompare(LABEL_TIPO_ALONGAMENTO[b] || b, "pt-BR"))
+      .map((tipo) => ({ id: tipo, nome: LABEL_TIPO_ALONGAMENTO[tipo] || tipo }));
+    this.#construirFiltroCheckbox(this.#filtroTipoOpcoesEl, tipos, this.#filtroTipoBtnEl, "Tipo");
   }
 
-  // Checkbox em vez de <select multiple>: no toque/mobile, um <select multiple>
-  // exige ctrl/cmd+clique pra selecionar mais de um item — inviável sem
-  // teclado. Checkbox permite tocar em quantas opções quiser.
   #construirFiltroCheckbox(containerEl, opcoes, botaoEl, rotuloBase) {
     containerEl.innerHTML = "";
     opcoes.forEach(({ id, nome }) => {
@@ -168,8 +146,7 @@ class TreinoNovoController {
     this.#pickerBuscaInputEl.value = "";
     [
       [this.#filtroGrupoOpcoesEl, this.#filtroGrupoBtnEl, "Grupo muscular"],
-      [this.#filtroEquipamentoOpcoesEl, this.#filtroEquipamentoBtnEl, "Equipamento"],
-      [this.#filtroCategoriaOpcoesEl, this.#filtroCategoriaBtnEl, "Categoria"]
+      [this.#filtroTipoOpcoesEl, this.#filtroTipoBtnEl, "Tipo"]
     ].forEach(([containerEl, botaoEl, rotuloBase]) => {
       containerEl.querySelectorAll("input:checked").forEach((input) => {
         input.checked = false;
@@ -181,7 +158,7 @@ class TreinoNovoController {
 
   #abrirPickerBusca() {
     this.#editandoIndex = null;
-    this.#pickerTituloEl.textContent = "Adicionar exercício";
+    this.#pickerTituloEl.textContent = "Adicionar alongamento";
     this.#pickerVoltarBtnEl.hidden = true;
     this.#pickerBuscaEl.hidden = false;
     this.#pickerPrescricaoEl.hidden = true;
@@ -194,40 +171,29 @@ class TreinoNovoController {
   #fecharPicker() {
     this.#pickerOverlayEl.hidden = true;
     this.#editandoIndex = null;
-    this.#exercicioEscolhidoId = null;
+    this.#alongamentoEscolhidoId = null;
   }
 
   #filtrarResultados() {
     const busca = normalizar(this.#pickerBuscaInputEl.value.trim());
     const gruposSelecionados = this.#valoresSelecionados(this.#filtroGrupoOpcoesEl);
-    const equipamentosSelecionados = this.#valoresSelecionados(this.#filtroEquipamentoOpcoesEl);
-    const categoriasSelecionadas = this.#valoresSelecionados(this.#filtroCategoriaOpcoesEl);
+    const tiposSelecionados = this.#valoresSelecionados(this.#filtroTipoOpcoesEl);
 
-    const exercicios = this.#bibliotecaExercicios.bibliotecas.exercicios;
-    const resultados = Object.values(exercicios).filter((exercicio) => {
-      if (categoriasSelecionadas.length && !categoriasSelecionadas.includes(exercicio.classificacao.categoria)) {
-        return false;
-      }
+    const alongamentos = this.#bibliotecaExercicios.bibliotecas.alongamentos;
+    const resultados = Object.values(alongamentos).filter((alongamento) => {
+      if (tiposSelecionados.length && !tiposSelecionados.includes(alongamento.classificacao.tipo)) return false;
 
       if (gruposSelecionados.length) {
         const grupos = [
-          ...exercicio.gruposMusculares.principais,
-          ...exercicio.gruposMusculares.sinergistas,
-          ...exercicio.gruposMusculares.estabilizadores
+          ...alongamento.gruposMusculares.principais,
+          ...alongamento.gruposMusculares.secundarios,
+          ...alongamento.gruposMusculares.estabilizadores
         ];
         if (!gruposSelecionados.some((g) => grupos.includes(g))) return false;
       }
 
-      if (equipamentosSelecionados.length) {
-        const equipamentos = [
-          ...exercicio.equipamentos.obrigatorios.map((e) => e.equipamentoId),
-          ...exercicio.equipamentos.opcionais.map((e) => e.equipamentoId)
-        ];
-        if (!equipamentosSelecionados.some((e) => equipamentos.includes(e))) return false;
-      }
-
       if (busca) {
-        const textos = [exercicio.nome, ...(exercicio.aliases || []), ...(exercicio.tags || [])].map(normalizar);
+        const textos = [alongamento.nome, ...(alongamento.aliases || []), ...(alongamento.tags || [])].map(normalizar);
         if (!textos.some((texto) => texto.includes(busca))) return false;
       }
 
@@ -242,13 +208,13 @@ class TreinoNovoController {
     this.#pickerResultadosEl.innerHTML = "";
 
     if (!resultados.length) {
-      this.#pickerResultadosEl.innerHTML = '<div class="picker-vazio">Nenhum exercício encontrado com esses filtros.</div>';
+      this.#pickerResultadosEl.innerHTML = '<div class="picker-vazio">Nenhum alongamento encontrado com esses filtros.</div>';
       return;
     }
 
-    resultados.forEach((exercicio) => {
+    resultados.forEach((alongamento) => {
       const grupos = PrescricaoFormatadores.gruposMusculares(
-        exercicio.gruposMusculares,
+        alongamento.gruposMusculares,
         this.#bibliotecaExercicios.gruposMusculares
       );
 
@@ -256,61 +222,44 @@ class TreinoNovoController {
       botao.type = "button";
       botao.className = "picker-resultado-item";
       botao.innerHTML = `
-        <div class="picker-resultado-nome">${exercicio.nome}</div>
+        <div class="picker-resultado-nome">${alongamento.nome}</div>
         ${grupos.length ? `<div class="picker-resultado-grupos">${grupos.map((g) => `<span>${g}</span>`).join("")}</div>` : ""}
       `;
-      botao.addEventListener("click", () => this.#selecionarExercicio(exercicio.id));
+      botao.addEventListener("click", () => this.#selecionarAlongamento(alongamento.id));
       this.#pickerResultadosEl.appendChild(botao);
     });
   }
 
-  #selecionarExercicio(exercicioId) {
-    const exercicio = this.#bibliotecaExercicios.bibliotecas.exercicios[exercicioId];
-    this.#exercicioEscolhidoId = exercicioId;
+  #selecionarAlongamento(alongamentoId) {
+    const alongamento = this.#bibliotecaExercicios.bibliotecas.alongamentos[alongamentoId];
+    this.#alongamentoEscolhidoId = alongamentoId;
 
-    this.#pickerTituloEl.textContent = exercicio.nome;
+    this.#pickerTituloEl.textContent = alongamento.nome;
     this.#pickerVoltarBtnEl.hidden = false;
     this.#pickerBuscaEl.hidden = true;
     this.#pickerPrescricaoEl.hidden = false;
     this.#prescricaoConfirmarBtnEl.textContent = "Adicionar";
 
     this.#prescricaoMetricaTipoInputEl.innerHTML = "";
-    exercicio.metricas.permitidas.forEach((tipo) => {
+    alongamento.metricas.permitidas.forEach((tipo) => {
       this.#prescricaoMetricaTipoInputEl.appendChild(new Option(LABEL_METRICA[tipo] || tipo, tipo));
     });
-    this.#prescricaoMetricaTipoInputEl.value = exercicio.metricas.padrao;
+    this.#prescricaoMetricaTipoInputEl.value = alongamento.metricas.padrao;
 
-    this.#prescricaoSeriesInputEl.value = "3";
-    this.#prescricaoModoInputEl.value = "faixa";
+    this.#prescricaoSeriesInputEl.value = "2";
+    this.#prescricaoModoInputEl.value = "fixo";
     this.#prescricaoMinInputEl.value = "";
     this.#prescricaoMaxInputEl.value = "";
-    this.#prescricaoValorInputEl.value = "";
+    this.#prescricaoValorInputEl.value = "30";
     this.#prescricaoDescansoInputEl.value = "";
-    this.#prescricaoIsometriaInputEl.checked = false;
-    this.#isometriaDuracaoInputEl.value = "20";
-    this.#isometriaUltimasSeriesInputEl.value = "2";
-    this.#isometriaPosicaoInputEl.value = "";
-    this.#isometriaMomentoInputEl.value = "final-da-serie";
-    this.#prescricaoAgrupamentoTipoInputEl.value = "";
-    this.#prescricaoAgrupamentoNumeroInputEl.value = "1";
 
     this.#atualizarVisibilidadeModo();
-    this.#atualizarVisibilidadeIsometria();
-    this.#atualizarVisibilidadeAgrupamento();
   }
 
   #atualizarVisibilidadeModo() {
     const modo = this.#prescricaoModoInputEl.value;
     this.#prescricaoFaixaCamposEl.hidden = modo !== "faixa";
     this.#prescricaoFixoCampoEl.hidden = modo !== "fixo";
-  }
-
-  #atualizarVisibilidadeIsometria() {
-    this.#prescricaoIsometriaCamposEl.hidden = !this.#prescricaoIsometriaInputEl.checked;
-  }
-
-  #atualizarVisibilidadeAgrupamento() {
-    this.#prescricaoAgrupamentoNumeroInputEl.hidden = !this.#prescricaoAgrupamentoTipoInputEl.value;
   }
 
   #lerPrescricaoDoFormulario() {
@@ -326,77 +275,52 @@ class TreinoNovoController {
       metrica.valor = Number(this.#prescricaoValorInputEl.value) || 0;
     }
 
-    const tecnicas = [];
-    if (this.#prescricaoIsometriaInputEl.checked) {
-      tecnicas.push({
-        tipo: "isometria",
-        duracaoSegundos: Number(this.#isometriaDuracaoInputEl.value) || 0,
-        posicao: this.#isometriaPosicaoInputEl.value.trim() || null,
-        momento: this.#isometriaMomentoInputEl.value,
-        aplicacao: { ultimasSeries: Number(this.#isometriaUltimasSeriesInputEl.value) || 1 }
-      });
-    }
-
     const descansoRaw = this.#prescricaoDescansoInputEl.value;
 
     return {
       series: Number(this.#prescricaoSeriesInputEl.value) || 1,
       metrica,
-      carga: null,
-      descansoSegundos: descansoRaw === "" ? null : Number(descansoRaw),
-      tecnicas,
-      intensidade: null
+      descansoSegundos: descansoRaw === "" ? null : Number(descansoRaw)
     };
   }
 
   #confirmarPrescricao() {
     const prescricao = this.#lerPrescricaoDoFormulario();
-    const agrupamentoTipo = this.#prescricaoAgrupamentoTipoInputEl.value;
-    const agrupamentoNumero = Number(this.#prescricaoAgrupamentoNumeroInputEl.value) || 1;
 
     const item = {
-      exercicioId: this.#exercicioEscolhidoId,
+      alongamentoId: this.#alongamentoEscolhidoId,
       ordem: 0,
-      superset: agrupamentoTipo === "superset" ? agrupamentoNumero : null,
-      circuito: agrupamentoTipo === "circuito" ? agrupamentoNumero : null,
       prescricao,
-      alternativas: [],
       observacao: null
     };
 
     if (this.#editandoIndex !== null) {
-      item.ordem = this.#exercicios[this.#editandoIndex].ordem;
-      this.#exercicios[this.#editandoIndex] = item;
+      item.ordem = this.#alongamentos[this.#editandoIndex].ordem;
+      this.#alongamentos[this.#editandoIndex] = item;
       this.#fecharPicker();
     } else {
-      this.#exercicios.push(item);
+      this.#alongamentos.push(item);
       this.#renumerarOrdem();
       this.#abrirPickerBusca();
     }
 
-    this.#renderListaExercicios();
+    this.#renderListaAlongamentos();
   }
 
   #renumerarOrdem() {
-    this.#exercicios.forEach((item, index) => {
+    this.#alongamentos.forEach((item, index) => {
       item.ordem = (index + 1) * 10;
     });
   }
 
-  #renderListaExercicios() {
-    this.#exercicioListaEl.innerHTML = "";
-    this.#exercicioVazioEl.hidden = this.#exercicios.length > 0;
+  #renderListaAlongamentos() {
+    this.#alongamentoListaEl.innerHTML = "";
+    this.#alongamentoVazioEl.hidden = this.#alongamentos.length > 0;
 
-    this.#exercicios.forEach((item, index) => {
-      const exercicio = this.#bibliotecaExercicios.bibliotecas.exercicios[item.exercicioId];
-      const nome = exercicio ? exercicio.nome : item.exercicioId;
+    this.#alongamentos.forEach((item, index) => {
+      const alongamento = this.#bibliotecaExercicios.bibliotecas.alongamentos[item.alongamentoId];
+      const nome = alongamento ? alongamento.nome : item.alongamentoId;
       const resumo = `${item.prescricao.series} séries · ${PrescricaoFormatadores.metrica(item.prescricao.metrica)}`;
-      const marcador =
-        item.superset != null
-          ? `Superset ${item.superset}`
-          : item.circuito != null
-            ? `Circuito ${item.circuito}`
-            : null;
 
       const div = document.createElement("div");
       div.className = "exercicio-item";
@@ -404,47 +328,46 @@ class TreinoNovoController {
         <div class="exercicio-item-info">
           <div class="exercicio-item-nome">${nome}</div>
           <div class="exercicio-item-resumo">${resumo}</div>
-          ${marcador ? `<span class="exercicio-item-marcador">${marcador}</span>` : ""}
         </div>
         <div class="exercicio-item-acoes">
           <button type="button" data-acao="subir" ${index === 0 ? "disabled" : ""} aria-label="Mover para cima">▲</button>
-          <button type="button" data-acao="descer" ${index === this.#exercicios.length - 1 ? "disabled" : ""} aria-label="Mover para baixo">▼</button>
+          <button type="button" data-acao="descer" ${index === this.#alongamentos.length - 1 ? "disabled" : ""} aria-label="Mover para baixo">▼</button>
           <button type="button" data-acao="editar" aria-label="Editar">✎</button>
           <button type="button" data-acao="remover" aria-label="Remover">✕</button>
         </div>
       `;
 
-      div.querySelector('[data-acao="subir"]').addEventListener("click", () => this.#moverExercicio(index, -1));
-      div.querySelector('[data-acao="descer"]').addEventListener("click", () => this.#moverExercicio(index, 1));
-      div.querySelector('[data-acao="editar"]').addEventListener("click", () => this.#editarExercicio(index));
-      div.querySelector('[data-acao="remover"]').addEventListener("click", () => this.#removerExercicio(index));
+      div.querySelector('[data-acao="subir"]').addEventListener("click", () => this.#moverAlongamento(index, -1));
+      div.querySelector('[data-acao="descer"]').addEventListener("click", () => this.#moverAlongamento(index, 1));
+      div.querySelector('[data-acao="editar"]').addEventListener("click", () => this.#editarAlongamento(index));
+      div.querySelector('[data-acao="remover"]').addEventListener("click", () => this.#removerAlongamento(index));
 
-      this.#exercicioListaEl.appendChild(div);
+      this.#alongamentoListaEl.appendChild(div);
     });
   }
 
-  #moverExercicio(index, direcao) {
+  #moverAlongamento(index, direcao) {
     const novoIndex = index + direcao;
-    if (novoIndex < 0 || novoIndex >= this.#exercicios.length) return;
-    [this.#exercicios[index], this.#exercicios[novoIndex]] = [this.#exercicios[novoIndex], this.#exercicios[index]];
+    if (novoIndex < 0 || novoIndex >= this.#alongamentos.length) return;
+    [this.#alongamentos[index], this.#alongamentos[novoIndex]] = [this.#alongamentos[novoIndex], this.#alongamentos[index]];
     this.#renumerarOrdem();
-    this.#renderListaExercicios();
+    this.#renderListaAlongamentos();
   }
 
-  #removerExercicio(index) {
-    this.#exercicios.splice(index, 1);
+  #removerAlongamento(index) {
+    this.#alongamentos.splice(index, 1);
     this.#renumerarOrdem();
-    this.#renderListaExercicios();
+    this.#renderListaAlongamentos();
   }
 
-  #editarExercicio(index) {
-    const item = this.#exercicios[index];
-    const exercicio = this.#bibliotecaExercicios.bibliotecas.exercicios[item.exercicioId];
+  #editarAlongamento(index) {
+    const item = this.#alongamentos[index];
+    const alongamento = this.#bibliotecaExercicios.bibliotecas.alongamentos[item.alongamentoId];
 
     this.#editandoIndex = index;
-    this.#exercicioEscolhidoId = item.exercicioId;
+    this.#alongamentoEscolhidoId = item.alongamentoId;
 
-    this.#pickerTituloEl.textContent = exercicio ? exercicio.nome : item.exercicioId;
+    this.#pickerTituloEl.textContent = alongamento ? alongamento.nome : item.alongamentoId;
     this.#pickerVoltarBtnEl.hidden = true;
     this.#pickerBuscaEl.hidden = true;
     this.#pickerPrescricaoEl.hidden = false;
@@ -452,7 +375,7 @@ class TreinoNovoController {
     this.#pickerOverlayEl.hidden = false;
 
     this.#prescricaoMetricaTipoInputEl.innerHTML = "";
-    (exercicio ? exercicio.metricas.permitidas : [item.prescricao.metrica.tipo]).forEach((tipo) => {
+    (alongamento ? alongamento.metricas.permitidas : [item.prescricao.metrica.tipo]).forEach((tipo) => {
       this.#prescricaoMetricaTipoInputEl.appendChild(new Option(LABEL_METRICA[tipo] || tipo, tipo));
     });
     this.#prescricaoMetricaTipoInputEl.value = item.prescricao.metrica.tipo;
@@ -464,19 +387,7 @@ class TreinoNovoController {
     this.#prescricaoValorInputEl.value = item.prescricao.metrica.valor ?? "";
     this.#prescricaoDescansoInputEl.value = item.prescricao.descansoSegundos ?? "";
 
-    const isometria = item.prescricao.tecnicas.find((t) => t.tipo === "isometria");
-    this.#prescricaoIsometriaInputEl.checked = Boolean(isometria);
-    this.#isometriaDuracaoInputEl.value = isometria ? isometria.duracaoSegundos : "20";
-    this.#isometriaUltimasSeriesInputEl.value = isometria ? isometria.aplicacao.ultimasSeries : "2";
-    this.#isometriaPosicaoInputEl.value = isometria && isometria.posicao ? isometria.posicao : "";
-    this.#isometriaMomentoInputEl.value = isometria ? isometria.momento : "final-da-serie";
-
-    this.#prescricaoAgrupamentoTipoInputEl.value = item.superset != null ? "superset" : item.circuito != null ? "circuito" : "";
-    this.#prescricaoAgrupamentoNumeroInputEl.value = item.superset ?? item.circuito ?? 1;
-
     this.#atualizarVisibilidadeModo();
-    this.#atualizarVisibilidadeIsometria();
-    this.#atualizarVisibilidadeAgrupamento();
   }
 
   #mostrarMensagem(texto) {
@@ -493,38 +404,24 @@ class TreinoNovoController {
       return;
     }
 
-    const idsExistentes = new Set(this.#dados.treinos.map((t) => t.id));
-    const id = gerarIdUnico(nome, idsExistentes);
-    const temCircuito = this.#exercicios.some((item) => item.circuito != null);
+    this.#dados.treinosAlongamento = this.#dados.treinosAlongamento || [];
+    const idsExistentes = new Set(this.#dados.treinosAlongamento.map((t) => t.id));
+    const id = gerarIdUnico(nome, idsExistentes, "treino-alongamento");
 
-    const treino = {
+    const treinoAlongamento = {
       id,
       nome,
-      tipo: this.#tipoInputEl.value,
-      aquecimento: null,
-      exercicios: this.#exercicios,
-      // Referências a treinos de cardio/alongamento complementares (ver
-      // seção 12.3 de docs/especificacao-biblioteca-exercicios.md) — anexar
-      // um existente continua manual, editando o array aqui depois de
-      // salvo (fora de escopo desta tela).
-      cardio: [],
-      alongamento: [],
-      status: this.#exercicios.length ? "ativo" : "rascunho",
+      momento: this.#momentoInputEl.value || null,
+      alongamentos: this.#alongamentos,
+      status: this.#alongamentos.length ? "ativo" : "rascunho",
       versao: 1
     };
 
-    if (temCircuito) {
-      treino.configuracaoCircuito = {
-        ativo: true,
-        modoExecucao: "uma-serie-de-cada-exercicio-em-sequencia"
-      };
-    }
-
-    this.#dados.treinos.push(treino);
+    this.#dados.treinosAlongamento.push(treinoAlongamento);
     TreinosStorage.definirDadosTreinos(this.#dados);
 
-    window.location.href = `treino_exercicios.html?treino=${encodeURIComponent(id)}`;
+    window.location.href = "treino_alongamento_menu.html";
   }
 }
 
-new TreinoNovoController().iniciar();
+new TreinoAlongamentoNovoController().iniciar();

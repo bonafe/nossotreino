@@ -1,4 +1,4 @@
-const CACHE_NOME = "treinos-shell-v9";
+const CACHE_NOME = "treinos-shell-v10";
 
 const ARQUIVOS_PARA_CACHE = [
   "index.html",
@@ -6,6 +6,10 @@ const ARQUIVOS_PARA_CACHE = [
   "importar_dados.html",
   "treino_bicicleta_menu.html",
   "treino_bicicleta.html",
+  "treino_bicicleta_novo.html",
+  "treino_alongamento_menu.html",
+  "treino_alongamento.html",
+  "treino_alongamento_novo.html",
   "treino_exercicios_menu.html",
   "treino_exercicios.html",
   "treino_execucao.html",
@@ -32,6 +36,7 @@ const ARQUIVOS_PARA_CACHE = [
   "js/prescricao-formatadores.js",
   "js/formatadores.js",
   "js/constantes.js",
+  "js/identificadores.js",
   "js/sinal-sonoro.js",
   "js/cronometro.js",
   "js/grafico-barras.js",
@@ -44,6 +49,10 @@ const ARQUIVOS_PARA_CACHE = [
   "js/paginas/importar-dados.js",
   "js/paginas/treino-bicicleta-menu.js",
   "js/paginas/treino-bicicleta.js",
+  "js/paginas/treino-bicicleta-novo.js",
+  "js/paginas/treino-alongamento-menu.js",
+  "js/paginas/treino-alongamento.js",
+  "js/paginas/treino-alongamento-novo.js",
   "js/paginas/treino-exercicios-menu.js",
   "js/paginas/treino-exercicios.js",
   "js/paginas/treino-execucao.js",

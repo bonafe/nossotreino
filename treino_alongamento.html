@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Execução do Alongamento</title>
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/componentes.css" />
+  <link rel="stylesheet" href="css/paginas/treino-execucao.css" />
+</head>
+<body>
+  <main>
+    <header class="top">
+      <a id="voltarIcon" class="voltar-icon" href="treino_alongamento_menu.html" aria-label="Sair">←</a>
+      <div>
+        <h1 id="titulo">Carregando…</h1>
+      </div>
+    </header>
+
+    <div id="stepper" class="stepper" hidden>
+      <button id="alongamentoAnterior" class="stepper-btn" type="button" aria-label="Alongamento anterior">‹</button>
+      <span id="progressoTag" class="tag"></span>
+      <button id="alongamentoProximo" class="stepper-btn" type="button" aria-label="Próximo alongamento">›</button>
+    </div>
+
+    <p class="hint-sair">Seu progresso fica salvo — pode sair e retomar depois.</p>
+
+    <div id="carregando" class="estado">Carregando treino…</div>
+    <div id="erro" class="estado" hidden></div>
+
+    <section id="execucao" class="card-exercicio" hidden>
+      <h2 id="alongamentoNome"></h2>
+      <div id="alongamentoGrupos" class="item-grupos"></div>
+
+      <div class="serie-info">
+        <span id="serieAtualLabel"></span>
+        <span id="alvoMetrica"></span>
+      </div>
+
+      <div id="serieTimer" class="serie-timer" hidden>
+        <span class="serie-timer-label">Em andamento</span>
+        <span id="serieTimerValor" class="serie-timer-valor">00:00</span>
+      </div>
+
+      <button id="comecarSerie" class="primary">▶ Começar série</button>
+      <button id="concluirSerie" class="primary" hidden>Concluir série</button>
+
+      <button type="button" id="verVideo" class="video-botao" hidden disabled>Vídeo…</button>
+    </section>
+
+    <section id="descanso" class="card-exercicio" hidden>
+      <h2>Descanso</h2>
+      <div id="descansoTempo" class="descanso-tempo">00:00</div>
+      <div class="descanso-alvo">
+        <span>Mín. <strong id="descansoMin"></strong></span>
+        <span>Máx. <strong id="descansoMax"></strong></span>
+      </div>
+      <p id="descansoProximo" class="descanso-proximo"></p>
+      <button id="iniciarSerie" class="primary">Iniciar série</button>
+    </section>
+
+    <section id="concluido" hidden>
+      <div class="emoji">🎉</div>
+      <h2>Treino concluído!</h2>
+      <p id="resumoConclusao"></p>
+      <a class="iniciar" href="treino_alongamento_menu.html">Voltar ao menu</a>
+    </section>
+
+    <img id="imagemAlongamento" class="imagem-exercicio" alt="" hidden />
+  </main>
+
+  <div id="videoOverlay" class="overlay" hidden>
+    <div class="video-card">
+      <button id="videoFechar" class="video-fechar" type="button" aria-label="Fechar vídeo">✕</button>
+      <video id="videoPlayer" controls playsinline></video>
+    </div>
+  </div>
+
+  <script type="module" src="js/paginas/treino-alongamento.js"></script>
+</body>
+</html>

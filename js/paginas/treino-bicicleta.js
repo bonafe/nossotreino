@@ -140,7 +140,8 @@ class TreinoBicicletaController {
   #registrarSessaoConcluida() {
     TreinosStorage.adicionarAoHistorico(TreinosStorage.chaves.historicoSessaoBicicleta, {
       modalidadeId: this.#config.modalidadeId,
-      treinoId: this.#config.treinoId,
+      treinoId: this.#config.treinoCardioId,
+      origemTreinoId: this.#config.origemTreinoId,
       nome: this.#config.nome,
       dataHora: new Date().toISOString(),
       duracaoSegundos: this.#totalSegundos,
@@ -227,12 +228,13 @@ class TreinoBicicletaController {
     this.#render();
   }
 
-  #extrairConfig(treino, entrada, modalidade) {
-    const cfg = entrada.treino;
+  #extrairConfig(treinoCardio, modalidade, origemTreinoId) {
+    const cfg = treinoCardio.treino;
     return {
-      modalidadeId: entrada.modalidadeId,
-      treinoId: treino.id,
-      nome: `${treino.nome} — ${modalidade.nome}`,
+      modalidadeId: treinoCardio.modalidadeId,
+      treinoCardioId: treinoCardio.id,
+      origemTreinoId,
+      nome: `${treinoCardio.nome} — ${modalidade.nome}`,
       series: cfg.series,
       tempoEstimuloSegundos: cfg.estimulo.duracaoSegundos,
       tempoRecuperacaoSegundos: cfg.recuperacao.duracaoSegundos,
@@ -243,14 +245,14 @@ class TreinoBicicletaController {
 
   async #carregarTreino() {
     const params = new URLSearchParams(window.location.search);
-    const treinoId = params.get("treino");
-    const modalidadeId = params.get("modalidade");
+    const treinoCardioId = params.get("treino");
+    const origemTreinoId = params.get("origem");
 
-    this.#voltarIconEl.href = treinoId
-      ? `treino_exercicios.html?treino=${encodeURIComponent(treinoId)}`
+    this.#voltarIconEl.href = origemTreinoId
+      ? `treino_exercicios.html?treino=${encodeURIComponent(origemTreinoId)}`
       : "treino_bicicleta_menu.html";
 
-    if (!treinoId || !modalidadeId) {
+    if (!treinoCardioId) {
       this.#mostrarErro("Nenhum treino selecionado.");
       return;
     }
@@ -265,23 +267,22 @@ class TreinoBicicletaController {
       return;
     }
 
-    const treino = dados.treinos.find((t) => t.id === treinoId);
-    const entrada = treino && treino.cardio && treino.cardio.find((c) => c.modalidadeId === modalidadeId);
-    const modalidade = bibliotecaExercicios.bibliotecas.cardio.modalidades[modalidadeId];
+    const treinoCardio = (dados.treinosCardio || []).find((t) => t.id === treinoCardioId);
+    const modalidade = treinoCardio && bibliotecaExercicios.bibliotecas.cardio.modalidades[treinoCardio.modalidadeId];
 
-    if (!treino || !entrada || !modalidade) {
+    if (!treinoCardio || !modalidade) {
       this.#mostrarErro("Não foi possível carregar este treino.", true);
       return;
     }
 
     // O motor só sabe tocar o ciclo intervalado estímulo/recuperação —
     // outros tipos (ex. contínuo) ficam fora de escopo por enquanto.
-    if (entrada.treino.tipo !== "intervalado" || !entrada.treino.estimulo || !entrada.treino.recuperacao) {
+    if (treinoCardio.treino.tipo !== "intervalado" || !treinoCardio.treino.estimulo || !treinoCardio.treino.recuperacao) {
       this.#mostrarErro("Este tipo de treino de bicicleta ainda não é suportado.");
       return;
     }
 
-    this.#iniciarComConfig(this.#extrairConfig(treino, entrada, modalidade));
+    this.#iniciarComConfig(this.#extrairConfig(treinoCardio, modalidade, origemTreinoId));
   }
 }
 

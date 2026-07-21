@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Novo Treino de Alongamento</title>
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/componentes.css" />
+  <link rel="stylesheet" href="css/paginas/treino-novo.css" />
+</head>
+<body>
+  <main>
+    <header class="top">
+      <a class="voltar-icon" href="treino_alongamento_menu.html" aria-label="Voltar">←</a>
+      <div>
+        <h1>Novo treino de alongamento</h1>
+      </div>
+    </header>
+
+    <div id="carregando" class="estado">Carregando…</div>
+
+    <div id="erro" class="estado" hidden></div>
+
+    <form id="formTreino" hidden>
+      <div class="campo">
+        <label for="nomeInput">Nome</label>
+        <input type="text" id="nomeInput" placeholder="Ex.: Mobilidade de quadril pós-treino" autocomplete="off" />
+      </div>
+
+      <div class="campo">
+        <label for="momentoInput">Momento <span class="opcional">— opcional</span></label>
+        <select id="momentoInput">
+          <option value="">Não especificado</option>
+          <option value="antes-musculacao">Antes da musculação</option>
+          <option value="apos-musculacao">Após a musculação</option>
+        </select>
+      </div>
+
+      <section class="secao">
+        <h2>Alongamentos</h2>
+        <div id="alongamentoLista" class="exercicio-lista"></div>
+        <div id="alongamentoVazio" class="estado">Nenhum alongamento adicionado ainda.</div>
+        <button type="button" id="adicionarAlongamentoBtn" class="adicionar-exercicio">+ Adicionar alongamento</button>
+      </section>
+
+      <button type="button" id="salvarBtn" class="primary">Salvar treino</button>
+
+      <div id="mensagem" class="mensagem" hidden></div>
+    </form>
+  </main>
+
+  <div id="pickerOverlay" class="overlay" hidden>
+    <div class="picker-card">
+      <div class="picker-cabecalho">
+        <button type="button" id="pickerVoltarBtn" class="picker-voltar" hidden>‹ Buscar</button>
+        <h2 id="pickerTitulo">Adicionar alongamento</h2>
+        <button type="button" id="pickerFecharBtn" class="picker-fechar" aria-label="Fechar">✕</button>
+      </div>
+
+      <div id="pickerBusca">
+        <div class="picker-filtros">
+          <input type="text" id="pickerBuscaInput" class="picker-busca" placeholder="Buscar por nome…" autocomplete="off" />
+
+          <div class="filtro-grupo">
+            <button type="button" class="filtro-toggle" id="filtroGrupoBtn">Grupo muscular</button>
+            <div class="filtro-opcoes" id="filtroGrupoOpcoes" hidden></div>
+          </div>
+
+          <div class="filtro-grupo">
+            <button type="button" class="filtro-toggle" id="filtroTipoBtn">Tipo</button>
+            <div class="filtro-opcoes" id="filtroTipoOpcoes" hidden></div>
+          </div>
+
+          <button type="button" id="pickerLimparBtn" class="picker-limpar">Limpar filtros</button>
+        </div>
+        <div id="pickerResultados" class="picker-resultados"></div>
+      </div>
+
+      <div id="pickerPrescricao" class="picker-prescricao" hidden>
+        <div class="campo-linha">
+          <div class="campo">
+            <label for="prescricaoSeriesInput">Séries</label>
+            <input type="number" id="prescricaoSeriesInput" min="1" value="2" />
+          </div>
+          <div class="campo">
+            <label for="prescricaoMetricaTipoInput">Métrica</label>
+            <select id="prescricaoMetricaTipoInput"></select>
+          </div>
+        </div>
+
+        <div class="campo">
+          <label for="prescricaoModoInput">Modo</label>
+          <select id="prescricaoModoInput">
+            <option value="fixo">Fixo</option>
+            <option value="faixa">Faixa</option>
+            <option value="maximo">Máximo</option>
+          </select>
+        </div>
+
+        <div id="prescricaoFaixaCampos" class="campo-linha" hidden>
+          <div class="campo">
+            <label for="prescricaoMinInput">Mínimo</label>
+            <input type="number" id="prescricaoMinInput" min="0" />
+          </div>
+          <div class="campo">
+            <label for="prescricaoMaxInput">Máximo</label>
+            <input type="number" id="prescricaoMaxInput" min="0" />
+          </div>
+        </div>
+
+        <div id="prescricaoFixoCampo" class="campo">
+          <label for="prescricaoValorInput">Valor</label>
+          <input type="number" id="prescricaoValorInput" min="0" value="30" />
+        </div>
+
+        <div class="campo">
+          <label for="prescricaoDescansoInput">Descanso (segundos) <span class="opcional">— opcional</span></label>
+          <input type="number" id="prescricaoDescansoInput" min="0" placeholder="15 a 30s (padrão)" />
+        </div>
+
+        <button type="button" id="prescricaoConfirmarBtn" class="primary">Adicionar</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/paginas/treino-alongamento-novo.js"></script>
+</body>
+</html>
