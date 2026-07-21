@@ -1,2 +1,6 @@
 dados/
 referencias/
+src/python/.env
+src/python/.venv/
+__pycache__/
+.env
