@@ -4,91 +4,42 @@ import base64
 
 GENEROS_VALIDOS = ("masculino", "feminino")
 
-_DESCRICAO_PERSONAGEM = {
-    "masculino": (
-        "- homem adulto baseado no homem da fotografia de referência;\n"
-        "- porte físico grande e forte, com aparência natural;\n"
-        "- cabelo castanho escuro, curto e cacheado;\n"
-        "- barba cheia grisalha, bem definida;\n"
-        "- vestir camiseta esportiva ajustada em tom verde-azulado, bermuda "
-        "esportiva preta e tênis de treino neutro."
-    ),
-    "feminino": (
-        "- mulher adulta baseada na mulher da fotografia de referência;\n"
-        "- corpo com proporções naturais e aparência saudável;\n"
-        "- cabelos loiros escuros ou castanho-claros, ondulados/cacheados, "
-        "presos parcialmente para não atrapalhar o exercício;\n"
-        "- vestir regata esportiva vermelha, legging preta e tênis de treino neutro."
-    ),
-}
 
-_TEMPLATE_PROMPT = """\
-Crie uma imagem didática e fotorrealista para uma biblioteca de exercícios \
-de musculação. Mantenha consistência visual entre todas as imagens da coleção.
-
-PERSONAGEM: {genero_label}
-{descricao_personagem}
-
-EXERCÍCIO: {nome}
-Representar o exercício com técnica biomecânica correta, incluindo:
-- posicionamento correto dos pés, mãos, coluna, cabeça e articulações;
-- pegada correta no equipamento;
-- amplitude segura e adequada;
-- alinhamento corporal natural;
-- equipamento com dimensões realistas;
-- musculatura corporal proporcional;
-- expressão facial neutra e concentrada;
-- ausência de esforço exagerado ou deformações anatômicas.
-
-COMPOSIÇÃO:
-- imagem horizontal;
-- dois quadros lado a lado;
-- quadro esquerdo mostrando a posição inicial;
-- quadro direito mostrando a posição final ou o ponto principal do movimento;
-- o mesmo personagem, roupa, equipamento, iluminação e ângulo nos dois quadros;
-- corpo inteiro visível, incluindo mãos, pés e equipamento;
-- câmera na altura aproximada do tronco;
-- ângulo de visão que melhor demonstre a execução do exercício, preferencialmente \
-lateral ou em três quartos;
-- enquadramento limpo, sem partes do corpo cortadas;
-- distância suficiente para compreender toda a trajetória do movimento;
-- pequena seta gráfica discreta indicando a direção principal do movimento, \
-somente quando ela ajudar na compreensão.
-
-AMBIENTE:
-- academia moderna, organizada e minimalista;
-- fundo neutro e levemente desfocado;
-- poucos equipamentos ao fundo;
-- iluminação natural e uniforme de estúdio;
-- contraste suficiente para separar o personagem do fundo;
-- piso emborrachado;
-- sem outras pessoas na cena.
-
-ESTILO:
-- fotografia profissional de instrução esportiva;
-- aparência realista, não ilustrada;
-- alta definição;
-- anatomia humana correta;
-- cores naturais;
-- imagem clara e objetiva;
-- sem sexualização;
-- sem suor excessivo;
-- sem aparência de fisiculturista extremo;
-- sem logotipos ou marcas comerciais;
-- sem textos, títulos, números, legendas ou marcas-d'água;
-- não alterar o rosto ou a roupa entre os dois quadros."""
+def humanizar_id(identificador: str) -> str:
+    return identificador.replace("-", " ")
 
 
 def montar_prompt(exercicio: dict, genero: str) -> str:
-    """Monta o prompt de imagem a partir do template didático fixo (mesmo
-    personagem/roupa/composição em toda a coleção), preenchendo só o gênero
-    e o nome do exercício — não depende de mais nenhum campo do registro."""
+    """Monta o prompt de imagem a partir dos campos do exercício na
+    biblioteca (nome, movimento, grupos musculares, equipamentos) — não
+    depende de nenhum outro dicionário além do próprio registro do
+    exercício, os grupos/equipamentos já vêm com id legível o bastante
+    pra entrar direto no prompt (ex.: "gluteo-maximo" -> "gluteo maximo")."""
+    pessoa = "um homem" if genero == "masculino" else "uma mulher"
     nome = exercicio.get("nome") or exercicio.get("id", "exercício")
-    return _TEMPLATE_PROMPT.format(
-        genero_label=genero.upper(),
-        descricao_personagem=_DESCRICAO_PERSONAGEM[genero],
-        nome=nome,
+    padrao_movimento = exercicio.get("movimento", {}).get("padrao")
+    grupos = exercicio.get("gruposMusculares", {}).get("principais", [])
+    equipamentos = [
+        item.get("equipamentoId")
+        for item in exercicio.get("equipamentos", {}).get("obrigatorios", [])
+        if item.get("equipamentoId")
+    ]
+
+    partes = [
+        f'Ilustração instrutiva de fitness, estilo flat/vetor, mostrando {pessoa} '
+        f'executando o exercício "{nome}" com a forma correta.'
+    ]
+    if grupos:
+        partes.append(f"Ênfase visual nos músculos: {', '.join(humanizar_id(g) for g in grupos)}.")
+    if equipamentos:
+        partes.append(f"Equipamento visível: {', '.join(humanizar_id(e) for e in equipamentos)}.")
+    if padrao_movimento:
+        partes.append(f"Padrão de movimento: {humanizar_id(padrao_movimento)}.")
+    partes.append(
+        "Fundo neutro e limpo, sem texto, sem marca d'água, uma única figura, "
+        "corpo inteiro visível, pose clara demonstrando o movimento em andamento."
     )
+    return " ".join(partes)
 
 
 def gerar_imagem_exercicio(
