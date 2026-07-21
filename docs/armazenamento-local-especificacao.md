@@ -62,7 +62,7 @@ sem ter que migrar dados antigos — se o formato mudar, cria-se uma
 | `historico.sessaoAlongamento.v1` | Array — um registro por alongamento concluído por inteiro (mesmo padrão de `historico.sessaoMusculacao.v1`), ver seção 7 de [treino-alongamento-especificacao.md](./treino-alongamento-especificacao.md) |
 | `execucao.musculacao.<treinoId>.v2` | Estado do treino de exercícios em andamento (para retomar após fechar a página) — endereçado por `exercicioId`, não por índice posicional |
 | `execucao.alongamento.<treinoId>.v1` | Estado do treino de alongamento em andamento — mesmo princípio de `execucao.musculacao.<treinoId>.v2`, endereçado por `alongamentoId` |
-| `preferencias.generoImagem.v1` | `"masculino"` ou `"feminino"` — escolhido na engrenagem de configurações (`sistema.html`), define qual variante das imagens de exercício (`biblioteca-exercicios/imagens-exercicios/<exercicioId>__<genero>.png`) é exibida |
+| `preferencias.generoImagem.v1` | `"masculino"` ou `"feminino"` — escolhido na engrenagem de configurações (`sistema.html`), define qual variante das imagens (`biblioteca-exercicios/imagens/musculacao/<exercicioId>__<genero>.png` ou `biblioteca-exercicios/imagens/alongamento/<alongamentoId>__<genero>.png`) é exibida |
 
 `dadosTreinos.v1`/`execucao.musculacao.<treinoId>.v1` (formato anterior,
 com `blocos`/`itens` e progresso por índice) não são mais lidos — a

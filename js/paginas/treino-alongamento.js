@@ -144,7 +144,7 @@ class TreinoAlongamentoController {
   #atualizarImagemAlongamento(alongamentoId, nome) {
     this.#imagemToken += 1;
     const token = this.#imagemToken;
-    ligarImagemExercicio(this.#imagemAlongamentoEl, alongamentoId, nome, () => token === this.#imagemToken);
+    ligarImagemExercicio(this.#imagemAlongamentoEl, alongamentoId, nome, () => token === this.#imagemToken, "alongamento");
   }
 
   #itemAtual() {
@@ -380,7 +380,7 @@ class TreinoAlongamentoController {
       return;
     }
 
-    prefetchImagensDoTreino(this.#slots.map((slot) => slot.alongamentoId));
+    prefetchImagensDoTreino(this.#slots.map((slot) => slot.alongamentoId), undefined, "alongamento");
     this.#carregarOuIniciarProgresso();
 
     document.title = `${this.#treinoAlongamento.nome} — Execução`;

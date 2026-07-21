@@ -5,9 +5,13 @@ const GENERO_PADRAO = "masculino";
 // As imagens são geradas fora do site (src/python/gerar_imagens_treino.py)
 // e salvas com nome previsível — não há campo na biblioteca apontando pra
 // elas, então o caminho é sempre montado por convenção a partir do
-// exercicioId e do gênero escolhido pelo aluno (configurações). Nem todo
-// exercício tem imagem gerada ainda, então quem usa isso precisa tratar o
-// caso de a imagem não existir (ver `ligarBotaoImagem`/`ligarImagemExercicio`).
+// id (exercicioId ou alongamentoId) e do gênero escolhido pelo aluno
+// (configurações). Cada categoria tem sua própria subpasta dentro de
+// `imagens/` (`musculacao/`, `alongamento/` — mesmo domínio usado por
+// `bibliotecas.exercicios`/`bibliotecas.alongamentos`), já que os dois
+// catálogos podem ter ids repetidos entre si. Nem todo item tem imagem
+// gerada ainda, então quem usa isso precisa tratar o caso de a imagem não
+// existir (ver `ligarBotaoImagem`/`ligarImagemExercicio`).
 export function obterGeneroImagem() {
   return TreinosStorage.lerJSON(TreinosStorage.chaves.generoImagem, GENERO_PADRAO);
 }
@@ -16,8 +20,8 @@ export function definirGeneroImagem(genero) {
   TreinosStorage.salvarJSON(TreinosStorage.chaves.generoImagem, genero);
 }
 
-export function caminhoImagemExercicio(exercicioId, genero = obterGeneroImagem()) {
-  return `biblioteca-exercicios/imagens-exercicios/${exercicioId}__${genero}.png`;
+export function caminhoImagemExercicio(id, genero = obterGeneroImagem(), dominio = "musculacao") {
+  return `biblioteca-exercicios/imagens/${dominio}/${id}__${genero}.png`;
 }
 
 // Modal simples (mesmo padrão de #videoOverlay/criarVideoPlayerModal em
@@ -59,9 +63,9 @@ export function criarImagemModal() {
  * uma vez seria desperdício. O cache em si é o do service worker (`sw.js`,
  * rede-primeiro-com-reserva-em-cache), então basta disparar o request.
  */
-export function prefetchImagensDoTreino(exercicioIds, genero = obterGeneroImagem()) {
-  [...new Set(exercicioIds)].forEach((exercicioId) => {
-    new Image().src = caminhoImagemExercicio(exercicioId, genero);
+export function prefetchImagensDoTreino(ids, genero = obterGeneroImagem(), dominio = "musculacao") {
+  [...new Set(ids)].forEach((id) => {
+    new Image().src = caminhoImagemExercicio(id, genero, dominio);
   });
 }
 
@@ -70,11 +74,11 @@ export function prefetchImagensDoTreino(exercicioIds, genero = obterGeneroImagem
  * existe de fato (não há como saber isso a partir da biblioteca, então
  * tenta carregar e reage ao sucesso/falha).
  */
-export function ligarBotaoImagem(botaoEl, exercicioId, nomeExercicio, imagemModal) {
+export function ligarBotaoImagem(botaoEl, exercicioId, nomeExercicio, imagemModal, dominio = "musculacao") {
   botaoEl.hidden = true;
   if (!exercicioId) return;
 
-  const src = caminhoImagemExercicio(exercicioId);
+  const src = caminhoImagemExercicio(exercicioId, undefined, dominio);
   const probe = new Image();
   probe.onload = () => {
     botaoEl.hidden = false;
@@ -95,11 +99,11 @@ export function ligarBotaoImagem(botaoEl, exercicioId, nomeExercicio, imagemModa
  * imagem antiga sobrescreva a tela depois que o aluno já avançou pra outro
  * exercício (mesmo problema resolvido em `ligarBotaoVideo`).
  */
-export function ligarImagemExercicio(imgEl, exercicioId, nomeExercicio, deveAtualizar = () => true) {
+export function ligarImagemExercicio(imgEl, exercicioId, nomeExercicio, deveAtualizar = () => true, dominio = "musculacao") {
   imgEl.hidden = true;
   if (!exercicioId) return;
 
-  const src = caminhoImagemExercicio(exercicioId);
+  const src = caminhoImagemExercicio(exercicioId, undefined, dominio);
   const probe = new Image();
   probe.onload = () => {
     if (!deveAtualizar()) return;

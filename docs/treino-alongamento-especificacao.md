@@ -139,10 +139,13 @@ essas opções, seção 2):
   cronômetro da série em andamento (mesmo padrão de
   `Cronometro`/`SinalSonoro` da musculação), botão "Ver vídeo"
   (`ligarBotaoVideo`, a partir de `bibliotecas.alongamentos[id].midia`) e
-  imagem sempre visível (`ligarImagemExercicio`, mesmo helper genérico por
-  id+gênero de `js/imagem-exercicio.js` — hoje nenhum alongamento tem
-  imagem gerada ainda, então fica oculta até existir uma seguindo a
-  convenção `<alongamentoId>__<genero>.png`).
+  imagem sempre visível (`ligarImagemExercicio(..., "alongamento")`, mesmo
+  helper genérico por id+gênero de `js/imagem-exercicio.js`, passando o
+  domínio `"alongamento"` pra resolver em `imagens/alongamento/` em vez de
+  `imagens/musculacao/` — hoje nenhum alongamento tem imagem gerada ainda,
+  então fica oculta até existir uma seguindo a convenção
+  `biblioteca-exercicios/imagens/alongamento/<alongamentoId>__<genero>.png`,
+  gerável com `src/python/gerar_imagens_treino.py --categoria alongamentos`).
 - Descanso entre séries/alongamentos: mesma tela/cronômetro da musculação,
   alvo min/máx a partir de `prescricao.descansoSegundos` do item, ou um
   padrão de 15–30s quando ausente (treino de alongamento não tem

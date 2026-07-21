@@ -312,7 +312,7 @@ distingue) por dia ou mês.
   [torrent-videos-especificacao.md](./torrent-videos-especificacao.md#7-estados-de-carregamento-ui);
   "Ver imagem" (`js/imagem-exercicio.js#ligarBotaoImagem`) só aparece se a
   imagem daquele `exercicioId` existir em
-  `biblioteca-exercicios/imagens-exercicios/` (tentativa de carregamento,
+  `biblioteca-exercicios/imagens/musculacao/` (tentativa de carregamento,
   sem registro prévio de quais exercícios já têm imagem — ver seção 2.1 de
   [especificacao-biblioteca-exercicios.md](./especificacao-biblioteca-exercicios.md))
   e abre a imagem num overlay próprio (`#imagemOverlay`); "Ver progresso"
