@@ -1,8 +1,19 @@
 #!/usr/bin/env python3
-"""CLI para gerar imagens de exercício e de alongamento (biblioteca + plano
-de treino) via API de imagens da OpenAI.
+"""CLI para gerar imagens de exercício e de alongamento (biblioteca, com ou
+sem plano de treino) via API de imagens da OpenAI.
+
+`--plano` é opcional:
+- **Com** `--plano`, gera só os itens prescritos nele (exercícios de
+  `treinos[]`/`treinosAlongamento[]`, opcionalmente filtrados por
+  `--treino-id`/`--treino-alongamento-id`) — mais barato, cobre só o que
+  aquele aluno usa.
+- **Sem** `--plano`, gera a partir da biblioteca inteira
+  (`bibliotecas.exercicios`/`bibliotecas.alongamentos`) — cobre tudo, mas
+  são ~350 exercícios + ~120 alongamentos × 2 gêneros; use `--limite`
+  pra não gerar tudo de uma vez e estourar custo sem querer.
 
 Uso:
+    # A partir de um plano específico (só o que está prescrito nele):
     python3 gerar_imagens_treino.py \\
         --biblioteca ../../biblioteca-exercicios/biblioteca-exercicios.json \\
         --plano ../../dados/treino-bonafe-v1.json \\
@@ -12,6 +23,12 @@ Uso:
         [--genero ambos|masculino|feminino] \\
         [--tamanho 1024x1024] [--qualidade auto] [--fundo auto] \\
         [--limite N] [--dry-run]
+
+    # A partir da biblioteca inteira (sem plano):
+    python3 gerar_imagens_treino.py \\
+        --biblioteca ../../biblioteca-exercicios/biblioteca-exercicios.json \\
+        --saida ../../biblioteca-exercicios/imagens \\
+        --categoria alongamentos --limite 20 [--dry-run]
 """
 
 import argparse
@@ -41,7 +58,12 @@ def analisar_argumentos():
         description="Gera imagens de exercício e/ou alongamento via API de imagens da OpenAI."
     )
     parser.add_argument("--biblioteca", required=True, type=Path, help="Caminho de biblioteca-exercicios.json")
-    parser.add_argument("--plano", required=True, type=Path, help="Caminho do JSON do plano de treino")
+    parser.add_argument(
+        "--plano",
+        default=None,
+        type=Path,
+        help="Caminho do JSON do plano de treino (opcional — sem ele, gera a partir da biblioteca inteira em vez de filtrar pelo que está prescrito num plano)",
+    )
     parser.add_argument(
         "--categoria",
         choices=("ambas", "exercicios", "alongamentos"),
@@ -193,8 +215,13 @@ def main():
     args = analisar_argumentos()
     load_dotenv(DIRETORIO_SCRIPT / ".env")
 
+    if args.treino_id and not args.plano:
+        sys.exit("--treino-id exige --plano (filtra exercícios de um treino específico do plano).")
+    if args.treino_alongamento_id and not args.plano:
+        sys.exit("--treino-alongamento-id exige --plano.")
+
     biblioteca = carregar_json(args.biblioteca)
-    plano = carregar_json(args.plano)
+    plano = carregar_json(args.plano) if args.plano else None
 
     generos = generos_selecionados(args.genero)
     args.saida.mkdir(parents=True, exist_ok=True)
@@ -216,8 +243,11 @@ def main():
 
     if args.categoria in ("ambas", "exercicios"):
         exercicios_biblioteca = biblioteca.get("bibliotecas", {}).get("exercicios", {})
-        treinos = resolver_treinos(plano, args.treino_id)
-        exercicio_ids = coletar_exercicio_ids(treinos)
+        if plano:
+            treinos = resolver_treinos(plano, args.treino_id)
+            exercicio_ids = coletar_exercicio_ids(treinos)
+        else:
+            exercicio_ids = list(exercicios_biblioteca.keys())
         gerar_para_categoria(
             "bibliotecas.exercicios",
             exercicio_ids,
@@ -232,8 +262,11 @@ def main():
 
     if args.categoria in ("ambas", "alongamentos"):
         alongamentos_biblioteca = biblioteca.get("bibliotecas", {}).get("alongamentos", {})
-        treinos_alongamento = resolver_treinos_alongamento(plano, args.treino_alongamento_id)
-        alongamento_ids = coletar_alongamento_ids(treinos_alongamento)
+        if plano:
+            treinos_alongamento = resolver_treinos_alongamento(plano, args.treino_alongamento_id)
+            alongamento_ids = coletar_alongamento_ids(treinos_alongamento)
+        else:
+            alongamento_ids = list(alongamentos_biblioteca.keys())
         gerar_para_categoria(
             "bibliotecas.alongamentos",
             alongamento_ids,
