@@ -36,8 +36,15 @@ def montar_prompt(exercicio: dict, genero: str) -> str:
     if padrao_movimento:
         partes.append(f"Padrão de movimento: {humanizar_id(padrao_movimento)}.")
     partes.append(
-        "Fundo neutro e limpo, sem texto, sem marca d'água, uma única figura, "
-        "corpo inteiro visível, pose clara demonstrando o movimento em andamento."
+        "Composição em dois quadros lado a lado, mesmo personagem, roupa e "
+        "ângulo nos dois: o quadro da esquerda mostra a posição inicial do "
+        "movimento, o da direita mostra a posição final (ou o ponto de maior "
+        "amplitude) — juntas, as duas posições devem deixar claro o que "
+        "precisa ser feito."
+    )
+    partes.append(
+        "Fundo neutro e limpo, sem texto, sem marca d'água, corpo inteiro "
+        "visível em cada quadro."
     )
     return " ".join(partes)
 
