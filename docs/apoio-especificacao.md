@@ -20,6 +20,35 @@ Consequências diretas:
 - Fora do gatilho pós-treino (seção 4), apoio é só um link discreto —
   nunca inundar a tela com isso.
 
+### 1.1 Compatibilidade com uma futura versão com servidor
+
+Existe um plano (fora de escopo por ora, seção 7) de no futuro oferecer
+uma versão com servidor — sincronização de plano/histórico entre
+aparelhos em vez de só `localStorage` — que será **paga**. Decisões já
+tomadas sobre como isso convive com os princípios de hoje:
+
+- **Mesma marca, mesmo repositório.** `nossotreino.com.br` continua
+  sendo o produto — não haverá um site/marca separado pro serviço com
+  servidor. O código do servidor, quando existir, entra neste mesmo
+  repositório, sob a mesma licença AGPL-3.0 (qualquer um pode se
+  auto-hospedar de graça; o que se cobra é a conveniência de hospedagem
+  pronta, não o software).
+- **O uso local nunca deixa de ser gratuito.** A sincronização com
+  servidor será uma camada **opcional** por cima do que já existe — nunca
+  uma substituição, nunca uma condição pra usar o que já funciona hoje
+  (importar dados, treinar, ver histórico, tudo via `localStorage`).
+- **Por isso os textos absolutos de `index.html` foram escopados pro "uso
+  local"** em vez de prometerem "isso nunca vai ter servidor/custo, nunca,
+  sob nenhuma circunstância" — que ficaria factualmente falso quando a
+  versão com servidor existir. Ex.: "Gratuito" e "Seus dados são só seus"
+  (seção de princípios) e a nota final da seção "Privacidade" deixam
+  explícito que qualquer recurso futuro com servidor será opcional e não
+  muda o uso local. Isso é uma correção de precisão, não uma mudança de
+  direção — o princípio continua o mesmo, só a frase ficou exata.
+- Nenhum detalhe da versão com servidor (preço, prazo, recursos) é
+  anunciado publicamente ainda — os textos só evitam prometer algo que
+  se tornaria falso, sem anunciar o que ainda não existe.
+
 ## 2. Meio de contribuição: só Pix
 
 Decisão (confirmada): **sem GitHub Sponsors**. Só Pix. Isso simplifica a
@@ -241,3 +270,7 @@ fora do backup).
 - Link de pagamento com valor aberto (Mercado Pago etc.) além do Pix
   "copia e cola" — pode entrar depois, mesma lógica da seção 2.1 (Bonafé
   fornece o link pronto, o código só exibe).
+- **Versão com servidor** (sincronização de plano/histórico entre
+  aparelhos, paga) — só a compatibilidade de princípios/texto foi
+  resolvida por enquanto (seção 1.1). Arquitetura, preço e prazo ainda
+  não foram desenhados.
