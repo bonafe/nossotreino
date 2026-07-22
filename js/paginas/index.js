@@ -45,7 +45,9 @@ function selecionarOpcao(opcao) {
 function mostrarCopiaManual() {
   copiaManualInputEl.hidden = false;
   copiaManualInputEl.value = payloadAtual;
+  copiaManualInputEl.focus();
   copiaManualInputEl.select();
+  copiaManualInputEl.setSelectionRange(0, payloadAtual.length);
 }
 
 function mostrarCopiado() {
@@ -56,15 +58,52 @@ function mostrarCopiado() {
   }, 2000);
 }
 
+// Fallback pra `navigator.clipboard.writeText` — necessário no Safari/iOS,
+// que em vários contextos rejeita a Clipboard API mesmo dentro de um clique
+// (diferente de Chrome desktop/Android, onde a Clipboard API já resolve
+// direto). `execCommand("copy")` é antigo mas ainda suportado em todo
+// lugar; `setSelectionRange` além de `.select()` é necessário
+// especificamente no iOS, que ignora `.select()` sozinho em textarea.
+function copiarViaExecCommand(texto) {
+  const areaTemp = document.createElement("textarea");
+  areaTemp.value = texto;
+  areaTemp.setAttribute("readonly", "");
+  areaTemp.style.position = "fixed";
+  areaTemp.style.top = "0";
+  areaTemp.style.left = "-9999px";
+  document.body.appendChild(areaTemp);
+  areaTemp.focus();
+  areaTemp.select();
+  areaTemp.setSelectionRange(0, texto.length);
+
+  let sucesso = false;
+  try {
+    sucesso = document.execCommand("copy");
+  } catch (erro) {
+    sucesso = false;
+  }
+
+  document.body.removeChild(areaTemp);
+  return sucesso;
+}
+
 function copiarPayload() {
   if (!payloadAtual) return;
 
+  function tentarExecCommand() {
+    if (copiarViaExecCommand(payloadAtual)) {
+      mostrarCopiado();
+    } else {
+      // Nem Clipboard API nem execCommand funcionaram — nunca falha
+      // silenciosamente, cai pro campo de texto selecionável.
+      mostrarCopiaManual();
+    }
+  }
+
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(payloadAtual).then(mostrarCopiado, mostrarCopiaManual);
+    navigator.clipboard.writeText(payloadAtual).then(mostrarCopiado, tentarExecCommand);
   } else {
-    // Sem Clipboard API (contexto inseguro, navegador antigo etc.) — nunca
-    // falha silenciosamente, cai pro campo de texto selecionável.
-    mostrarCopiaManual();
+    tentarExecCommand();
   }
 }
 
