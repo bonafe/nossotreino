@@ -304,19 +304,22 @@ distingue) por dia ou mês.
   exercício específico em
   `treino_execucao.html?treino=<id>&exercicio=<exercicioId>&opcao=<opcaoExercicioId>`
   (o item principal usa `opcao` igual ao próprio `exercicioId`; cada
-  alternativa usa o seu). Dentro do card, três botões próprios (cada
-  um com `event.stopPropagation()` para não disparar a navegação do
-  card): "Ver vídeo" mostra o estado do download por torrent (baixando/
-  pronto/indisponível) e abre um player embutido quando o vídeo estiver
-  pronto — ver
-  [torrent-videos-especificacao.md](./torrent-videos-especificacao.md#7-estados-de-carregamento-ui);
-  "Ver imagem" (`js/imagem-exercicio.js#ligarBotaoImagem`) só aparece se a
+  alternativa usa o seu). O card é dividido em duas colunas
+  (`.item-linha`): a esquerda com nome, grupos musculares, prescrição e
+  ações; a direita com a imagem do exercício (`.item-imagem`,
+  `js/imagem-exercicio.js#ligarImagemExercicio`) — só aparece se a
   imagem daquele `exercicioId` existir em
   `biblioteca-exercicios/imagens/musculacao/` (tentativa de carregamento,
   sem registro prévio de quais exercícios já têm imagem — ver seção 2.1 de
-  [especificacao-biblioteca-exercicios.md](./especificacao-biblioteca-exercicios.md))
-  e abre a imagem num overlay próprio (`#imagemOverlay`); "Ver progresso"
-  leva para
+  [especificacao-biblioteca-exercicios.md](./especificacao-biblioteca-exercicios.md)),
+  e clicar nela (`event.stopPropagation()` pra não disparar a navegação
+  do card) abre em tamanho maior num overlay próprio (`#imagemOverlay`,
+  `criarImagemModal`). Dentro da coluna de conteúdo, dois botões/links
+  próprios (mesmo `event.stopPropagation()`): "Ver vídeo" mostra o estado
+  do download por torrent (baixando/pronto/indisponível) e abre um
+  player embutido quando o vídeo estiver pronto — ver
+  [torrent-videos-especificacao.md](./torrent-videos-especificacao.md#7-estados-de-carregamento-ui);
+  "Ver progresso" leva para
   `treino_exercicio_progresso.html?exercicio=<exercicioId>&treino=<treinoId>`
   (seção 9).
 
@@ -385,8 +388,8 @@ aqui o escopo é só os exercícios deste treino — a pasta de imagens já
 passa de 40 MB, então baixar a biblioteca inteira de uma vez seria
 desperdício. `treino_exercicios.html` (seção 6.2) já cobre isso hoje sem
 precisar dessa função: como monta um card por item/alternativa de uma
-vez, cada `ligarBotaoImagem` já dispara o carregamento daquela imagem
-como efeito colateral.
+vez, cada `ligarImagemExercicio` já dispara o carregamento daquela
+imagem como efeito colateral.
 
 ### 8.2.1 Pular direto para um exercício (`?exercicio=` e `?opcao=`)
 

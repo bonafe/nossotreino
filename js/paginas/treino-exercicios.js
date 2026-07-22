@@ -4,7 +4,7 @@ import { PrescricaoFormatadores } from "../prescricao-formatadores.js";
 import { Formatadores } from "../formatadores.js";
 import { LABEL_TIPO } from "../constantes.js";
 import { criarVideoPlayerModal, ligarBotaoVideo } from "../video-player-modal.js";
-import { criarImagemModal, ligarBotaoImagem } from "../imagem-exercicio.js";
+import { criarImagemModal, ligarImagemExercicio } from "../imagem-exercicio.js";
 
 const MOMENTO_LABEL = {
   "final-da-serie": "ao final da série",
@@ -131,20 +131,24 @@ class TreinoExerciciosController {
     div.tabIndex = 0;
     div.setAttribute("role", "link");
     div.innerHTML = `
-      <div class="item-cabecalho">
-        <span class="item-nome">${nome}</span>
-        ${ehAlternativa ? '<span class="item-substituto-label">Substituto</span>' : ""}
-      </div>
-      ${grupos.length ? `<div class="item-grupos">${grupos.map((g) => `<span>${g}</span>`).join("")}</div>` : ""}
-      <div class="item-detalhes">
-        <span><strong>${prescricao.series}</strong> séries</span>
-        <span>${PrescricaoFormatadores.metrica(prescricao.metrica)}</span>
-      </div>
-      ${isometria ? `<div class="item-isometria-nota">${this.#notaIsometria(prescricao.tecnicas)}</div>` : ""}
-      <div class="item-acoes">
-        <button type="button" class="ver-video" hidden></button>
-        <button type="button" class="ver-imagem" hidden></button>
-        <a class="ver-progresso" href="${progressoUrl}">Ver progresso →</a>
+      <div class="item-linha">
+        <div class="item-conteudo">
+          <div class="item-cabecalho">
+            <span class="item-nome">${nome}</span>
+            ${ehAlternativa ? '<span class="item-substituto-label">Substituto</span>' : ""}
+          </div>
+          ${grupos.length ? `<div class="item-grupos">${grupos.map((g) => `<span>${g}</span>`).join("")}</div>` : ""}
+          <div class="item-detalhes">
+            <span><strong>${prescricao.series}</strong> séries</span>
+            <span>${PrescricaoFormatadores.metrica(prescricao.metrica)}</span>
+          </div>
+          ${isometria ? `<div class="item-isometria-nota">${this.#notaIsometria(prescricao.tecnicas)}</div>` : ""}
+          <div class="item-acoes">
+            <button type="button" class="ver-video" hidden></button>
+            <a class="ver-progresso" href="${progressoUrl}">Ver progresso →</a>
+          </div>
+        </div>
+        <img class="item-imagem" alt="" hidden />
       </div>
     `;
 
@@ -159,7 +163,13 @@ class TreinoExerciciosController {
     });
 
     ligarBotaoVideo(div.querySelector(".ver-video"), exercicio && exercicio.midia, this.#videoModal);
-    ligarBotaoImagem(div.querySelector(".ver-imagem"), exercicioId, nome, this.#imagemModal);
+
+    const imagemEl = div.querySelector(".item-imagem");
+    ligarImagemExercicio(imagemEl, exercicioId, nome);
+    imagemEl.addEventListener("click", (evento) => {
+      evento.stopPropagation();
+      this.#imagemModal.abrir(imagemEl.src, nome);
+    });
 
     div.querySelector(".ver-progresso").addEventListener("click", (evento) => {
       evento.stopPropagation();

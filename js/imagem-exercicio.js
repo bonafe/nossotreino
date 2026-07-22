@@ -6,14 +6,14 @@
 // usado por `bibliotecas.exercicios`/`bibliotecas.alongamentos`), já que
 // os dois catálogos podem ter ids repetidos entre si. Nem todo item tem
 // imagem gerada ainda, então quem usa isso precisa tratar o caso de a
-// imagem não existir (ver `ligarBotaoImagem`/`ligarImagemExercicio`).
+// imagem não existir (ver `ligarImagemExercicio`).
 export function caminhoImagemExercicio(id, dominio = "musculacao") {
   return `biblioteca-exercicios/imagens/${dominio}/${id}.png`;
 }
 
 // Modal simples (mesmo padrão de #videoOverlay/criarVideoPlayerModal em
-// video-player-modal.js) pra abrir a imagem em tamanho maior a partir do
-// botão "Ver imagem" de um card de exercício.
+// video-player-modal.js) pra abrir em tamanho maior a imagem exibida no
+// card de um exercício.
 export function criarImagemModal() {
   const overlayEl = document.getElementById("imagemOverlay");
   const imgEl = document.getElementById("imagemModalImg");
@@ -57,33 +57,13 @@ export function prefetchImagensDoTreino(ids, dominio = "musculacao") {
 }
 
 /**
- * Liga um botão "Ver imagem" a um exercício: só aparece quando a imagem
- * existe de fato (não há como saber isso a partir da biblioteca, então
- * tenta carregar e reage ao sucesso/falha).
- */
-export function ligarBotaoImagem(botaoEl, exercicioId, nomeExercicio, imagemModal, dominio = "musculacao") {
-  botaoEl.hidden = true;
-  if (!exercicioId) return;
-
-  const src = caminhoImagemExercicio(exercicioId, dominio);
-  const probe = new Image();
-  probe.onload = () => {
-    botaoEl.hidden = false;
-    botaoEl.disabled = false;
-    botaoEl.textContent = "Ver imagem →";
-    botaoEl.onclick = (evento) => {
-      evento.stopPropagation();
-      imagemModal.abrir(src, nomeExercicio);
-    };
-  };
-  probe.src = src;
-}
-
-/**
- * Liga um <img> visível diretamente na tela (sem botão/modal) ao exercício
- * atual — usado em treino_execucao.html, onde a imagem fica sempre à
- * mostra. `deveAtualizar`, se informado, evita que o carregamento de uma
- * imagem antiga sobrescreva a tela depois que o aluno já avançou pra outro
+ * Liga um <img> visível diretamente na tela ao exercício atual — usado em
+ * treino_execucao.html (imagem sempre à mostra) e em treino_exercicios.html
+ * (uma por card, ao lado da prescrição — abrir em tamanho maior ao clicar é
+ * responsabilidade de quem chama, ver criarImagemModal). Fica `hidden` até
+ * a imagem carregar de fato; se não existir, continua escondida.
+ * `deveAtualizar`, se informado, evita que o carregamento de uma imagem
+ * antiga sobrescreva a tela depois que o aluno já avançou pra outro
  * exercício (mesmo problema resolvido em `ligarBotaoVideo`).
  */
 export function ligarImagemExercicio(imgEl, exercicioId, nomeExercicio, deveAtualizar = () => true, dominio = "musculacao") {
