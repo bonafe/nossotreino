@@ -64,6 +64,7 @@ Duas famílias de chave convivem em `storage.js`:
 | `planos.v1` | Índice de todos os planos guardados neste navegador: `[{id, professor, aluno, criadoEm, atualizadoEm}]` |
 | `planoAtivoId.v1` | Id do plano cujas chaves escopadas (seção 2.2) estão sendo lidas/escritas agora, ou `null` se nenhum plano foi escolhido ainda |
 | `apoio.ultimaExibicaoContador.v1`, `apoio.ultimaExibicaoData.v1`, `apoio.dispensadoPermanentemente.v1` | Cadência do banner de apoio pós-treino (ver `js/apoio.js` e [apoio-especificacao.md](./apoio-especificacao.md)) |
+| `avisoIaAceito.v1` | Booleano — `true` depois que a pessoa concorda com o aviso de conteúdo gerado por IA em `planos.html` (seção 3.1). Ausente/`false` faz o aviso aparecer de novo |
 
 ### 2.2 Chaves escopadas por plano
 
@@ -111,6 +112,18 @@ outras telas de menu** (`treino_bicicleta_menu.html`,
 Qualquer tela nova de "listar + criar" deve seguir esse mesmo par
 (`<algo>_menu.html`/`<algo>.html` + botão "+" → `<algo>_novo.html`) pra
 manter a consistência visual do site.
+
+Antes de qualquer outra coisa, se `avisoIaAceito.v1` ainda não estiver
+`true`, mostra um overlay bloqueante avisando que exercícios (nomes,
+descrições, grupos musculares) e imagens da biblioteca foram criados com
+apoio de inteligência artificial e podem conter erros, reforçando
+também o aviso já presente em `index.html` (seção "Aviso importante"):
+o sistema não substitui acompanhamento de um profissional de educação
+física habilitado, e o uso é de responsabilidade de quem usa — mesmo
+padrão visual de `.confirm-card`/`.confirm-botoes` usado no resto do
+site. "Entendi, concordo" grava `avisoIaAceito.v1 = true` e libera a
+tela; "Não concordo" volta pra `index.html` sem gravar nada (aparece de
+novo na próxima visita).
 
 Lista os planos do índice (`planos.v1`), cada um com as ações:
 

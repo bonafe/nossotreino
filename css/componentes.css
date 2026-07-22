@@ -80,6 +80,13 @@
   text-align: left;
 }
 
+.confirm-card h2 {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #bef264;
+}
+
 .confirm-card p {
   margin: 0 0 18px;
   max-width: none;
@@ -114,6 +121,12 @@
   background: #fb7185;
   border: 1px solid #fda4af;
   color: #1a0508;
+}
+
+.confirm-botoes .primary {
+  background: #bef264;
+  border: 1px solid transparent;
+  color: #06110a;
 }
 
 .confirm-botoes button:active {

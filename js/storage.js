@@ -120,7 +120,8 @@ export class TreinosStorage {
     execucaoAlongamento: (treinoId) => `execucao.alongamento.${treinoId}.v1`,
     apoioUltimaExibicaoContador: "apoio.ultimaExibicaoContador.v1",
     apoioUltimaExibicaoData: "apoio.ultimaExibicaoData.v1",
-    apoioDispensadoPermanentemente: "apoio.dispensadoPermanentemente.v1"
+    apoioDispensadoPermanentemente: "apoio.dispensadoPermanentemente.v1",
+    avisoIaAceito: "avisoIaAceito.v1"
   };
 
   // Escopadas ao plano ativo — usadas por toda página de treino.

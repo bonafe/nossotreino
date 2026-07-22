@@ -17,6 +17,9 @@ class PlanosController {
   #confirmCancelarEl = document.getElementById("confirmCancelar");
   #arquivoInputEl = document.getElementById("arquivoInput");
   #baixarBackupBtnEl = document.getElementById("baixarBackupBtn");
+  #avisoIaOverlayEl = document.getElementById("avisoIaOverlay");
+  #avisoIaAceitarEl = document.getElementById("avisoIaAceitar");
+  #avisoIaRecusarEl = document.getElementById("avisoIaRecusar");
 
   #idParaExcluir = null;
 
@@ -25,7 +28,20 @@ class PlanosController {
     this.#confirmOkEl.addEventListener("click", () => this.#confirmarExclusao());
     this.#arquivoInputEl.addEventListener("change", (evento) => this.#aoEscolherArquivo(evento));
     this.#baixarBackupBtnEl.addEventListener("click", () => this.#aoBaixarBackup());
+    this.#avisoIaAceitarEl.addEventListener("click", () => this.#aoAceitarAvisoIa());
+    this.#avisoIaRecusarEl.addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
     this.#renderizarLista();
+
+    if (!TreinosStorage.lerJSONGlobal(TreinosStorage.chaves.avisoIaAceito, false)) {
+      this.#avisoIaOverlayEl.hidden = false;
+    }
+  }
+
+  #aoAceitarAvisoIa() {
+    TreinosStorage.salvarJSONGlobal(TreinosStorage.chaves.avisoIaAceito, true);
+    this.#avisoIaOverlayEl.hidden = true;
   }
 
   #validarPlano(dados) {

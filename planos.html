@@ -10,6 +10,34 @@
   <link rel="stylesheet" href="css/paginas/planos.css" />
 </head>
 <body>
+  <div id="avisoIaOverlay" class="overlay" hidden>
+    <div class="confirm-card">
+      <h2>Antes de começar</h2>
+      <p>
+        Os exercícios (nomes, descrições, grupos musculares) e as imagens
+        ilustrativas da nossa biblioteca foram criados com apoio de
+        inteligência artificial — e podem conter erros: uma execução
+        descrita de forma imprecisa, ou uma imagem que não retrata o
+        movimento com exatidão.
+      </p>
+      <p>
+        O Nosso Treino é uma ferramenta de apoio para organizar e
+        acompanhar treinos — não substitui avaliação médica nem o
+        acompanhamento de um profissional de educação física habilitado.
+        Não execute um exercício que você não conhece bem sem orientação,
+        principalmente se tiver alguma condição de saúde preexistente.
+      </p>
+      <p>
+        Ao continuar, você reconhece esses riscos e confirma que o uso do
+        sistema é de sua responsabilidade.
+      </p>
+      <div class="confirm-botoes">
+        <button id="avisoIaRecusar" class="secondary" type="button">Não concordo</button>
+        <button id="avisoIaAceitar" class="primary" type="button">Entendi, concordo</button>
+      </div>
+    </div>
+  </div>
+
   <div id="confirmOverlay" class="overlay" hidden>
     <div class="confirm-card">
       <p id="confirmTexto"></p>
