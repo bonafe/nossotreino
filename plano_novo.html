@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Novo Plano</title>
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/componentes.css" />
+  <link rel="stylesheet" href="css/paginas/treino-novo.css" />
+</head>
+<body>
+  <main>
+    <header class="top">
+      <a class="voltar-icon" href="planos.html" aria-label="Voltar">←</a>
+      <div>
+        <h1>Novo plano</h1>
+      </div>
+    </header>
+
+    <div class="campo">
+      <label for="professorInput">Nome do professor</label>
+      <input type="text" id="professorInput" autocomplete="off" />
+    </div>
+    <div class="campo">
+      <label for="alunoInput">Nome do aluno</label>
+      <input type="text" id="alunoInput" autocomplete="off" />
+    </div>
+    <div class="campo-linha">
+      <div class="campo">
+        <label for="inicioInput">Início do ciclo</label>
+        <input type="date" id="inicioInput" />
+      </div>
+      <div class="campo">
+        <label for="fimInput">Fim do ciclo</label>
+        <input type="date" id="fimInput" />
+      </div>
+    </div>
+
+    <button id="criarBtn" class="primary" type="button">Criar plano</button>
+    <div id="mensagem" class="mensagem" hidden></div>
+
+    <p class="rodape-apoio"><a href="index.html#apoio">❤️ Apoiar o Nosso Treino</a></p>
+  </main>
+
+  <script type="module" src="js/paginas/plano-novo.js"></script>
+</body>
+</html>

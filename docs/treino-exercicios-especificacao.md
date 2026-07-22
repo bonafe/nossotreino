@@ -23,11 +23,11 @@ padrão de "motor genérico + JSON de dados" já usado no
   cacheada pelo service worker pra funcionar offline, e mantida em memória
   durante o carregamento da página (sem passar por `localStorage`).
 - **Plano de treino** (dado pessoal: nome do professor, do aluno, datas do
-  ciclo, os treinos prescritos): carregado manualmente uma vez por
-  navegador/aparelho em [importar_dados.html](../importar_dados.html), que
-  grava em `localStorage` via `TreinosStorage.definirDadosTreinos()`. Toda
-  página lê com `TreinosStorage.carregarDadosTreinos()` (rejeita se nada foi
-  carregado ainda) — ver
+  ciclo, os treinos prescritos): um navegador pode guardar vários planos,
+  escolhidos/criados/importados em [planos.html](../planos.html); "entrar"
+  num plano grava `TreinosStorage.definirDadosTreinos()`. Toda página lê
+  com `TreinosStorage.carregarDadosTreinos()` (rejeita se nenhum plano
+  estiver ativo ainda) — ver
   [armazenamento-local-especificacao.md](./armazenamento-local-especificacao.md).
   Os treinos de bicicleta também são derivados dele (ver seção 4 de
   [treino-bicicleta-especificacao.md](./treino-bicicleta-especificacao.md)).
@@ -289,8 +289,8 @@ distingue) por dia ou mês.
     [treino-alongamento-especificacao.md](./treino-alongamento-especificacao.md)).
 - Se não houver `treino` na URL, o `id` não existir, o plano não estiver
   carregado, ou a biblioteca não puder ser buscada, mostra mensagem de
-  erro com link de volta para o menu (e para `importar_dados.html`, se
-  for o caso) — mesmo comportamento já adotado em `treino_bicicleta.html`.
+  erro com link de volta para o menu (e para `planos.html`, se for o
+  caso) — mesmo comportamento já adotado em `treino_bicicleta.html`.
 - Quando `treino.exercicios` tiver ao menos um item, mostra um botão que
   leva a `treino_execucao.html?treino=<id>` (seção 8). O texto do botão
   depende de já existir progresso salvo pra esse treino
@@ -733,8 +733,8 @@ e anexa a `dados.treinos`. Acessível por um botão "+" no cabeçalho de
 
 Como qualquer outra página, carrega o plano
 (`TreinosStorage.carregarDadosTreinos()`) e a biblioteca
-(`carregarBiblioteca()`) — sem plano carregado, mostra erro apontando
-pra `importar_dados.html` (não dá pra criar um treino "solto", sem
+(`carregarBiblioteca()`) — sem plano ativo, mostra erro apontando pra
+`planos.html` (não dá pra criar um treino "solto", sem
 `metadata`/`distribuicaoSemanal`/`orientacoesGerais` de um plano
 existente).
 
@@ -796,8 +796,8 @@ tela, editável só no JSON depois (seção 12.3 de
 `circuito`; `status: "ativo"` com pelo menos um exercício, `"rascunho"`
 sem nenhum), empurra em `dados.treinos` e regrava o plano inteiro com
 `TreinosStorage.definirDadosTreinos(dados)` — mesma função já usada por
-`importar-dados.js`, sem mudar assinatura. Redireciona pra
-`treino_exercicios.html?treino=<id>`.
+`plano-novo.js`/`planos.js` pra criar/importar um plano, sem mudar
+assinatura. Redireciona pra `treino_exercicios.html?treino=<id>`.
 
 ### 11.5 Fora de escopo desta tela
 

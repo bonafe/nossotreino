@@ -1,22 +1,3 @@
-import { TreinosStorage } from "./storage.js";
-
-const GENERO_PADRAO = "masculino";
-
-// Preferência de gênero nas configurações — hoje não influencia mais qual
-// imagem é exibida (imagens deixaram de ter gênero fixo no nome desde que
-// a geração passou a sortear gênero/etnia por conta própria, ver
-// src/python/gerar_imagens_treino.py e docs/estrutura-biblioteca-alongamentos.md).
-// A opção continua existindo em sistema.html só porque ainda não foi
-// decidido remover a UI; nenhuma leitura daqui influencia mais o caminho
-// da imagem.
-export function obterGeneroImagem() {
-  return TreinosStorage.lerJSON(TreinosStorage.chaves.generoImagem, GENERO_PADRAO);
-}
-
-export function definirGeneroImagem(genero) {
-  TreinosStorage.salvarJSON(TreinosStorage.chaves.generoImagem, genero);
-}
-
 // As imagens são geradas fora do site (src/python/gerar_imagens_treino.py)
 // e salvas com nome previsível — não há campo na biblioteca apontando pra
 // elas, então o caminho é sempre montado por convenção a partir do id

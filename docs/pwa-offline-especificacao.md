@@ -3,8 +3,8 @@
 ## 1. Objetivo
 
 O site já funciona offline no que diz respeito aos **dados de treino**: eles
-vivem só em `localStorage`, carregados manualmente em
-[importar_dados.html](../importar_dados.html) (ver
+vivem só em `localStorage`, escolhidos/criados manualmente em
+[planos.html](../planos.html) (ver
 [armazenamento-local-especificacao.md](./armazenamento-local-especificacao.md)).
 Essa especificação cobre a segunda parte do problema: fazer as **páginas em
 si** (HTML/CSS/JS) carregarem mesmo sem internet, depois de um primeiro
@@ -56,8 +56,8 @@ if ("serviceWorker" in navigator) {
 ```js
 const ARQUIVOS_PARA_CACHE = [
   "index.html",
+  "planos.html",
   "sistema.html",
-  "importar_dados.html",
   "treino_bicicleta_menu.html",
   "treino_bicicleta.html",
   "treino_exercicios_menu.html",

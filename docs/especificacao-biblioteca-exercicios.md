@@ -35,8 +35,8 @@
 > `bibliotecas.exercicios`) e `imagens/alongamento/` (`bibliotecas.alongamentos`,
 > ver `docs/estrutura-biblioteca-alongamentos.md`); subpastas separadas
 > porque os dois catálogos podem ter ids repetidos entre si) e o plano de
-> treino é carregado manualmente em
-> [importar_dados.html](../importar_dados.html) como sempre foi (dado
+> treino é escolhido/criado manualmente em
+> [planos.html](../planos.html) como sempre foi (dado
 > pessoal, só em `localStorage`). Ver
 > [treino-exercicios-especificacao.md](./treino-exercicios-especificacao.md),
 > [treino-bicicleta-especificacao.md](./treino-bicicleta-especificacao.md) e
@@ -53,11 +53,10 @@
 > `src/python/openai_imagens.py` (`GENEROS_VALIDOS`/`ETNIAS_VALIDAS`).
 > Não existe registro de quais itens já têm imagem gerada, então o código
 > sempre tenta carregar e trata a ausência como "sem imagem ainda"
-> (`js/imagem-exercicio.js`). A preferência
-> `preferencias.generoImagem.v1` (engrenagem de configurações em
-> `sistema.html`) continua existindo, mas não influencia mais qual
-> imagem é exibida — ver seção 2 de
-> [armazenamento-local-especificacao.md](./armazenamento-local-especificacao.md).
+> (`js/imagem-exercicio.js`). A antiga preferência de gênero na
+> engrenagem de configurações (`sistema.html`) foi removida — desde que a
+> geração passou a sortear gênero/etnia por conta própria, ela havia
+> parado de influenciar qual imagem é exibida.
 
 ---
 

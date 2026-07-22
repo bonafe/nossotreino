@@ -20,22 +20,22 @@ function diasDesde(dataIso) {
 }
 
 export function deveExibirPedidoApoio() {
-  if (TreinosStorage.lerJSON(TreinosStorage.chaves.apoioDispensadoPermanentemente, false)) return false;
+  if (TreinosStorage.lerJSONGlobal(TreinosStorage.chaves.apoioDispensadoPermanentemente, false)) return false;
 
   const total = totalTreinosConcluidos();
-  const ultimaData = TreinosStorage.lerJSON(TreinosStorage.chaves.apoioUltimaExibicaoData, null);
+  const ultimaData = TreinosStorage.lerJSONGlobal(TreinosStorage.chaves.apoioUltimaExibicaoData, null);
 
   if (!ultimaData) return total >= TREINOS_MINIMOS_PRIMEIRA_EXIBICAO;
 
-  const ultimoContador = TreinosStorage.lerJSON(TreinosStorage.chaves.apoioUltimaExibicaoContador, 0);
+  const ultimoContador = TreinosStorage.lerJSONGlobal(TreinosStorage.chaves.apoioUltimaExibicaoContador, 0);
   return (
     total - ultimoContador >= TREINOS_MINIMOS_ENTRE_EXIBICOES || diasDesde(ultimaData) >= DIAS_MINIMOS_ENTRE_EXIBICOES
   );
 }
 
 function marcarExibido() {
-  TreinosStorage.salvarJSON(TreinosStorage.chaves.apoioUltimaExibicaoContador, totalTreinosConcluidos());
-  TreinosStorage.salvarJSON(TreinosStorage.chaves.apoioUltimaExibicaoData, new Date().toISOString());
+  TreinosStorage.salvarJSONGlobal(TreinosStorage.chaves.apoioUltimaExibicaoContador, totalTreinosConcluidos());
+  TreinosStorage.salvarJSONGlobal(TreinosStorage.chaves.apoioUltimaExibicaoData, new Date().toISOString());
 }
 
 /**
@@ -67,7 +67,7 @@ export function renderizarPedidoApoio(containerEl) {
 
   containerEl.querySelector('[data-acao="agora-nao"]').addEventListener("click", fechar);
   containerEl.querySelector('[data-acao="nao-mostrar"]').addEventListener("click", () => {
-    TreinosStorage.salvarJSON(TreinosStorage.chaves.apoioDispensadoPermanentemente, true);
+    TreinosStorage.salvarJSONGlobal(TreinosStorage.chaves.apoioDispensadoPermanentemente, true);
     fechar();
   });
 }

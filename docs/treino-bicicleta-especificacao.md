@@ -110,8 +110,8 @@ Isso quer dizer:
   `estimulo`/`recuperacao` definidos — outros tipos (ex. `continuo`) ficam
   fora de escopo (seção 8).
 - O plano vem de `TreinosStorage.carregarDadosTreinos()` (`localStorage`,
-  sem `fetch` — carregado manualmente em
-  [importar_dados.html](../importar_dados.html)); a biblioteca vem de
+  sem `fetch` — o plano ativo é escolhido/criado em
+  [planos.html](../planos.html)); a biblioteca vem de
   `carregarBiblioteca()` (`fetch`, ver
   [armazenamento-local-especificacao.md](./armazenamento-local-especificacao.md)).
   Ambos os documentos são carregados antes de montar a config do motor.
@@ -349,8 +349,8 @@ isso é uma limitação aceita por ora (ver seção 7 de
 
 O motor faz `fetch()` da biblioteca de exercícios (`biblioteca-exercicios.json`,
 seção 4) — diferente do plano de treino, que continua vindo só do
-`localStorage`, carregado manualmente em
-[importar_dados.html](../importar_dados.html). Por isso o site precisa ser
+`localStorage`, escolhido/criado manualmente em
+[planos.html](../planos.html). Por isso o site precisa ser
 servido por HTTP (não `file://`) pra essa página funcionar, mesmo que só
 localmente — o service worker (`sw.js`) cacheia
 `biblioteca-exercicios.json` como parte do app shell depois da primeira

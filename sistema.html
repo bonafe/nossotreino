@@ -9,24 +9,6 @@
   <link rel="stylesheet" href="css/paginas/sistema.css" />
 </head>
 <body>
-  <a href="index.html" class="voltar-icon voltar-fixo" aria-label="Voltar para a página inicial">←</a>
-
-  <button id="configBtn" class="config-icon" type="button" aria-label="Configurações" aria-haspopup="true" aria-expanded="false">⚙️</button>
-
-  <div id="configMenu" class="config-menu" hidden>
-    <button type="button" class="config-menu-item" data-acao="reset-musculacao">🏋️ Resetar dados de musculação</button>
-    <button type="button" class="config-menu-item" data-acao="reset-bicicleta">🚴‍♂️ Resetar dados de bicicleta</button>
-    <button type="button" class="config-menu-item" data-acao="reset-alongamento">🧘 Resetar dados de alongamento</button>
-    <div class="config-menu-divisor"></div>
-    <div class="config-menu-secao">
-      <label for="generoImagemSelect">Gênero nas imagens de exercício</label>
-      <select id="generoImagemSelect">
-        <option value="masculino">Masculino</option>
-        <option value="feminino">Feminino</option>
-      </select>
-    </div>
-  </div>
-
   <div id="confirmOverlay" class="overlay" hidden>
     <div class="confirm-card">
       <p id="confirmTexto"></p>
@@ -40,13 +22,21 @@
   <div id="toast" class="toast" hidden></div>
 
   <main>
+    <header class="top">
+      <a href="planos.html" class="voltar-icon" aria-label="Voltar para a seleção de planos">←</a>
+      <div class="config-wrapper">
+        <button id="configBtn" class="icon-btn" type="button" aria-label="Configurações" aria-haspopup="true" aria-expanded="false">⚙️</button>
+        <div id="configMenu" class="config-menu" hidden>
+          <button type="button" class="config-menu-item" data-acao="reset-musculacao">🏋️ Resetar dados de musculação</button>
+          <button type="button" class="config-menu-item" data-acao="reset-bicicleta">🚴‍♂️ Resetar dados de bicicleta</button>
+          <button type="button" class="config-menu-item" data-acao="reset-alongamento">🧘 Resetar dados de alongamento</button>
+        </div>
+      </div>
+    </header>
+
     <section class="card">
       <h1>Meus Treinos</h1>
       <p>Escolha um treino para começar.</p>
-
-      <a id="avisoDados" class="aviso-dados" href="importar_dados.html" hidden>
-        ⚠️ Primeiro acesso — carregue os dados do treino
-      </a>
 
       <a class="workout" href="treino_alongamento_menu.html">
         🧘 Entrar no treino de alongamento
@@ -63,13 +53,7 @@
         <span>Escolha entre os treinos disponíveis</span>
       </a>
 
-      <div class="small">
-        Funciona offline depois de carregado.
-        <br />
-        <a href="importar_dados.html">Carregar/atualizar dados do treino</a>
-        ·
-        <a href="index.html#apoio">❤️ Apoiar o Nosso Treino</a>
-      </div>
+      <p class="rodape-apoio"><a href="index.html#apoio">❤️ Apoiar o Nosso Treino</a></p>
     </section>
   </main>
 

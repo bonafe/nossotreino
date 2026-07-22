@@ -71,6 +71,55 @@
   display: none;
 }
 
+.confirm-card {
+  background: rgba(15, 23, 42, 0.98);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 20px;
+  padding: 20px;
+  width: min(360px, 100%);
+  text-align: left;
+}
+
+.confirm-card p {
+  margin: 0 0 18px;
+  max-width: none;
+  color: #e2e8f0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.confirm-botoes {
+  display: flex;
+  gap: 10px;
+}
+
+.confirm-botoes button {
+  appearance: none;
+  flex: 1;
+  border-radius: 14px;
+  padding: 13px 10px;
+  font-size: 0.95rem;
+  font-weight: 900;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.confirm-botoes .secondary {
+  background: rgba(148, 163, 184, 0.14);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  color: #e2e8f0;
+}
+
+.confirm-botoes .danger {
+  background: #fb7185;
+  border: 1px solid #fda4af;
+  color: #1a0508;
+}
+
+.confirm-botoes button:active {
+  transform: translateY(1px) scale(0.99);
+}
+
 .video-card {
   position: relative;
   width: min(720px, 100%);
@@ -234,6 +283,18 @@
 
 .detalhes-imagem[hidden] {
   display: none;
+}
+
+.rodape-apoio {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 0.85rem;
+}
+
+.rodape-apoio a {
+  color: #7dd3fc;
+  font-weight: 700;
+  text-decoration: none;
 }
 
 .apoio-banner {

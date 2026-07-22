@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Meus Planos</title>
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/componentes.css" />
+  <link rel="stylesheet" href="css/paginas/treino-novo.css" />
+  <link rel="stylesheet" href="css/paginas/planos.css" />
+</head>
+<body>
+  <div id="confirmOverlay" class="overlay" hidden>
+    <div class="confirm-card">
+      <p id="confirmTexto"></p>
+      <div class="confirm-botoes">
+        <button id="confirmCancelar" class="secondary" type="button">Cancelar</button>
+        <button id="confirmOk" class="danger" type="button">Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <header class="top">
+      <a class="voltar-icon" href="index.html" aria-label="Voltar">←</a>
+      <div>
+        <h1>Meus Planos</h1>
+        <p class="subtitle">Escolha um plano pra entrar, ou crie um novo.</p>
+      </div>
+      <div class="acoes-header">
+        <label class="icon-btn" for="arquivoInput" aria-label="Importar plano ou backup">📂</label>
+        <input type="file" id="arquivoInput" accept="application/json,.json" hidden />
+        <a class="icon-btn" href="plano_novo.html" aria-label="Novo plano">+</a>
+      </div>
+    </header>
+
+    <div id="lista" class="lista">
+      <div class="estado">Carregando planos…</div>
+    </div>
+
+    <div id="mensagem" class="mensagem" hidden></div>
+
+    <div class="small">
+      <button type="button" id="baixarBackupBtn" class="link-botao">⬇️ Baixar backup completo</button>
+    </div>
+
+    <p class="rodape-apoio"><a href="index.html#apoio">❤️ Apoiar o Nosso Treino</a></p>
+  </main>
+
+  <script type="module" src="js/paginas/planos.js"></script>
+</body>
+</html>

@@ -135,14 +135,16 @@ morto) vira o painel completo:
 `id="apoio"` na section, pra permitir link `index.html#apoio` a partir de
 dentro do sistema (seção 3.2/3.3).
 
-### 3.2 Link discreto no menu principal (`sistema.html`)
+### 3.2 Link discreto em todas as páginas
 
-Um item simples "❤️ Apoiar o Nosso Treino" — mesmo estilo visual dos
-outros itens de link da tela (perto da engrenagem de configurações ou no
-rodapé do card "Meus Treinos", ao lado de "Carregar/atualizar dados do
-treino"). Linka pra `index.html#apoio`. Sempre visível, sem gatilho nem
-contador — é só um caminho permanente pra quem quiser apoiar por conta
-própria a qualquer momento.
+Um item simples "❤️ Apoiar o Nosso Treino" (`<p class="rodape-apoio">`,
+estilo compartilhado em `css/componentes.css`), linkando pra
+`index.html#apoio`. Aparece no rodapé de `<main>`, logo antes do
+`</main>`, em **toda** página do site (menus, telas de criação, telas de
+execução) — só `index.html` fica de fora, já que é o próprio destino do
+link. Sempre visível, sem gatilho nem contador — é só um caminho
+permanente pra quem quiser apoiar por conta própria a qualquer momento,
+não importa em qual tela esteja.
 
 ### 3.3 Banner pós-treino (o principal ponto de conversão)
 
@@ -252,9 +254,10 @@ a convenção de
 | `apoio.dispensadoPermanentemente.v1` | Booleano — `true` depois de "Não mostrar novamente" |
 
 Não entram em `TreinosStorage.montarBackup()`/`restaurarBackup()` — é
-preferência de UI local ao aparelho, não dado de treino (mesmo
-tratamento hoje dado a `preferencias.generoImagem.v1`, que também fica de
-fora do backup).
+preferência de UI local ao aparelho, não dado de treino, mesmo
+tratamento dado a qualquer chave gravada com `lerJSONGlobal`/
+`salvarJSONGlobal` (seção 2.1 de
+[armazenamento-local-especificacao.md](./armazenamento-local-especificacao.md#21-chaves-globais-não-dependem-de-qual-plano-está-ativo)).
 
 ## 7. Fora de escopo (por ora)
 

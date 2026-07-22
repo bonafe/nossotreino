@@ -1,0 +1,152 @@
+main {
+  width: min(620px, 100%);
+}
+
+.subtitle {
+  margin: 0;
+  color: #94a3b8;
+  font-size: clamp(0.95rem, 3.5vw, 1.05rem);
+}
+
+.acoes-header {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.painel {
+  background: rgba(15, 23, 42, 0.86);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.plano-card-topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.plano-card-topo h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+.plano-card-sub {
+  margin: 2px 0 0;
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+.plano-card-atualizado {
+  margin: 8px 0 14px;
+  color: #64748b;
+  font-size: 0.78rem;
+}
+
+.plano-card-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.plano-card-acoes button {
+  appearance: none;
+  cursor: pointer;
+  background: rgba(148, 163, 184, 0.12);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  color: #e2e8f0;
+  border-radius: 12px;
+  padding: 9px 12px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  flex: 1 1 auto;
+}
+
+.plano-card-acoes button[data-acao="entrar"] {
+  background: #bef264;
+  color: #06110a;
+  border-color: transparent;
+  flex-basis: 100%;
+}
+
+.plano-card-acoes button.danger {
+  background: rgba(251, 113, 133, 0.12);
+  border-color: rgba(251, 113, 133, 0.35);
+  color: #fb7185;
+}
+
+.plano-card-acoes button:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.plano-card-editar {
+  background: rgba(2, 6, 23, 0.4);
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.plano-card-editar[hidden] {
+  display: none;
+}
+
+.plano-card-editar .campo {
+  margin-bottom: 10px;
+}
+
+.plano-card-editar .campo-linha {
+  margin-bottom: 10px;
+}
+
+.plano-card-editar-acoes {
+  display: flex;
+  gap: 8px;
+}
+
+.plano-card-editar-acoes button {
+  appearance: none;
+  cursor: pointer;
+  flex: 1;
+  background: rgba(148, 163, 184, 0.12);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  color: #e2e8f0;
+  border-radius: 12px;
+  padding: 9px 12px;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.plano-card-editar-acoes button[data-acao="salvar-edicao"] {
+  background: #bef264;
+  color: #06110a;
+  border-color: transparent;
+}
+
+.small {
+  text-align: center;
+  margin-top: 6px;
+  color: #94a3b8;
+  font-size: 0.92rem;
+}
+
+.link-botao {
+  appearance: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+  color: #7dd3fc;
+  font-weight: 700;
+}

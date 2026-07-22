@@ -2,33 +2,36 @@
 
 ## 1. Objetivo
 
-O site não tem backend: cada página HTML roda isolada no navegador do
-aluno. Esta especificação define como passamos a usar `localStorage` do
-navegador para dois propósitos:
+O site não tem backend: cada página HTML roda isolada no navegador de
+quem usa. Esta especificação define como passamos a usar `localStorage`
+do navegador para dois propósitos:
 
-1. **Plano de treino** — dado pessoal (nome do professor/aluno, datas do
-   ciclo, os treinos prescritos), nunca publicado junto com o site. Os
-   dados só existem depois que o aluno os carrega manualmente uma vez,
-   pela tela [importar_dados.html](../importar_dados.html), e ficam
-   salvos no `localStorage` daquele navegador dali em diante (ver seção
-   3). **A biblioteca de exercícios (`biblioteca-exercicios.json`) não
-   entra aqui** — não é dado pessoal, é um arquivo estático versionado no
-   repositório e carregado por `fetch` a cada página, sem passar por
-   `localStorage` (ver
+1. **Planos de treino** — dado pessoal (nome do professor/aluno, datas
+   do ciclo, os treinos prescritos), nunca publicado junto com o site.
+   Um mesmo navegador pode guardar **vários** planos ao mesmo tempo (um
+   professor pode ter um por aluno) — a pessoa escolhe entre eles em
+   [planos.html](../planos.html), que também é onde se cria um plano do
+   zero, se duplica um existente como template, ou se importa um plano
+   recebido/backup (ver seção 3). **A biblioteca de exercícios
+   (`biblioteca-exercicios.json`) não entra aqui** — não é dado pessoal,
+   é um arquivo estático versionado no repositório e carregado por
+   `fetch` a cada página, sem passar por `localStorage` (ver
    [especificacao-biblioteca-exercicios.md](./especificacao-biblioteca-exercicios.md)
    seção 2.1).
-2. **Histórico de execução** — guardar, no próprio navegador do aluno, o
-   que foi realmente feito em cada treino (treinos de bike concluídos,
-   séries de musculação com carga/repetições), para no futuro gerar totais
-   e relatórios.
+2. **Histórico de execução** — guardar, no próprio navegador de quem
+   usa, o que foi realmente feito em cada treino (treinos de bike
+   concluídos, séries de musculação com carga/repetições), para no
+   futuro gerar totais e relatórios. Cada plano tem o seu próprio
+   histórico, independente dos outros planos guardados no mesmo
+   navegador.
 
 Isso cobre a parte de **dados** funcionando offline. A outra metade — as
 **páginas em si** (HTML/CSS/JS) abrindo sem internet, inclusive num link
 publicado — é responsabilidade do service worker, ver
 [pwa-offline-especificacao.md](./pwa-offline-especificacao.md).
 
-É usado por [sistema.html](../sistema.html),
-[importar_dados.html](../importar_dados.html),
+É usado por [planos.html](../planos.html), [plano_novo.html](../plano_novo.html),
+[sistema.html](../sistema.html),
 [treino_bicicleta.html](../treino_bicicleta.html),
 [treino_bicicleta_menu.html](../treino_bicicleta_menu.html),
 [treino_bicicleta_novo.html](../treino_bicicleta_novo.html),
@@ -52,64 +55,137 @@ terminam com uma versão (`.v1`), para permitir mudar o formato no futuro
 sem ter que migrar dados antigos — se o formato mudar, cria-se uma
 `.v2` e a leitura da `.v1` é simplesmente abandonada.
 
+Duas famílias de chave convivem em `storage.js`:
+
+### 2.1 Chaves globais (não dependem de qual plano está ativo)
+
 | Chave (sem prefixo) | Conteúdo |
 |---|---|
-| `dadosTreinos.v2` | Plano de treino carregado manualmente pelo aluno em [importar_dados.html](../importar_dados.html) |
-| `dadosTreinosCarregadoEm.v1` | Data/hora (ISO 8601) em que essa cópia foi salva |
-| `historico.sessaoBicicleta.v1` | Array — um registro por treino de bike concluído por inteiro (bike não registra ciclo a ciclo, só o treino completo) |
+| `planos.v1` | Índice de todos os planos guardados neste navegador: `[{id, professor, aluno, criadoEm, atualizadoEm}]` |
+| `planoAtivoId.v1` | Id do plano cujas chaves escopadas (seção 2.2) estão sendo lidas/escritas agora, ou `null` se nenhum plano foi escolhido ainda |
+| `apoio.ultimaExibicaoContador.v1`, `apoio.ultimaExibicaoData.v1`, `apoio.dispensadoPermanentemente.v1` | Cadência do banner de apoio pós-treino (ver `js/apoio.js` e [apoio-especificacao.md](./apoio-especificacao.md)) |
+
+### 2.2 Chaves escopadas por plano
+
+Fisicamente gravadas como `treinos.plano.<id>.<chave>`, mas todo o
+código de página (`treino_execucao.html`, `treino_novo.html` etc.) lê e
+escreve usando só o nome relativo abaixo — `storage.js` resolve o
+`<id>` do plano ativo (`planoAtivoId.v1`) por baixo dos panos, sem que
+nenhuma dessas páginas precise saber que existe mais de um plano no
+navegador (ver seção 3.3):
+
+| Chave relativa | Conteúdo |
+|---|---|
+| `dados.v1` | Composição do plano — treinos, cardio, alongamento, metadata |
+| `historico.sessaoBicicleta.v1` | Array — um registro por treino de bike concluído por inteiro |
 | `historico.serieMusculacao.v1` | Array — um registro por série de exercício concluída (carga/repetições) |
 | `historico.sessaoMusculacao.v1` | Array — um registro por treino de exercícios concluído por inteiro |
-| `historico.sessaoAlongamento.v1` | Array — um registro por alongamento concluído por inteiro (mesmo padrão de `historico.sessaoMusculacao.v1`), ver seção 7 de [treino-alongamento-especificacao.md](./treino-alongamento-especificacao.md) |
+| `historico.sessaoAlongamento.v1` | Array — um registro por alongamento concluído por inteiro, ver seção 7 de [treino-alongamento-especificacao.md](./treino-alongamento-especificacao.md) |
 | `execucao.musculacao.<treinoId>.v2` | Estado do treino de exercícios em andamento (para retomar após fechar a página) — endereçado por `exercicioId`, não por índice posicional |
-| `execucao.alongamento.<treinoId>.v1` | Estado do treino de alongamento em andamento — mesmo princípio de `execucao.musculacao.<treinoId>.v2`, endereçado por `alongamentoId` |
-| `preferencias.generoImagem.v1` | `"masculino"` ou `"feminino"` — escolhido na engrenagem de configurações (`sistema.html`). Não influencia mais qual imagem é exibida (ver seção 2.1 de [especificacao-biblioteca-exercicios.md](./especificacao-biblioteca-exercicios.md)); a opção continua na tela, só não é mais lida pelo carregamento de imagem |
+| `execucao.alongamento.<alongamentoId>.v1` | Estado do treino de alongamento em andamento — mesmo princípio, endereçado por `alongamentoId` |
 
-`dadosTreinos.v1`/`execucao.musculacao.<treinoId>.v1` (formato anterior,
-com `blocos`/`itens` e progresso por índice) não são mais lidos — a
-troca de versão da chave é o padrão do projeto para mudança de formato,
-sem migração automática do conteúdo antigo.
+Como o id do plano já faz parte da chave física, dois planos diferentes
+podem ter um treino com o mesmo id (ex: ambos com um treino
+`treino-a`) sem nenhum risco de um vazar/misturar com o outro.
 
-## 3. Carregamento manual do plano de treino
+## 3. Gestão de planos e carregamento
 
-Nenhuma página faz `fetch()` do plano de treino. Como ele é pessoal e
+Nenhuma página faz `fetch()` de um plano de treino. Como ele é pessoal e
 nunca é publicado junto com o site (seção 1), um `fetch` relativo só
 funcionaria em desenvolvimento local, com o arquivo presente em disco, e
 falharia sempre em qualquer versão publicada do site. Em vez disso, o
-site trata `localStorage` como a **única** fonte do plano, igual em
+site trata `localStorage` como a **única** fonte dos planos, igual em
 qualquer ambiente (local ou publicado) — a biblioteca de exercícios é o
 caso oposto: **sempre** vem por `fetch`, nunca por importação manual (ver
 seção 1).
 
-### 3.1 `importar_dados.html`
+### 3.1 `planos.html` + `plano_novo.html`
 
-Tela dedicada para colar o conteúdo do arquivo do plano (ou escolher o
-arquivo do disco, lido com `FileReader`) e salvar no `localStorage`.
-Antes de salvar, confere se o JSON tem os campos esperados (`schema`,
-`metadata`, `distribuicaoSemanal`, `treinos`) — ver seção 2.2 de
-[especificacao-biblioteca-exercicios.md](./especificacao-biblioteca-exercicios.md)
-pra descrição de cada um. Mostra também o status atual (quantos treinos
-estão carregados e quando) pra confirmar que deu certo, ou pra saber se
-precisa recarregar depois de o professor atualizar o plano.
+Primeira tela depois de `index.html` (`sistema.html` redireciona pra cá
+se não houver plano ativo, seção 3.3). Segue **o mesmo padrão visual das
+outras telas de menu** (`treino_bicicleta_menu.html`,
+`treino_exercicios_menu.html`, `treino_alongamento_menu.html`): cabeçalho
+`header.top` com seta de voltar à esquerda e um botão "+" à direita
+(`.icon-btn`) que leva pra uma tela dedicada de criação — aqui,
+`plano_novo.html` — em vez de um formulário embutido na própria lista.
+Qualquer tela nova de "listar + criar" deve seguir esse mesmo par
+(`<algo>_menu.html`/`<algo>.html` + botão "+" → `<algo>_novo.html`) pra
+manter a consistência visual do site.
 
-Precisa ser feito uma vez por navegador/aparelho — não sincroniza
-sozinho entre eles (seção 6).
+Lista os planos do índice (`planos.v1`), cada um com as ações:
 
-### 3.2 `TreinosStorage.carregarDadosTreinos()`
+- **Entrar** — `TreinosStorage.ativarPlano(id)` (só grava
+  `planoAtivoId.v1`) e navega pra `sistema.html`.
+- **Editar** — formulário inline (professor, aluno, início/fim do
+  ciclo) → `TreinosStorage.atualizarMetadataPlano(id, {...})`.
+- **Duplicar** — `TreinosStorage.duplicarPlano(id)`: clona só a
+  composição (`dados.v1`) do plano de origem num id novo, limpa o nome
+  do aluno e não ativa sozinho — pensado como template pra outro aluno,
+  sem histórico/progresso.
+- **Baixar plano** — `TreinosStorage.lerDadosDoPlano(id)`, baixa só a
+  composição (sem histórico) — pro professor mandar pro aluno.
+- **Baixar tudo (com estatísticas)** —
+  `TreinosStorage.montarExportacaoCompletaDoPlano(id)`, baixa composição
+  + histórico + progresso em andamento — pro aluno devolver pro
+  professor com os dados preenchidos.
+- **Excluir** — `TreinosStorage.excluirPlano(id)`: remove a entrada do
+  índice e todas as chaves físicas daquele plano
+  (`plano.<id>.*` — composição, histórico, progresso em andamento). Pede
+  confirmação (mesmo overlay `.confirm-card`/`.confirm-botoes`
+  compartilhado com o menu de reset de `sistema.html`, agora em
+  `css/componentes.css`). Se o plano excluído era o ativo,
+  `planoAtivoId.v1` volta pra `null`.
 
-Usada por todas as páginas que precisam do plano, no lugar de ler
-`dadosTreinos.v2` na mão:
+`plano_novo.html` (mesmos 4 campos: professor, aluno, início/fim do
+ciclo) chama `TreinosStorage.criarPlano({professor, aluno, inicio, fim})`:
+gera um id único (`gerarIdUnico`, [identificadores.js](../js/identificadores.js)),
+adiciona ao índice, ativa e grava um esqueleto vazio (`treinos`,
+`treinosCardio`, `treinosAlongamento` vazios, `distribuicaoSemanal` com
+todos os dias sem treino, `orientacoesGerais: null` — código já trata
+essa ausência graciosamente, ver seção 6 de
+[treino-exercicios-especificacao.md](./treino-exercicios-especificacao.md))
+e redireciona pra `sistema.html`. De lá, o professor usa os mesmos botões
+"+" que um aluno usa (`treino_novo.html`, `treino_bicicleta_novo.html`,
+`treino_alongamento_novo.html`) pra montar os treinos — essas telas já
+funcionam com qualquer plano ativo, não distinguem se foi importado,
+criado do zero ou duplicado.
+
+Dois ícones no mesmo cabeçalho, ao lado do "+", cobrem os casos que não
+envolvem escolher entre planos já existentes: um 📂 (`<label class="icon-btn" for="arquivoInput">`,
+mesmo truque de `<input type="file" hidden>` associado por `for`/`id` já
+usado nas telas de criação) que aceita tanto um **plano avulso recebido**
+de alguém (`TreinosStorage.importarPlano(dados)` seguido de
+`ativarPlano(id)` — cria uma entrada nova no índice e já entra nela, sem
+passo de "salvar" separado) quanto um **backup completo**
+(`tipo: "backup-treinos"`, `TreinosStorage.restaurarBackup(backup)` —
+substitui o índice inteiro e todos os planos que o backup contém,
+entrando no plano que estava ativo no momento do backup); e um botão de
+texto discreto, "Baixar backup completo" (`TreinosStorage.montarBackup()`),
+com todos os planos do navegador, pra levar pra outro aparelho. Escolher
+o arquivo já basta — sem colar conteúdo, sem botão de confirmação — a
+navegação pra `sistema.html` acontece sozinha em seguida.
+
+### 3.2 `TreinosStorage.carregarDadosTreinos()` / `definirDadosTreinos(dados)`
 
 ```js
 async function carregarDadosTreinos() {
-  const cache = lerJSON("dadosTreinos.v2", null);
+  const cache = lerJSON("dados.v1", null); // já escopado ao plano ativo
   if (cache) return cache;
   throw new Error("Nenhum dado de treino carregado ainda.");
 }
+
+function definirDadosTreinos(dados) {
+  salvarJSON("dados.v1", dados); // idem
+  // e atualiza `atualizadoEm` do plano ativo no índice `planos.v1`
+}
 ```
 
-Se ainda não houver nada salvo (primeira visita nesse navegador, ou
-depois de limpar dados do site), rejeita — cada página trata isso
-mostrando um link para `importar_dados.html` (ver seção 6.2 de
+Usadas por toda página que precisa da composição do plano (`treino-novo.js`,
+`treino-execucao.js`, `treino-bicicleta*.js`, `treino-alongamento*.js`
+etc.), exatamente como antes de existir mais de um plano por navegador —
+nenhuma dessas páginas muda de comportamento. Se não houver plano ativo
+com dados salvos, rejeita — cada página trata isso mostrando um link
+para `planos.html` (ver seção 6.2 de
 [treino-exercicios-especificacao.md](./treino-exercicios-especificacao.md)
 e seção 5 de
 [treino-bicicleta-especificacao.md](./treino-bicicleta-especificacao.md)).
@@ -118,18 +194,27 @@ A biblioteca de exercícios usa um carregamento à parte,
 `localStorage`) — páginas que mostram nome/vídeo/grupo muscular de
 exercício carregam os dois em paralelo.
 
-### 3.3 `TreinosStorage.definirDadosTreinos(dados)`
+### 3.3 Como o escopo por plano funciona por baixo
 
-```js
-function definirDadosTreinos(dados) {
-  salvarJSON("dadosTreinos.v2", dados);
-  salvarJSON("dadosTreinosCarregadoEm.v1", new Date().toISOString());
-}
-```
+`TreinosStorage.lerJSON(chave, padrao)`, `salvarJSON(chave, valor)`,
+`removerChave(chave)`, `adicionarAoHistorico(chave, entrada)` e
+`listarChavesComPrefixo(prefixo)` — usadas por praticamente toda página
+de treino — resolvem a chave física automaticamente como
+`treinos.plano.<planoAtivoId>.<chave>` internamente, usando
+`planoAtivoId.v1` (seção 2.1). Trocar de plano (`ativarPlano(id)`) é só
+regravar esse ponteiro — não há cópia de dados envolvida, e por isso não
+há risco de progresso de um plano vazar pro outro.
 
-Usada por `importar_dados.html` para gravar um novo conjunto de dados
-(inclui atualizar `dadosTreinosCarregadoEm.v1`, usada só pra exibir
-"carregado em ..." no status).
+Preferências que não são por plano (gênero da imagem, cadência do
+banner de apoio) usam `lerJSONGlobal(chave, padrao)` /
+`salvarJSONGlobal(chave, valor)` em vez disso, gravando direto em
+`treinos.<chave>`, sem passar pelo plano ativo — usadas hoje só por
+`js/imagem-exercicio.js` e `js/apoio.js`.
+
+Duas primitivas adicionais, usadas só por `planos.html` pra operar sobre
+um plano que não precisa estar ativo (duplicar, editar metadata, baixar):
+`TreinosStorage.lerJSONDoPlano(id, chave, padrao)` e
+`salvarJSONDoPlano(id, chave, valor)`.
 
 ## 4. Formato dos registros de histórico
 
@@ -152,15 +237,41 @@ Os campos específicos de cada tipo de registro estão descritos em
 ## 5. `storage.js` — API
 
 ```js
-TreinosStorage.carregarDadosTreinos()        // Promise<dados> — lê do localStorage, rejeita se vazio; ver seção 3.2
-TreinosStorage.definirDadosTreinos(dados)    // grava dados + data de carregamento; ver seção 3.3
-TreinosStorage.lerJSON(chave, padrao)        // lê e faz JSON.parse; retorna `padrao` se não existir/der erro
-TreinosStorage.salvarJSON(chave, valor)      // faz JSON.stringify e grava; nunca lança erro
-TreinosStorage.adicionarAoHistorico(chave, entrada) // lê array (ou []), dá push, salva de volta
+// Escopadas ao plano ativo (ver seção 3.3)
+TreinosStorage.carregarDadosTreinos()        // Promise<dados> — rejeita se o plano ativo não tiver dados
+TreinosStorage.definirDadosTreinos(dados)    // grava dados + atualiza `atualizadoEm` do plano ativo
+TreinosStorage.lerJSON(chave, padrao)
+TreinosStorage.salvarJSON(chave, valor)
+TreinosStorage.removerChave(chave)
+TreinosStorage.listarChavesComPrefixo(prefixo)
+TreinosStorage.adicionarAoHistorico(chave, entrada)
+
+// Globais (não dependem do plano ativo)
+TreinosStorage.lerJSONGlobal(chave, padrao)
+TreinosStorage.salvarJSONGlobal(chave, valor)
+
+// Gestão de planos (planos.html, seção 3.1)
+TreinosStorage.listarPlanos()
+TreinosStorage.obterPlanoAtivoId()
+TreinosStorage.ativarPlano(id)
+TreinosStorage.criarPlano({professor, aluno, inicio, fim})
+TreinosStorage.duplicarPlano(id)
+TreinosStorage.atualizarMetadataPlano(id, {professor, aluno, inicio, fim})
+TreinosStorage.excluirPlano(id)
+TreinosStorage.importarPlano(dadosPlano)     // planos.html, seção 3.1
+TreinosStorage.lerDadosDoPlano(id)
+TreinosStorage.montarExportacaoCompletaDoPlano(id)
+TreinosStorage.lerJSONDoPlano(id, chave, padrao)
+TreinosStorage.salvarJSONDoPlano(id, chave, valor)
+
+// Backup completo, todos os planos (planos.html, seção 3.1)
+TreinosStorage.montarBackup()
+TreinosStorage.restaurarBackup(backup)
 ```
 
-`chave` nessas funções é sempre sem o prefixo `treinos.` — a função monta
-o nome completo internamente.
+`chave` nessas funções é sempre o nome relativo (sem o prefixo
+`treinos.` nem o `plano.<id>.`) — a função monta o nome físico completo
+internamente.
 
 Toda escrita é protegida por `try/catch`: se `localStorage` estiver
 indisponível (modo privado do navegador, quota cheia etc.), a gravação
@@ -171,20 +282,23 @@ funcionando, só o histórico daquela sessão não é salvo.
 
 - `localStorage` é por origem (protocolo + host + porta) **e por
   navegador/aparelho** — não sincroniza entre o celular e o computador,
-  por exemplo, nem entre navegadores diferentes no mesmo aparelho. Isso
-  vale para o histórico e para o plano de treino: é preciso passar por
-  `importar_dados.html` em cada navegador/aparelho onde o site for usado.
-  A biblioteca de exercícios **não** tem essa limitação — vem por `fetch`
+  por exemplo, nem entre navegadores diferentes no mesmo aparelho. Vários
+  planos podem conviver no mesmo navegador (seção 3), mas não sincronizam
+  sozinhos pra outro navegador/aparelho — é preciso baixar um backup
+  completo em `planos.html` e restaurá-lo no destino. A
+  biblioteca de exercícios **não** tem essa limitação — vem por `fetch`
   a cada página, então é a mesma em qualquer navegador/aparelho sem
   precisar de nenhuma ação manual.
-- Limpar dados de navegação / dados do site apaga tudo — histórico **e**
-  o plano de treino importado (é preciso importar de novo). A biblioteca
-  de exercícios não é afetada (não vive em `localStorage`).
+- Limpar dados de navegação / dados do site apaga tudo — todos os planos
+  guardados nesse navegador, com histórico e progresso. A biblioteca de
+  exercícios não é afetada (não vive em `localStorage`).
 - Quota é pequena (alguns MB), mas de sobra para o volume de texto
-  gerado por esse histórico e pelos dados de treino.
-- Quando o professor atualiza o plano, é preciso reimportar
-  manualmente em `importar_dados.html` — não há aviso automático de que
-  os dados ficaram desatualizados.
+  gerado por esse histórico e pelos dados de treino, mesmo com vários
+  planos guardados ao mesmo tempo.
+- Quando o professor atualiza a composição de um plano à distância
+  (fora do site), é preciso reimportar manualmente em `planos.html`
+  (ícone 📂) — não há aviso automático de que os dados ficaram
+  desatualizados.
 
 ## 7. Fora de escopo
 
@@ -199,7 +313,6 @@ funcionando, só o histórico daquela sessão não é salvo.
   [treino-bicicleta-especificacao.md](./treino-bicicleta-especificacao.md#511-gráfico-de-histórico-tempo-de-bicicleta)
   e seção 6.1.2 de
   [treino-exercicios-especificacao.md](./treino-exercicios-especificacao.md#612-gráfico-de-histórico-tempo-total-de-exercícios).
-- Exportar/importar ou sincronizar **histórico** entre aparelhos (os
-  dados de treino em si já são importáveis, via `importar_dados.html`
-  — seção 3.1 — mas isso é diferente do histórico de execução).
 - Editar ou apagar entradas de histórico pela interface.
+- Pular `planos.html` automaticamente quando só existe um plano — a
+  lista sempre aparece, mesmo com um item só.

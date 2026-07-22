@@ -98,7 +98,7 @@ class TreinoAlongamentoNovoController {
       this.#dados = await TreinosStorage.carregarDadosTreinos();
     } catch (erro) {
       this.#mostrarErro(
-        'Nenhum plano de treino carregado ainda neste navegador. <a href="importar_dados.html">Carregue o arquivo do seu plano</a> pra começar.'
+        'Nenhum plano de treino carregado ainda neste navegador. <a href="planos.html">Escolha ou crie um plano</a> pra começar.'
       );
       return;
     }

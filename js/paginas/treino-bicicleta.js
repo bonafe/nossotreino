@@ -211,7 +211,7 @@ class TreinoBicicletaController {
     this.#phaseTimeEl.textContent = "";
     this.#hintEl.hidden = !mostrarLinkImportar;
     this.#hintEl.innerHTML = mostrarLinkImportar
-      ? 'Se ainda não carregou os dados neste navegador, <a href="importar_dados.html">carregue o arquivo do seu plano</a> primeiro.'
+      ? 'Se ainda não tem um plano neste navegador, <a href="planos.html">escolha ou crie um</a> primeiro.'
       : "";
   }
 

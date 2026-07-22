@@ -50,7 +50,7 @@ class TreinoAlongamentoMenuController {
       dados = await TreinosStorage.carregarDadosTreinos();
     } catch (erro) {
       this.#listaEl.innerHTML =
-        '<div class="estado">Nenhum plano de treino carregado ainda neste navegador. <a href="importar_dados.html">Carregue o arquivo do seu plano</a> pra começar.</div>';
+        '<div class="estado">Nenhum plano de treino carregado ainda neste navegador. <a href="planos.html">Escolha ou crie um plano</a> pra começar.</div>';
       return;
     }
 

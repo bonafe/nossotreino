@@ -137,8 +137,8 @@ biblioteca está sempre disponível.
   do sistema passa) chama `carregarBiblioteca()` (`fetch`) e, com o
   resultado, `VideosTorrent.prefetchTodosOsVideos(bibliotecaExercicios)`
   — dispara o download de toda a biblioteca, incondicionalmente.
-- **Gatilho de reforço**: `importar_dados.html`, depois de salvar um
-  plano novo ou restaurar um backup, faz a mesma chamada. Como o
+- **Gatilho de reforço**: `planos.html`, depois de importar um plano
+  novo ou restaurar um backup (ícone 📂), faz a mesma chamada. Como o
   download checa o Cache API antes de baixar (seção 6), disparar de novo
   é barato: vídeo já presente é só um `cache.match` (praticamente
   instantâneo), sem nenhuma requisição de rede — cobre o caso de a
