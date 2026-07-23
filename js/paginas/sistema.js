@@ -10,6 +10,10 @@ if (!planoAtivoId) {
   document.getElementById("voltarLink").href = aluno
     ? `planos.html?aluno=${encodeURIComponent(aluno.alunoId)}`
     : "alunos.html";
+
+  const titulo = TreinosStorage.tituloDoPlano(planoAtivoId);
+  document.getElementById("tituloPlano").textContent = titulo;
+  document.title = titulo;
 }
 
 // Gatilho de reforço do pré-carregamento (seção 8 de

@@ -1,5 +1,12 @@
-import "../storage.js";
+import { TreinosStorage } from "../storage.js";
 import { OPCOES_PIX } from "../dados-apoio.js";
+
+// Pula a navegação por alunos/planos pra quem já tem um plano ativo —
+// "Entrar" leva direto pro sistema.html, que já tem botão de voltar pra
+// planos.html se a pessoa quiser trocar de plano/aluno.
+if (TreinosStorage.obterPlanoAtivoId()) {
+  document.getElementById("entrarLink").href = "sistema.html";
+}
 
 // Painel de apoio (docs/apoio-especificacao.md): só exibe as strings "Pix
 // copia e cola" já prontas (nunca constrói/calcula payload aqui). Sem

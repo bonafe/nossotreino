@@ -86,13 +86,7 @@ class PlanosController {
     card.className = "painel plano-card";
     card.dataset.id = plano.id;
 
-    const dados = TreinosStorage.lerJSONDoPlano(plano.id, "dados.v1", null);
-    const planejamento = dados && dados.metadata && dados.metadata.planejamento;
-    const titulo =
-      plano.nome ||
-      (planejamento && (planejamento.inicio || planejamento.fim)
-        ? `Ciclo ${planejamento.inicio || "?"} – ${planejamento.fim || "?"}`
-        : `Plano criado em ${Formatadores.dataHora(plano.criadoEm)}`);
+    const titulo = TreinosStorage.tituloDoPlano(plano.id);
 
     card.innerHTML = `
       <div class="plano-card-topo">

@@ -1,4 +1,5 @@
 import { gerarIdUnico } from "./identificadores.js";
+import { Formatadores } from "./formatadores.js";
 
 const PREFIXO = "treinos.";
 
@@ -407,6 +408,23 @@ export class TreinosStorage {
       };
       TreinosStorage.salvarJSONDoPlano(id, "dados.v1", dados);
     }
+  }
+
+  // Rótulo de exibição de um plano — usado tanto no card de planos.html
+  // quanto no título de sistema.html, pra ficar consistente nos dois
+  // lugares.
+  static tituloDoPlano(id) {
+    const plano = TreinosStorage.listarPlanos().find((p) => p.id === id);
+    if (!plano) return "Meus Treinos";
+
+    const dados = TreinosStorage.lerJSONDoPlano(id, "dados.v1", null);
+    const planejamento = dados && dados.metadata && dados.metadata.planejamento;
+    return (
+      plano.nome ||
+      (planejamento && (planejamento.inicio || planejamento.fim)
+        ? `Ciclo ${planejamento.inicio || "?"} – ${planejamento.fim || "?"}`
+        : `Plano criado em ${Formatadores.dataHora(plano.criadoEm)}`)
+    );
   }
 
   // Plano avulso recebido de fora (colado/escolhido em alunos.html) — o
