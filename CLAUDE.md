@@ -52,10 +52,11 @@ completo):
   progresso por exercício) somam o histórico de **todos os planos do
   aluno ativo**, não só do ciclo atual (`TreinosStorage.lerHistoricoAgregadoDoAluno`,
   seção 3.5 do mesmo documento). Única exceção a "nunca no código":
-  `treinos-exemplo/*.json` (iniciante/intermediário/avançado,
-  genéricos, sem dado pessoal de ninguém) — `js/treinos-exemplo.js`
-  semeia um aluno "Meu perfil" com esses 3 planos na primeira visita a
-  `alunos.html`, se o navegador estiver genuinamente vazio (seção 3.1.1
+  `treinos-exemplo/*.json` (iniciante/intermediário/avançado/casa com
+  halteres e banco/peso corporal, genéricos, sem dado pessoal de
+  ninguém) — `js/treinos-exemplo.js` semeia um aluno "Meu perfil" com
+  esses 5 planos na primeira visita a `alunos.html`, se o navegador
+  estiver genuinamente vazio (seção 3.1.1
   de `docs/armazenamento-local-especificacao.md`).
 
 Páginas que mostram nome/vídeo/grupo muscular de um exercício carregam os
@@ -85,13 +86,15 @@ index.html (institucional)
                         ├─> treino_bicicleta_menu.html → treino_bicicleta_novo.html
                         │                              └─> treino_bicicleta.html?treino=<treinoCardioId>[&origem=<id>]
                         ├─> treino_alongamento_menu.html → treino_alongamento_novo.html
-                        │                                └─> treino_alongamento.html?treino=<treinoAlongamentoId>[&origem=<id>]
+                        │                                └─> treino_alongamento_exercicios.html?treino=<treinoAlongamentoId>[&origem=<id>]
+                        │                                       └─> treino_alongamento.html?treino=<treinoAlongamentoId>[&alongamento=<id>][&origem=<id>]
+                        │                                              └─> treino_alongamento_progresso.html?alongamento=<id>&treino=<treinoAlongamentoId>
                         └─> treino_exercicios_menu.html → treino_novo.html
                                                         └─> treino_exercicios.html?treino=<id> → treino_execucao.html?treino=<id>
                                                                                                      └─> treino_exercicio_progresso.html?exercicio=<id>&treino=<id>
 ```
 
-Os três fluxos (bike / alongamento / musculação) são independentes — cada um tem seu próprio menu, motor e tela de criação. Cardio e alongamento são "treinos" de primeira classe (coleções `treinosCardio`/`treinosAlongamento` no plano, irmãs de `treinos`, cada uma com `id`/`nome` próprios) que também podem ser **referenciados** como complemento de um treino de musculação via `treino.cardio[]`/`treino.alongamento[]` (arrays de `{ treinoCardioId|treinoAlongamentoId, momento }`) — o card complementar linka para `treino_bicicleta.html?treino=<treinoCardioId>&origem=<id>` / `treino_alongamento.html?treino=<treinoAlongamentoId>&origem=<id>`, onde `origem` é o treino de musculação de onde veio (usado só pro botão de voltar, ver seção 5.2.1 de `docs/treino-bicicleta-especificacao.md` e seção 5.3 de `docs/treino-alongamento-especificacao.md`).
+Os três fluxos (bike / alongamento / musculação) são independentes — cada um tem seu próprio menu, motor e tela de criação. Cardio e alongamento são "treinos" de primeira classe (coleções `treinosCardio`/`treinosAlongamento` no plano, irmãs de `treinos`, cada uma com `id`/`nome` próprios) que também podem ser **referenciados** como complemento de um treino de musculação via `treino.cardio[]`/`treino.alongamento[]` (arrays de `{ treinoCardioId|treinoAlongamentoId, momento }`) — o card complementar linka para `treino_bicicleta.html?treino=<treinoCardioId>&origem=<id>` / `treino_alongamento_exercicios.html?treino=<treinoAlongamentoId>&origem=<id>`, onde `origem` é o treino de musculação de onde veio (usado só pro botão de voltar, ver seção 5.2.1 de `docs/treino-bicicleta-especificacao.md` e seção 5.3/6.1 de `docs/treino-alongamento-especificacao.md`).
 
 `treino_execucao.html` é a tela mais complexa do projeto: monta uma fila sequencial de "slots" a partir da lista plana `treino.exercicios` (superset/circuito não são respeitados ainda, tudo roda sequencial — simplificação deliberada, ver seção 8.1 da especificação de exercícios), trata exercício substituto (`alternativas[]`), cronômetro de série/descanso, sinal sonoro e persiste o progresso — endereçado por `exercicioId`, não por índice posicional — a cada passo para poder retomar depois de fechar o navegador.
 

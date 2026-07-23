@@ -1,0 +1,1923 @@
+{
+  "schema": "plano-de-treino",
+  "schemaVersion": "1.3",
+  "biblioteca": {
+    "arquivo": "biblioteca-exercicios.json"
+  },
+  "origem": {
+    "arquivo": null,
+    "tipo": "treino-exemplo",
+    "dataConversao": "2026-07-22",
+    "paginasComPrescricoes": []
+  },
+  "metadata": {
+    "professor": null,
+    "consultoria": "Nosso Treino",
+    "aluno": "Exemplo — casa com halteres e banco",
+    "planejamento": {
+      "inicio": null,
+      "fim": null
+    },
+    "objetivos": [
+      "hipertrofia",
+      "forca-geral",
+      "condicionamento-fisico"
+    ],
+    "nivel": "intermediario",
+    "carater": "exemplo-generico-nao-individualizado",
+    "equipamentos": {
+      "ambiente": "casa",
+      "obrigatorios": [
+        "halter"
+      ],
+      "recomendados": [
+        "banco-ajustavel"
+      ],
+      "opcionais": [
+        "bola-suica",
+        "colchonete"
+      ],
+      "observacao": "Exercícios com banco possuem alternativa sem banco. Sempre que viável, também foi incluída alternativa sem halteres; a bola suíça é opcional."
+    }
+  },
+  "distribuicaoSemanal": [
+    {
+      "dia": "segunda-feira",
+      "treinoId": "casa-a"
+    },
+    {
+      "dia": "terca-feira",
+      "treinoId": null
+    },
+    {
+      "dia": "quarta-feira",
+      "treinoId": "casa-b"
+    },
+    {
+      "dia": "quinta-feira",
+      "treinoId": null
+    },
+    {
+      "dia": "sexta-feira",
+      "treinoId": "casa-c"
+    },
+    {
+      "dia": "sabado",
+      "treinoId": null
+    },
+    {
+      "dia": "domingo",
+      "treinoId": null
+    }
+  ],
+  "regraContinuidade": "Se não for possível treinar no dia programado, continuar pela próxima sessão da sequência, sem compensar com duas sessões no mesmo dia.",
+  "orientacoesGerais": {
+    "ajusteCarga": {
+      "regra": "Aumentar carga ou repetições quando todas as séries atingirem o máximo prescrito, mantendo amplitude, controle e reserva técnica.",
+      "aplicacao": "exercicios-com-faixa-de-repeticoes"
+    },
+    "cadenciaPadrao": {
+      "modo": "qualitativo",
+      "concentrica": "controlada-com-intencao",
+      "excentrica": "controlada"
+    },
+    "descansoPadrao": {
+      "modo": "prescrito-ou-autosselecionado",
+      "minSegundos": 60,
+      "maxSegundos": 150
+    },
+    "superset": {
+      "regra": "Quando houver marcadores 1 e 2, combinar os exercícios pela ordem relativa.",
+      "modelagem": "Exercícios sem marcador são executados individualmente."
+    },
+    "isometria": {
+      "duracaoSegundos": 15,
+      "momento": "final-da-serie",
+      "posicao": "maior-contracao",
+      "aplicacao": {
+        "ultimasSeries": 1
+      }
+    },
+    "circuito": {
+      "regra": "Executar uma passagem por todos os exercícios do circuito antes do descanso entre voltas."
+    },
+    "alongamentoPosTreino": {
+      "regra": "Realizar os alongamentos pós-treino com respiração contínua e sem rebotes.",
+      "ordem": "apos-cardio-ou-musculacao"
+    }
+  },
+  "treinos": [
+    {
+      "id": "casa-a",
+      "nome": "Casa A — corpo inteiro",
+      "tipo": "musculacao",
+      "aquecimento": {
+        "protocolos": [
+          {
+            "tipo": "mobilidade-alongamento",
+            "series": 1,
+            "dosagem": {
+              "valor": 10,
+              "unidade": "repeticoes-controladas"
+            },
+            "videoUrl": null,
+            "observacao": "Usar mobilidade dinâmica nas articulações envolvidas. Os alongamentos estáticos ficam para o fim da sessão."
+          },
+          {
+            "tipo": "serie-preparatoria-do-exercicio",
+            "alvo": "primeiro-exercicio-do-treino",
+            "series": 2,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "fixo",
+              "valor": 10
+            },
+            "observacao": "Aumentar a carga progressivamente sem gerar fadiga antes das séries válidas."
+          }
+        ]
+      },
+      "exercicios": [
+        {
+          "exercicioId": "agachamento-goblet",
+          "ordem": 10,
+          "prescricao": {
+            "series": 4,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 8,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 90,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "agachamento-dividido",
+              "prioridade": 1,
+              "motivo": "sem-halter",
+              "prescricao": {
+                "series": 4,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 10,
+                  "max": 15
+                },
+                "carga": null,
+                "descansoSegundos": 90,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "floor-press-com-halteres",
+          "ordem": 20,
+          "prescricao": {
+            "series": 4,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 8,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 90,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "flexao-de-bracos",
+              "prioridade": 1,
+              "motivo": "sem-halter",
+              "prescricao": {
+                "series": 4,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 6,
+                  "max": 15
+                },
+                "carga": null,
+                "descansoSegundos": 90,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "remada-unilateral-no-banco",
+          "ordem": 30,
+          "prescricao": {
+            "series": 4,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 8,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 90,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "remada-unilateral-com-halter",
+              "prioridade": 1,
+              "motivo": "sem-banco",
+              "prescricao": {
+                "series": 4,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 8,
+                  "max": 15
+                },
+                "carga": null,
+                "descansoSegundos": 90,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            },
+            {
+              "exercicioId": "superman",
+              "prioridade": 2,
+              "motivo": "sem-halter-e-sem-banco;nao-e-substituicao-biomecanica-direta",
+              "prescricao": {
+                "series": 3,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 12,
+                  "max": 18
+                },
+                "carga": null,
+                "descansoSegundos": 60,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "levantamento-terra-romeno-com-halteres",
+          "ordem": 40,
+          "prescricao": {
+            "series": 4,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 8,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 105,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "superman",
+              "prioridade": 1,
+              "motivo": "sem-halter",
+              "prescricao": {
+                "series": 4,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 12,
+                  "max": 18
+                },
+                "carga": null,
+                "descansoSegundos": 60,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            },
+            {
+              "exercicioId": "slide-leg-na-bola",
+              "prioridade": 2,
+              "motivo": "opcao-com-bola-suica",
+              "prescricao": {
+                "series": 4,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 8,
+                  "max": 15
+                },
+                "carga": null,
+                "descansoSegundos": 75,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "desenvolvimento-com-halteres-em-pe",
+          "ordem": 50,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 8,
+              "max": 12
+            },
+            "carga": null,
+            "descansoSegundos": 90,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "inchworm",
+              "prioridade": 1,
+              "motivo": "sem-halter;mantem-enfase-em-ombros-e-core",
+              "prescricao": {
+                "series": 3,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 5,
+                  "max": 10
+                },
+                "carga": null,
+                "descansoSegundos": 75,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "prancha-isometrica",
+          "ordem": 60,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "faixa",
+              "min": 25,
+              "max": 50,
+              "unidade": "segundos"
+            },
+            "carga": null,
+            "descansoSegundos": 60,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "reverse-bird-dog",
+              "prioridade": 1,
+              "motivo": "alternativa-sem-equipamento",
+              "prescricao": {
+                "series": 3,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 8,
+                  "max": 14
+                },
+                "carga": null,
+                "descansoSegundos": 60,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": null
+        }
+      ],
+      "cardio": [
+        {
+          "treinoCardioId": "casa-a-cardio",
+          "momento": "apos-musculacao"
+        }
+      ],
+      "status": "ativo",
+      "versao": 2,
+      "alongamento": [
+        {
+          "treinoAlongamentoId": "casa-a-alongamento",
+          "momento": "apos-cardio-ou-musculacao"
+        }
+      ]
+    },
+    {
+      "id": "casa-b",
+      "nome": "Casa B — banco e halteres",
+      "tipo": "musculacao",
+      "aquecimento": {
+        "protocolos": [
+          {
+            "tipo": "mobilidade-alongamento",
+            "series": 1,
+            "dosagem": {
+              "valor": 10,
+              "unidade": "repeticoes-controladas"
+            },
+            "videoUrl": null,
+            "observacao": "Usar mobilidade dinâmica nas articulações envolvidas. Os alongamentos estáticos ficam para o fim da sessão."
+          },
+          {
+            "tipo": "serie-preparatoria-do-exercicio",
+            "alvo": "primeiro-exercicio-do-treino",
+            "series": 2,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "fixo",
+              "valor": 10
+            },
+            "observacao": "Aumentar a carga progressivamente sem gerar fadiga antes das séries válidas."
+          }
+        ]
+      },
+      "exercicios": [
+        {
+          "exercicioId": "agachamento-bulgaro-com-halteres",
+          "ordem": 10,
+          "prescricao": {
+            "series": 4,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 8,
+              "max": 12
+            },
+            "carga": null,
+            "descansoSegundos": 105,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "afundo-reverso-com-halteres",
+              "prioridade": 1,
+              "motivo": "sem-banco",
+              "prescricao": {
+                "series": 4,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 8,
+                  "max": 12
+                },
+                "carga": null,
+                "descansoSegundos": 105,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            },
+            {
+              "exercicioId": "agachamento-dividido",
+              "prioridade": 2,
+              "motivo": "sem-halter-e-sem-banco",
+              "prescricao": {
+                "series": 4,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 10,
+                  "max": 15
+                },
+                "carga": null,
+                "descansoSegundos": 90,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "supino-inclinado-com-halteres",
+          "ordem": 20,
+          "prescricao": {
+            "series": 4,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 8,
+              "max": 12
+            },
+            "carga": null,
+            "descansoSegundos": 105,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "floor-press-com-halteres",
+              "prioridade": 1,
+              "motivo": "sem-banco",
+              "prescricao": {
+                "series": 4,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 8,
+                  "max": 15
+                },
+                "carga": null,
+                "descansoSegundos": 90,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            },
+            {
+              "exercicioId": "flexao-de-bracos",
+              "prioridade": 2,
+              "motivo": "sem-halter-e-sem-banco",
+              "prescricao": {
+                "series": 4,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 6,
+                  "max": 15
+                },
+                "carga": null,
+                "descansoSegundos": 90,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "remada-com-peito-apoiado-e-halteres",
+          "ordem": 30,
+          "prescricao": {
+            "series": 4,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 8,
+              "max": 12
+            },
+            "carga": null,
+            "descansoSegundos": 105,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "remada-unilateral-com-halter",
+              "prioridade": 1,
+              "motivo": "sem-banco",
+              "prescricao": {
+                "series": 4,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 8,
+                  "max": 15
+                },
+                "carga": null,
+                "descansoSegundos": 90,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            },
+            {
+              "exercicioId": "superman",
+              "prioridade": 2,
+              "motivo": "sem-halter-e-sem-banco;nao-e-substituicao-biomecanica-direta",
+              "prescricao": {
+                "series": 3,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 12,
+                  "max": 18
+                },
+                "carga": null,
+                "descansoSegundos": 60,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "hip-thrust-com-halter",
+          "ordem": 40,
+          "prescricao": {
+            "series": 4,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 10,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 105,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "levantamento-terra-romeno-com-halteres",
+              "prioridade": 1,
+              "motivo": "sem-banco",
+              "prescricao": {
+                "series": 4,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 8,
+                  "max": 15
+                },
+                "carga": null,
+                "descansoSegundos": 105,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            },
+            {
+              "exercicioId": "abducao-de-quadril-no-solo",
+              "prioridade": 2,
+              "motivo": "sem-halter-e-sem-banco",
+              "prescricao": {
+                "series": 4,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 15,
+                  "max": 20
+                },
+                "carga": null,
+                "descansoSegundos": 60,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            },
+            {
+              "exercicioId": "slide-leg-na-bola",
+              "prioridade": 3,
+              "motivo": "opcao-com-bola-suica",
+              "prescricao": {
+                "series": 4,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 8,
+                  "max": 15
+                },
+                "carga": null,
+                "descansoSegundos": 75,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "elevacao-lateral-inclinada-com-halter",
+          "ordem": 50,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 10,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 75,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "elevacao-lateral-com-halter",
+              "prioridade": 1,
+              "motivo": "sem-banco",
+              "prescricao": {
+                "series": 3,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 10,
+                  "max": 15
+                },
+                "carga": null,
+                "descansoSegundos": 75,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "rosca-martelo",
+          "ordem": 60,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 10,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 75,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "rosca-scott-na-bola",
+              "prioridade": 1,
+              "motivo": "opcao-com-bola-suica",
+              "prescricao": {
+                "series": 3,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 10,
+                  "max": 15
+                },
+                "carga": null,
+                "descansoSegundos": 75,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": "Sem halteres não há substituto equivalente para flexão de cotovelo na biblioteca sem equipamento.",
+          "superset": 1
+        },
+        {
+          "exercicioId": "triceps-frances-unilateral-com-halter",
+          "ordem": 70,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 10,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 75,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "flexao-diamante",
+              "prioridade": 1,
+              "motivo": "sem-halter",
+              "prescricao": {
+                "series": 3,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 5,
+                  "max": 12
+                },
+                "carga": null,
+                "descansoSegundos": 75,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": 2
+        }
+      ],
+      "cardio": [
+        {
+          "treinoCardioId": "casa-b-cardio",
+          "momento": "apos-musculacao"
+        }
+      ],
+      "status": "ativo",
+      "versao": 2,
+      "alongamento": [
+        {
+          "treinoAlongamentoId": "casa-b-alongamento",
+          "momento": "apos-cardio-ou-musculacao"
+        }
+      ]
+    },
+    {
+      "id": "casa-c",
+      "nome": "Casa C — estabilidade e condicionamento",
+      "tipo": "musculacao",
+      "aquecimento": {
+        "protocolos": [
+          {
+            "tipo": "mobilidade-alongamento",
+            "series": 1,
+            "dosagem": {
+              "valor": 10,
+              "unidade": "repeticoes-controladas"
+            },
+            "videoUrl": null,
+            "observacao": "Usar mobilidade dinâmica nas articulações envolvidas. Os alongamentos estáticos ficam para o fim da sessão."
+          },
+          {
+            "tipo": "serie-preparatoria-do-exercicio",
+            "alvo": "primeiro-exercicio-do-treino",
+            "series": 2,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "fixo",
+              "valor": 10
+            },
+            "observacao": "Aumentar a carga progressivamente sem gerar fadiga antes das séries válidas."
+          }
+        ]
+      },
+      "exercicios": [
+        {
+          "exercicioId": "afundo-reverso-com-halteres",
+          "ordem": 10,
+          "prescricao": {
+            "series": 4,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 8,
+              "max": 14
+            },
+            "carga": null,
+            "descansoSegundos": 90,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "avanco-retrocesso",
+              "prioridade": 1,
+              "motivo": "sem-halter",
+              "prescricao": {
+                "series": 4,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 8,
+                  "max": 14
+                },
+                "carga": null,
+                "descansoSegundos": 90,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "squeeze-press-com-halteres",
+          "ordem": 20,
+          "prescricao": {
+            "series": 4,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 8,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 90,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "floor-press-com-halteres",
+              "prioridade": 1,
+              "motivo": "sem-banco",
+              "prescricao": {
+                "series": 4,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 8,
+                  "max": 15
+                },
+                "carga": null,
+                "descansoSegundos": 90,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            },
+            {
+              "exercicioId": "flexao-diamante",
+              "prioridade": 2,
+              "motivo": "sem-halter-e-sem-banco",
+              "prescricao": {
+                "series": 4,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 5,
+                  "max": 12
+                },
+                "carga": null,
+                "descansoSegundos": 90,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "remada-renegade",
+          "ordem": 30,
+          "prescricao": {
+            "series": 4,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 6,
+              "max": 12
+            },
+            "carga": null,
+            "descansoSegundos": 105,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "remada-unilateral-com-halter",
+              "prioridade": 1,
+              "motivo": "menor-demanda-de-estabilidade",
+              "prescricao": {
+                "series": 4,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 8,
+                  "max": 15
+                },
+                "carga": null,
+                "descansoSegundos": 90,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            },
+            {
+              "exercicioId": "bird-dog",
+              "prioridade": 2,
+              "motivo": "sem-halter;preserva-o-componente-anti-rotacao",
+              "prescricao": {
+                "series": 4,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 8,
+                  "max": 12
+                },
+                "carga": null,
+                "descansoSegundos": 60,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "hip-thrust-unilateral",
+          "ordem": 40,
+          "prescricao": {
+            "series": 4,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 8,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 90,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "superman",
+              "prioridade": 1,
+              "motivo": "sem-banco",
+              "prescricao": {
+                "series": 4,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 12,
+                  "max": 18
+                },
+                "carga": null,
+                "descansoSegundos": 60,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            },
+            {
+              "exercicioId": "slide-leg-na-bola",
+              "prioridade": 2,
+              "motivo": "opcao-com-bola-suica",
+              "prescricao": {
+                "series": 4,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 8,
+                  "max": 15
+                },
+                "carga": null,
+                "descansoSegundos": 75,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "desenvolvimento-arnold",
+          "ordem": 50,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 8,
+              "max": 12
+            },
+            "carga": null,
+            "descansoSegundos": 90,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "desenvolvimento-com-halteres-em-pe",
+              "prioridade": 1,
+              "motivo": "sem-banco",
+              "prescricao": {
+                "series": 3,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 8,
+                  "max": 12
+                },
+                "carga": null,
+                "descansoSegundos": 90,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            },
+            {
+              "exercicioId": "inchworm",
+              "prioridade": 2,
+              "motivo": "sem-halter-e-sem-banco",
+              "prescricao": {
+                "series": 3,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 5,
+                  "max": 10
+                },
+                "carga": null,
+                "descansoSegundos": 75,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "suitcase-carry",
+          "ordem": 60,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 10,
+              "max": 20
+            },
+            "carga": null,
+            "descansoSegundos": 75,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "prancha-lateral",
+              "prioridade": 1,
+              "motivo": "sem-halter",
+              "prescricao": {
+                "series": 3,
+                "metrica": {
+                  "tipo": "tempo",
+                  "modo": "faixa",
+                  "min": 20,
+                  "max": 40,
+                  "unidade": "segundos"
+                },
+                "carga": null,
+                "descansoSegundos": 60,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": "Contar passos por lado como repetições.",
+          "superset": null
+        }
+      ],
+      "cardio": [
+        {
+          "treinoCardioId": "casa-c-cardio",
+          "momento": "apos-musculacao"
+        }
+      ],
+      "status": "ativo",
+      "versao": 2,
+      "alongamento": [
+        {
+          "treinoAlongamentoId": "casa-c-alongamento",
+          "momento": "apos-cardio-ou-musculacao"
+        }
+      ]
+    }
+  ],
+  "treinosCardio": [
+    {
+      "id": "casa-a-cardio",
+      "nome": "Intervalado em casa A",
+      "modalidadeId": "bicicleta-ergometrica",
+      "treino": {
+        "tipo": "intervalado",
+        "series": 10,
+        "estimulo": {
+          "duracaoSegundos": 25,
+          "intensidade": {
+            "modo": "percepcao-livre",
+            "valor": "maxima"
+          }
+        },
+        "recuperacao": {
+          "duracaoSegundos": 35,
+          "intensidade": {
+            "modo": "percepcao-livre",
+            "valor": "leve"
+          }
+        }
+      },
+      "observacao": "Pode ser feito em qualquer bicicleta ergométrica disponível (academia, condomínio etc.) — não é preciso ter uma em casa.",
+      "status": "ativo",
+      "versao": 1
+    },
+    {
+      "id": "casa-b-cardio",
+      "nome": "Intervalado em casa B",
+      "modalidadeId": "bicicleta-ergometrica",
+      "treino": {
+        "tipo": "intervalado",
+        "series": 12,
+        "estimulo": {
+          "duracaoSegundos": 25,
+          "intensidade": {
+            "modo": "percepcao-livre",
+            "valor": "maxima"
+          }
+        },
+        "recuperacao": {
+          "duracaoSegundos": 35,
+          "intensidade": {
+            "modo": "percepcao-livre",
+            "valor": "leve"
+          }
+        }
+      },
+      "observacao": "Pode ser feito em qualquer bicicleta ergométrica disponível (academia, condomínio etc.) — não é preciso ter uma em casa.",
+      "status": "ativo",
+      "versao": 1
+    },
+    {
+      "id": "casa-c-cardio",
+      "nome": "Intervalado em casa C",
+      "modalidadeId": "bicicleta-ergometrica",
+      "treino": {
+        "tipo": "intervalado",
+        "series": 10,
+        "estimulo": {
+          "duracaoSegundos": 30,
+          "intensidade": {
+            "modo": "percepcao-livre",
+            "valor": "maxima"
+          }
+        },
+        "recuperacao": {
+          "duracaoSegundos": 30,
+          "intensidade": {
+            "modo": "percepcao-livre",
+            "valor": "leve"
+          }
+        }
+      },
+      "observacao": "Pode ser feito em qualquer bicicleta ergométrica disponível (academia, condomínio etc.) — não é preciso ter uma em casa.",
+      "status": "ativo",
+      "versao": 1
+    }
+  ],
+  "treinosAlongamento": [
+    {
+      "id": "casa-a-alongamento",
+      "nome": "Alongamento — Casa A — corpo inteiro",
+      "momento": "apos-cardio-ou-musculacao",
+      "nivel": "intermediario",
+      "observacao": "Sequência definida conforme os principais grupos musculares trabalhados na sessão.",
+      "status": "ativo",
+      "versao": 1,
+      "alongamentos": [
+        {
+          "alongamentoId": "piriforme-em-figura-quatro-deitado",
+          "ordem": 10,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "gluteo-maximo-joelho-ao-ombro-oposto",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "deltoide-posterior-com-braco-cruzado",
+          "ordem": 20,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "manguito-posterior-em-decubito-lateral",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "triceps-acima-da-cabeca",
+          "ordem": 30,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "quadriceps-deitado-de-lado",
+          "ordem": 40,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "reto-femoral-meio-ajoelhado-com-pe-seguro",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "ombros-em-extensao-com-maos-entrelacadas",
+          "ordem": 50,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": false,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "manguito-posterior-em-decubito-lateral",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        }
+      ]
+    },
+    {
+      "id": "casa-b-alongamento",
+      "nome": "Alongamento — Casa B — banco e halteres",
+      "momento": "apos-cardio-ou-musculacao",
+      "nivel": "intermediario",
+      "observacao": "Sequência definida conforme os principais grupos musculares trabalhados na sessão.",
+      "status": "ativo",
+      "versao": 1,
+      "alongamentos": [
+        {
+          "alongamentoId": "piriforme-em-figura-quatro-deitado",
+          "ordem": 10,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "gluteo-maximo-joelho-ao-ombro-oposto",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "deltoide-posterior-com-braco-cruzado",
+          "ordem": 20,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "ombros-em-extensao-com-maos-entrelacadas",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            },
+            {
+              "alongamentoId": "manguito-posterior-em-decubito-lateral",
+              "prioridade": 2,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "triceps-acima-da-cabeca",
+          "ordem": 30,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "supinadores-do-antebraco",
+          "ordem": 40,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "pronadores-do-antebraco",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            },
+            {
+              "alongamentoId": "punhos-em-oracao",
+              "prioridade": 2,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "quadriceps-deitado-de-lado",
+          "ordem": 50,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "reto-femoral-meio-ajoelhado-com-pe-seguro",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        }
+      ]
+    },
+    {
+      "id": "casa-c-alongamento",
+      "nome": "Alongamento — Casa C — estabilidade e condicionamento",
+      "momento": "apos-cardio-ou-musculacao",
+      "nivel": "intermediario",
+      "observacao": "Sequência definida conforme os principais grupos musculares trabalhados na sessão.",
+      "status": "ativo",
+      "versao": 1,
+      "alongamentos": [
+        {
+          "alongamentoId": "piriforme-em-figura-quatro-deitado",
+          "ordem": 10,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "gluteo-maximo-joelho-ao-ombro-oposto",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "deltoide-posterior-com-braco-cruzado",
+          "ordem": 20,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "manguito-posterior-em-decubito-lateral",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "quadriceps-deitado-de-lado",
+          "ordem": 30,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "reto-femoral-meio-ajoelhado-com-pe-seguro",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "ombros-em-extensao-com-maos-entrelacadas",
+          "ordem": 40,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": false,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "manguito-posterior-em-decubito-lateral",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "romboides-com-maos-entrelacadas",
+          "ordem": 50,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": false,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "abraco-escapular",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        }
+      ]
+    }
+  ]
+}

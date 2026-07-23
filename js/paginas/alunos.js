@@ -47,9 +47,9 @@ class AlunosController {
     this.#renderizarLista();
     if (semeado) {
       this.#mostrarMensagem(
-        'Criamos um perfil de exemplo ("Meu perfil") com 3 planos de treino ' +
-          "(Iniciante, Intermediário, Avançado) pra você já explorar o sistema " +
-          "— pode renomear ou excluir quando quiser.",
+        'Criamos um perfil de exemplo ("Meu perfil") com 5 planos de treino ' +
+          "(Iniciante, Intermediário, Avançado, Casa e Peso corporal) pra você já " +
+          "explorar o sistema — pode renomear ou excluir quando quiser.",
         "sucesso"
       );
     }

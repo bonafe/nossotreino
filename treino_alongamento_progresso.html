@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Progresso do Alongamento</title>
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/componentes.css" />
+  <link rel="stylesheet" href="css/paginas/treino-exercicio-progresso.css" />
+</head>
+<body>
+  <main>
+    <header class="top">
+      <a id="voltarLink" class="voltar-icon" href="treino_alongamento_menu.html" aria-label="Voltar">←</a>
+      <div>
+        <h1 id="titulo">Carregando…</h1>
+        <span id="totalTag" class="tag" hidden></span>
+      </div>
+    </header>
+
+    <div id="carregando" class="estado">Carregando histórico…</div>
+    <div id="vazio" class="estado" hidden>
+      Nenhuma série registrada ainda para este alongamento. Registre séries pela execução guiada do treino.
+    </div>
+    <div id="erro" class="estado" hidden></div>
+
+    <div class="tabs" hidden>
+      <button type="button" class="tab-btn active" data-tab="grafico">Gráfico</button>
+      <button type="button" class="tab-btn" data-tab="tabela">Tabela</button>
+    </div>
+
+    <section id="painelGrafico" class="painel" hidden>
+      <div class="legenda">
+        <span><i class="dot peso"></i>Tempo médio sustentado do dia (segundos)</span>
+      </div>
+      <svg id="grafico" viewBox="0 0 800 360" preserveAspectRatio="xMidYMid meet"></svg>
+      <p class="hint-cor">Cada ponto é a média do dia — várias séries no mesmo dia viram um único ponto na linha.</p>
+    </section>
+
+    <section id="painelTabela" class="painel" hidden>
+      <div class="tabela-wrap">
+        <table>
+          <thead>
+            <tr><th>Série</th><th>Tempo</th><th>Hora</th></tr>
+          </thead>
+          <tbody id="tabelaCorpo"></tbody>
+        </table>
+      </div>
+      <p class="hint-cor">As cores alternam a cada treino realizado (o mesmo treino em outro dia conta como novo).</p>
+    </section>
+
+    <p class="rodape-apoio"><a href="index.html#apoio">❤️ Apoiar o Nosso Treino</a></p>
+  </main>
+
+  <script src="d3.v7.min.js"></script>
+  <script type="module" src="js/paginas/treino-alongamento-progresso.js"></script>
+</body>
+</html>

@@ -1,14 +1,16 @@
 import { TreinosStorage } from "./storage.js";
 
-// Conteúdo de onboarding: 3 planos genéricos (não são dados pessoais de
+// Conteúdo de onboarding: 5 planos genéricos (não são dados pessoais de
 // ninguém, ver `metadata.carater: "exemplo-generico-nao-individualizado"`
 // em cada arquivo) versionados em `treinos-exemplo/`, a única exceção à
 // regra de "plano nunca no código" — ver seção 1 de
 // docs/armazenamento-local-especificacao.md.
 const NIVEIS = [
-  { arquivo: "treinos-exemplo/iniciante.json", nome: "Iniciante" },
-  { arquivo: "treinos-exemplo/intermediario.json", nome: "Intermediário" },
-  { arquivo: "treinos-exemplo/avancado.json", nome: "Avançado" }
+  { arquivo: "treinos-exemplo/treino-exemplo-iniciante.json", nome: "Iniciante" },
+  { arquivo: "treinos-exemplo/treino-exemplo-intermediario.json", nome: "Intermediário" },
+  { arquivo: "treinos-exemplo/treino-exemplo-avancado.json", nome: "Avançado" },
+  { arquivo: "treinos-exemplo/treino-exemplo-casa-halteres-banco.json", nome: "Casa (halteres e banco)" },
+  { arquivo: "treinos-exemplo/treino-exemplo-peso-corporal.json", nome: "Peso corporal (sem equipamento)" }
 ];
 
 const NOME_ALUNO_PADRAO = "Meu perfil";

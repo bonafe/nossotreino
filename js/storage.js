@@ -95,6 +95,7 @@ function montarExportacaoCompletaDoPlano(id) {
     historicoSerieMusculacao: lerBruto(chaveDoPlano(id, "historico.serieMusculacao.v1"), []),
     historicoSessaoMusculacao: lerBruto(chaveDoPlano(id, "historico.sessaoMusculacao.v1"), []),
     historicoSessaoAlongamento: lerBruto(chaveDoPlano(id, "historico.sessaoAlongamento.v1"), []),
+    historicoSerieAlongamento: lerBruto(chaveDoPlano(id, "historico.serieAlongamento.v1"), []),
     execucoesEmAndamento
   };
 }
@@ -105,6 +106,7 @@ function restaurarExportacaoCompletaDoPlano(id, exportacao) {
   salvarBruto(chaveDoPlano(id, "historico.serieMusculacao.v1"), exportacao.historicoSerieMusculacao || []);
   salvarBruto(chaveDoPlano(id, "historico.sessaoMusculacao.v1"), exportacao.historicoSessaoMusculacao || []);
   salvarBruto(chaveDoPlano(id, "historico.sessaoAlongamento.v1"), exportacao.historicoSessaoAlongamento || []);
+  salvarBruto(chaveDoPlano(id, "historico.serieAlongamento.v1"), exportacao.historicoSerieAlongamento || []);
   Object.entries(exportacao.execucoesEmAndamento || {}).forEach(([chave, valor]) => {
     salvarBruto(chaveDoPlano(id, chave), valor);
   });
@@ -155,6 +157,7 @@ export class TreinosStorage {
     historicoSerieMusculacao: "historico.serieMusculacao.v1",
     historicoSessaoMusculacao: "historico.sessaoMusculacao.v1",
     historicoSessaoAlongamento: "historico.sessaoAlongamento.v1",
+    historicoSerieAlongamento: "historico.serieAlongamento.v1",
     execucaoMusculacao: (treinoId) => `execucao.musculacao.${treinoId}.v2`,
     execucaoAlongamento: (treinoId) => `execucao.alongamento.${treinoId}.v1`,
     apoioUltimaExibicaoContador: "apoio.ultimaExibicaoContador.v1",
@@ -231,6 +234,7 @@ export class TreinosStorage {
 
   static resetarAlongamento() {
     removerChave(TreinosStorage.chaves.historicoSessaoAlongamento);
+    removerChave(TreinosStorage.chaves.historicoSerieAlongamento);
     listarChavesComPrefixo("execucao.alongamento.").forEach((chave) => removerChave(chave));
   }
 

@@ -22,7 +22,7 @@ do navegador para três propósitos:
    `fetch` a cada página, sem passar por `localStorage` (ver
    [especificacao-biblioteca-exercicios.md](./especificacao-biblioteca-exercicios.md)
    seção 2.1). Única exceção deliberada à regra de "plano nunca no
-   código": `treinos-exemplo/*.json` (seção 3.1.1) — 3 planos
+   código": `treinos-exemplo/*.json` (seção 3.1.1) — 5 planos
    **genéricos, não individualizados** (`metadata.carater:
    "exemplo-generico-nao-individualizado"`, sem nome de aluno/professor
    real) usados só pra popular a conta de quem nunca usou o site.
@@ -95,6 +95,7 @@ navegador (ver seção 3.4):
 | `historico.sessaoBicicleta.v1` | Array — um registro por treino de bike concluído por inteiro |
 | `historico.serieMusculacao.v1` | Array — um registro por série de exercício concluída (carga/repetições) |
 | `historico.sessaoMusculacao.v1` | Array — um registro por treino de exercícios concluído por inteiro |
+| `historico.serieAlongamento.v1` | Array — um registro por série de alongamento concluída (tempo sustentado, sem carga/repetições), ver seção 7 de [treino-alongamento-especificacao.md](./treino-alongamento-especificacao.md) |
 | `historico.sessaoAlongamento.v1` | Array — um registro por alongamento concluído por inteiro, ver seção 7 de [treino-alongamento-especificacao.md](./treino-alongamento-especificacao.md) |
 | `execucao.musculacao.<treinoId>.v2` | Estado do treino de exercícios em andamento (para retomar após fechar a página) — endereçado por `exercicioId`, não por índice posicional |
 | `execucao.alongamento.<alongamentoId>.v1` | Estado do treino de alongamento em andamento — mesmo princípio, endereçado por `alongamentoId` |
@@ -199,15 +200,15 @@ antigos sem `alunoId`, seção 5.1, que já rodou dentro dessas duas
 chamadas e por si só não conta como "vazio"):
 
 1. Cria um aluno `"Meu perfil"` (`criarAluno`).
-2. Busca (`fetch`) os 3 arquivos de `treinos-exemplo/` (iniciante,
-   intermediário, avançado — planos genéricos, ver seção 1), sobrescreve
-   `dados.metadata.aluno` pro nome desse aluno (mesmo ajuste feito em
-   qualquer importação, seção 3.1) e importa cada um
-   (`TreinosStorage.importarPlano(dados, alunoId)`).
-3. Rotula cada plano importado com `TreinosStorage.atualizarMetadataPlano(id, {..., nome: "Iniciante"|"Intermediário"|"Avançado"})`
-   — necessário porque os 3 arquivos têm `planejamento.inicio`/`fim`
-   nulos, então sem esse rótulo os três cards em `planos.html` cairiam
-   no mesmo título ("Plano criado em ...").
+2. Busca (`fetch`) os 5 arquivos de `treinos-exemplo/` (iniciante,
+   intermediário, avançado, casa com halteres/banco, peso corporal —
+   planos genéricos, ver seção 1), sobrescreve `dados.metadata.aluno` pro
+   nome desse aluno (mesmo ajuste feito em qualquer importação, seção
+   3.1) e importa cada um (`TreinosStorage.importarPlano(dados, alunoId)`).
+3. Rotula cada plano importado com `TreinosStorage.atualizarMetadataPlano(id, {..., nome: "Iniciante"|"Intermediário"|"Avançado"|"Casa (halteres e banco)"|"Peso corporal (sem equipamento)"})`
+   — necessário porque os 5 arquivos têm `planejamento.inicio`/`fim`
+   nulos, então sem esse rótulo os cards em `planos.html` cairiam no
+   mesmo título ("Plano criado em ...").
 
 Se `fetch` falhar (sem conexão na primeira visita, antes do service
 worker cachear `treinos-exemplo/*.json`), o nível problemático é só

@@ -150,6 +150,23 @@ class TreinoAlongamentoController {
     });
   }
 
+  // Mirror de historicoSerieMusculacao — um registro por série concluída
+  // (não só por alongamento inteiro), pra alimentar
+  // treino_alongamento_progresso.html com gráfico/tabela por item, mesmo
+  // padrão de estatística da musculação (ver seção 7 de
+  // docs/treino-alongamento-especificacao.md).
+  #registrarSerieConcluida(item, alongamento, duracaoSegundos) {
+    TreinosStorage.adicionarAoHistorico(TreinosStorage.chaves.historicoSerieAlongamento, {
+      treinoId: this.#treinoAlongamento.id,
+      treinoNome: this.#treinoAlongamento.nome,
+      alongamentoId: item.alongamentoId,
+      alongamentoNome: alongamento ? alongamento.nome : item.alongamentoId,
+      serie: this.#progresso.serieAtual,
+      duracaoSegundos,
+      dataHora: new Date().toISOString()
+    });
+  }
+
   #atualizarImagemAlongamento(alongamentoId, nome) {
     this.#imagemToken += 1;
     const token = this.#imagemToken;
@@ -300,6 +317,8 @@ class TreinoAlongamentoController {
     this.#cronometroSerie.pausar();
     this.#adicionarTempoAlongamento(duracaoSerieSegundos);
 
+    this.#registrarSerieConcluida(item, alongamento, serieFoiIniciada ? duracaoSerieSegundos : null);
+
     if (this.#progresso.serieAtual < item.prescricao.series) {
       this.#progresso.serieAtual += 1;
       this.#salvarProgresso();
@@ -348,19 +367,40 @@ class TreinoAlongamentoController {
     this.#tituloEl.textContent = "Execução do Alongamento";
   }
 
+  // Mirror de #aplicarSaltoParaExercicio em treino-execucao.js — permite
+  // entrar direto num alongamento específico a partir do clique num card
+  // de treino_alongamento_exercicios.html.
+  #aplicarSaltoParaAlongamento(params) {
+    if (!params.has("alongamento")) return;
+
+    const alongamentoAlvo = params.get("alongamento");
+    const slot = this.#slots.find((s) => s.alongamentoId === alongamentoAlvo);
+    if (!slot) return;
+
+    this.#progresso.alongamentoId = slot.alongamentoId;
+    this.#progresso.serieAtual = 1;
+    this.#progresso.tempoAcumuladoSegundos = 0;
+    this.#salvarProgresso();
+
+    const url =
+      `treino_alongamento.html?treino=${encodeURIComponent(this.#treinoAlongamento.id)}` +
+      (this.#origemTreinoId ? `&origem=${encodeURIComponent(this.#origemTreinoId)}` : "");
+    window.history.replaceState({}, "", url);
+  }
+
   async #carregar() {
     const params = new URLSearchParams(window.location.search);
     const treinoAlongamentoId = params.get("treino");
     this.#origemTreinoId = params.get("origem");
 
-    this.#voltarIconEl.href = this.#origemTreinoId
-      ? `treino_exercicios.html?treino=${encodeURIComponent(this.#origemTreinoId)}`
-      : "treino_alongamento_menu.html";
-
     if (!treinoAlongamentoId) {
       this.#mostrarErro("Nenhum treino selecionado.");
       return;
     }
+
+    this.#voltarIconEl.href =
+      `treino_alongamento_exercicios.html?treino=${encodeURIComponent(treinoAlongamentoId)}` +
+      (this.#origemTreinoId ? `&origem=${encodeURIComponent(this.#origemTreinoId)}` : "");
 
     let dados;
     try {
@@ -393,6 +433,7 @@ class TreinoAlongamentoController {
 
     prefetchImagensDoTreino(this.#slots.map((slot) => slot.alongamentoId), "alongamento");
     this.#carregarOuIniciarProgresso();
+    this.#aplicarSaltoParaAlongamento(params);
 
     document.title = `${this.#treinoAlongamento.nome} — Execução`;
     this.#tituloEl.textContent = this.#treinoAlongamento.nome;

@@ -27,7 +27,7 @@ class TreinoAlongamentoMenuController {
   #cartaoTreino(treinoAlongamento) {
     const a = document.createElement("a");
     a.className = "treino";
-    a.href = `treino_alongamento.html?treino=${encodeURIComponent(treinoAlongamento.id)}`;
+    a.href = `treino_alongamento_exercicios.html?treino=${encodeURIComponent(treinoAlongamento.id)}`;
 
     const quantidade = treinoAlongamento.alongamentos.length;
     const campos = [

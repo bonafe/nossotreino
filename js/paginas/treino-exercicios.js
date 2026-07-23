@@ -339,7 +339,7 @@ class TreinoExerciciosController {
         <div class="campos">
           <div class="campo"><strong>Alongamentos</strong><span>${quantidade}</span></div>
         </div>
-        <a class="iniciar" href="treino_alongamento.html?treino=${encodeURIComponent(treinoAlongamento.id)}&origem=${encodeURIComponent(treinoId)}" style="margin-top: 14px;">Fazer alongamento →</a>
+        <a class="iniciar" href="treino_alongamento_exercicios.html?treino=${encodeURIComponent(treinoAlongamento.id)}&origem=${encodeURIComponent(treinoId)}" style="margin-top: 14px;">Fazer alongamento →</a>
       `;
       listaEl.appendChild(divEl);
     });

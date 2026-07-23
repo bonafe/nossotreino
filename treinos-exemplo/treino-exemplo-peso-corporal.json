@@ -1,0 +1,1357 @@
+{
+  "schema": "plano-de-treino",
+  "schemaVersion": "1.3",
+  "biblioteca": {
+    "arquivo": "biblioteca-exercicios.json"
+  },
+  "origem": {
+    "arquivo": null,
+    "tipo": "treino-exemplo",
+    "dataConversao": "2026-07-22",
+    "paginasComPrescricoes": []
+  },
+  "metadata": {
+    "professor": null,
+    "consultoria": "Nosso Treino",
+    "aluno": "Exemplo — apenas peso corporal",
+    "planejamento": {
+      "inicio": null,
+      "fim": null
+    },
+    "objetivos": [
+      "saude",
+      "condicionamento-fisico",
+      "forca-geral"
+    ],
+    "nivel": "iniciante",
+    "carater": "exemplo-generico-nao-individualizado",
+    "equipamentos": {
+      "ambiente": "casa-ou-ar-livre",
+      "obrigatorios": [],
+      "opcionais": [
+        "colchonete"
+      ],
+      "observacao": "Nenhum exercício, alongamento ou cardio exige equipamento."
+    }
+  },
+  "distribuicaoSemanal": [
+    {
+      "dia": "segunda-feira",
+      "treinoId": "peso-corporal-a"
+    },
+    {
+      "dia": "terca-feira",
+      "treinoId": null
+    },
+    {
+      "dia": "quarta-feira",
+      "treinoId": "peso-corporal-b"
+    },
+    {
+      "dia": "quinta-feira",
+      "treinoId": null
+    },
+    {
+      "dia": "sexta-feira",
+      "treinoId": "peso-corporal-c"
+    },
+    {
+      "dia": "sabado",
+      "treinoId": null
+    },
+    {
+      "dia": "domingo",
+      "treinoId": null
+    }
+  ],
+  "regraContinuidade": "Se não for possível treinar no dia programado, continuar pela próxima sessão da sequência, sem compensar com duas sessões no mesmo dia.",
+  "orientacoesGerais": {
+    "ajusteCarga": {
+      "regra": "Começar com carga ou variação confortável. Aumentar somente quando todas as séries atingirem o máximo da faixa com técnica estável e sem dor.",
+      "aplicacao": "exercicios-com-faixa-de-repeticoes"
+    },
+    "cadenciaPadrao": {
+      "modo": "qualitativo",
+      "concentrica": "controlada-com-intencao",
+      "excentrica": "controlada"
+    },
+    "descansoPadrao": {
+      "modo": "prescrito-ou-autosselecionado",
+      "minSegundos": 60,
+      "maxSegundos": 120
+    },
+    "superset": {
+      "regra": "Quando houver marcadores 1 e 2, combinar os exercícios pela ordem relativa.",
+      "modelagem": "Exercícios sem marcador são executados individualmente."
+    },
+    "isometria": {
+      "duracaoSegundos": 15,
+      "momento": "final-da-serie",
+      "posicao": "maior-contracao",
+      "aplicacao": {
+        "ultimasSeries": 1
+      }
+    },
+    "circuito": {
+      "regra": "Executar uma passagem por todos os exercícios do circuito antes do descanso entre voltas."
+    },
+    "alongamentoPosTreino": {
+      "regra": "Após o cardio ou a musculação, sustentar tensão confortável, sem buscar dor.",
+      "ordem": "apos-cardio-ou-musculacao"
+    }
+  },
+  "treinos": [
+    {
+      "id": "peso-corporal-a",
+      "nome": "Peso corporal A — fundamentos",
+      "tipo": "musculacao",
+      "aquecimento": {
+        "protocolos": [
+          {
+            "tipo": "mobilidade-alongamento",
+            "series": 1,
+            "dosagem": {
+              "valor": 8,
+              "unidade": "repeticoes-controladas"
+            },
+            "videoUrl": null,
+            "observacao": "Usar mobilidade dinâmica nas articulações envolvidas. Os alongamentos estáticos ficam para o fim da sessão."
+          },
+          {
+            "tipo": "serie-preparatoria-do-exercicio",
+            "alvo": "primeiro-exercicio-do-treino",
+            "series": 1,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "fixo",
+              "valor": 12
+            },
+            "observacao": "Executar a primeira série em ritmo leve, usando apenas o peso do corpo."
+          }
+        ]
+      },
+      "exercicios": [
+        {
+          "exercicioId": "agachamento-dividido",
+          "ordem": 10,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 8,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 75,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "afundo-lateral",
+              "prioridade": 1,
+              "motivo": "alternativa-sem-equipamento-com-menor-demanda-de-equilibrio",
+              "prescricao": {
+                "series": 3,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 8,
+                  "max": 12
+                },
+                "carga": null,
+                "descansoSegundos": 75,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "flexao-de-bracos",
+          "ordem": 20,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 6,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 90,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": "Usar amplitude confortável. Caso ainda não consiga a faixa mínima, reduzir a amplitude mantendo o corpo alinhado.",
+          "superset": null
+        },
+        {
+          "exercicioId": "superman",
+          "ordem": 30,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 10,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 60,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "bird-dog",
+              "prioridade": 1,
+              "motivo": "alternativa-sem-equipamento-com-maior-estabilidade",
+              "prescricao": {
+                "series": 3,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 8,
+                  "max": 12
+                },
+                "carga": null,
+                "descansoSegundos": 60,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "abducao-de-quadril-no-solo",
+          "ordem": 40,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 12,
+              "max": 20
+            },
+            "carga": null,
+            "descansoSegundos": 60,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "prancha-alta",
+          "ordem": 50,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "faixa",
+              "min": 20,
+              "max": 40,
+              "unidade": "segundos"
+            },
+            "carga": null,
+            "descansoSegundos": 60,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "reverse-bird-dog",
+              "prioridade": 1,
+              "motivo": "alternativa-sem-equipamento-de-menor-demanda-isometrica",
+              "prescricao": {
+                "series": 3,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 8,
+                  "max": 12
+                },
+                "carga": null,
+                "descansoSegundos": 60,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "panturrilha-unilateral-em-pe",
+          "ordem": 60,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 12,
+              "max": 20
+            },
+            "carga": null,
+            "descansoSegundos": 60,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        }
+      ],
+      "cardio": [
+        {
+          "treinoCardioId": "peso-corporal-a-cardio",
+          "momento": "apos-musculacao"
+        }
+      ],
+      "status": "ativo",
+      "versao": 2,
+      "alongamento": [
+        {
+          "treinoAlongamentoId": "peso-corporal-a-alongamento",
+          "momento": "apos-cardio-ou-musculacao"
+        }
+      ]
+    },
+    {
+      "id": "peso-corporal-b",
+      "nome": "Peso corporal B — unilateral e core",
+      "tipo": "musculacao",
+      "aquecimento": {
+        "protocolos": [
+          {
+            "tipo": "mobilidade-alongamento",
+            "series": 1,
+            "dosagem": {
+              "valor": 8,
+              "unidade": "repeticoes-controladas"
+            },
+            "videoUrl": null,
+            "observacao": "Usar mobilidade dinâmica nas articulações envolvidas. Os alongamentos estáticos ficam para o fim da sessão."
+          },
+          {
+            "tipo": "serie-preparatoria-do-exercicio",
+            "alvo": "primeiro-exercicio-do-treino",
+            "series": 1,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "fixo",
+              "valor": 12
+            },
+            "observacao": "Executar a primeira série em ritmo leve, usando apenas o peso do corpo."
+          }
+        ]
+      },
+      "exercicios": [
+        {
+          "exercicioId": "afundo-lateral",
+          "ordem": 10,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 8,
+              "max": 12
+            },
+            "carga": null,
+            "descansoSegundos": 75,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "agachamento-dividido",
+              "prioridade": 1,
+              "motivo": "alternativa-sem-equipamento",
+              "prescricao": {
+                "series": 3,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 8,
+                  "max": 15
+                },
+                "carga": null,
+                "descansoSegundos": 75,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "flexao-diamante",
+          "ordem": 20,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 5,
+              "max": 12
+            },
+            "carga": null,
+            "descansoSegundos": 90,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "flexao-de-bracos",
+              "prioridade": 1,
+              "motivo": "regressao-sem-equipamento",
+              "prescricao": {
+                "series": 3,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 6,
+                  "max": 15
+                },
+                "carga": null,
+                "descansoSegundos": 90,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "flexao-nordica-reversa",
+          "ordem": 30,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 6,
+              "max": 12
+            },
+            "carga": null,
+            "descansoSegundos": 75,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": "Usar amplitude curta no início e evitar dor nos joelhos.",
+          "superset": null
+        },
+        {
+          "exercicioId": "bird-dog",
+          "ordem": 40,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 8,
+              "max": 12
+            },
+            "carga": null,
+            "descansoSegundos": 60,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "reverse-bird-dog",
+              "prioridade": 1,
+              "motivo": "alternativa-sem-equipamento-em-decubito-dorsal",
+              "prescricao": {
+                "series": 3,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 8,
+                  "max": 12
+                },
+                "carga": null,
+                "descansoSegundos": 60,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "prancha-lateral",
+          "ordem": 50,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "faixa",
+              "min": 15,
+              "max": 35,
+              "unidade": "segundos"
+            },
+            "carga": null,
+            "descansoSegundos": 60,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "prancha-isometrica",
+              "prioridade": 1,
+              "motivo": "alternativa-bilateral-sem-equipamento",
+              "prescricao": {
+                "series": 3,
+                "metrica": {
+                  "tipo": "tempo",
+                  "modo": "faixa",
+                  "min": 20,
+                  "max": 40,
+                  "unidade": "segundos"
+                },
+                "carga": null,
+                "descansoSegundos": 60,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "crab-walk",
+          "ordem": 60,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 8,
+              "max": 16
+            },
+            "carga": null,
+            "descansoSegundos": 60,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": "Contar cada deslocamento de mão como uma repetição.",
+          "superset": null
+        }
+      ],
+      "cardio": [
+        {
+          "treinoCardioId": "peso-corporal-b-cardio",
+          "momento": "apos-musculacao"
+        }
+      ],
+      "status": "ativo",
+      "versao": 2,
+      "alongamento": [
+        {
+          "treinoAlongamentoId": "peso-corporal-b-alongamento",
+          "momento": "apos-cardio-ou-musculacao"
+        }
+      ]
+    },
+    {
+      "id": "peso-corporal-c",
+      "nome": "Peso corporal C — condicionamento e controle",
+      "tipo": "musculacao",
+      "aquecimento": {
+        "protocolos": [
+          {
+            "tipo": "mobilidade-alongamento",
+            "series": 1,
+            "dosagem": {
+              "valor": 8,
+              "unidade": "repeticoes-controladas"
+            },
+            "videoUrl": null,
+            "observacao": "Usar mobilidade dinâmica nas articulações envolvidas. Os alongamentos estáticos ficam para o fim da sessão."
+          },
+          {
+            "tipo": "serie-preparatoria-do-exercicio",
+            "alvo": "primeiro-exercicio-do-treino",
+            "series": 1,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "fixo",
+              "valor": 12
+            },
+            "observacao": "Executar a primeira série em ritmo leve, usando apenas o peso do corpo."
+          }
+        ]
+      },
+      "exercicios": [
+        {
+          "exercicioId": "avanco-retrocesso",
+          "ordem": 10,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 8,
+              "max": 14
+            },
+            "carga": null,
+            "descansoSegundos": 75,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "agachamento-dividido",
+              "prioridade": 1,
+              "motivo": "alternativa-sem-deslocamento",
+              "prescricao": {
+                "series": 3,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 8,
+                  "max": 15
+                },
+                "carga": null,
+                "descansoSegundos": 75,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "flexao-de-bracos",
+          "ordem": 20,
+          "prescricao": {
+            "series": 4,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 6,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 90,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "inchworm",
+          "ordem": 30,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 5,
+              "max": 10
+            },
+            "carga": null,
+            "descansoSegundos": 75,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "prancha-alta",
+              "prioridade": 1,
+              "motivo": "alternativa-sem-deslocamento",
+              "prescricao": {
+                "series": 3,
+                "metrica": {
+                  "tipo": "tempo",
+                  "modo": "faixa",
+                  "min": 20,
+                  "max": 40,
+                  "unidade": "segundos"
+                },
+                "carga": null,
+                "descansoSegundos": 60,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "bear-crawl",
+          "ordem": 40,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 8,
+              "max": 16
+            },
+            "carga": null,
+            "descansoSegundos": 75,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [
+            {
+              "exercicioId": "bird-dog",
+              "prioridade": 1,
+              "motivo": "regressao-sem-equipamento",
+              "prescricao": {
+                "series": 3,
+                "metrica": {
+                  "tipo": "repeticoes",
+                  "modo": "faixa",
+                  "min": 8,
+                  "max": 12
+                },
+                "carga": null,
+                "descansoSegundos": 60,
+                "cadencia": null,
+                "tecnicas": [
+                  {
+                    "tipo": "tradicional"
+                  }
+                ],
+                "intensidade": null
+              },
+              "observacao": null
+            }
+          ],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "abducao-de-quadril-no-solo",
+          "ordem": 50,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 12,
+              "max": 20
+            },
+            "carga": null,
+            "descansoSegundos": 60,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "reverse-bird-dog",
+          "ordem": 60,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 8,
+              "max": 14
+            },
+            "carga": null,
+            "descansoSegundos": 60,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        }
+      ],
+      "cardio": [
+        {
+          "treinoCardioId": "peso-corporal-c-cardio",
+          "momento": "apos-musculacao"
+        }
+      ],
+      "status": "ativo",
+      "versao": 2,
+      "alongamento": [
+        {
+          "treinoAlongamentoId": "peso-corporal-c-alongamento",
+          "momento": "apos-cardio-ou-musculacao"
+        }
+      ]
+    }
+  ],
+  "treinosCardio": [
+    {
+      "id": "peso-corporal-a-cardio",
+      "nome": "Intervalado leve — Peso corporal A",
+      "modalidadeId": "bicicleta-ergometrica",
+      "treino": {
+        "tipo": "intervalado",
+        "series": 8,
+        "estimulo": {
+          "duracaoSegundos": 20,
+          "intensidade": {
+            "modo": "percepcao-livre",
+            "valor": "maxima"
+          }
+        },
+        "recuperacao": {
+          "duracaoSegundos": 40,
+          "intensidade": {
+            "modo": "percepcao-livre",
+            "valor": "leve"
+          }
+        }
+      },
+      "observacao": "Pode ser feito em qualquer bicicleta ergométrica disponível — não é preciso ter equipamento em casa.",
+      "status": "ativo",
+      "versao": 1
+    },
+    {
+      "id": "peso-corporal-b-cardio",
+      "nome": "Intervalado — Peso corporal B",
+      "modalidadeId": "bicicleta-ergometrica",
+      "treino": {
+        "tipo": "intervalado",
+        "series": 10,
+        "estimulo": {
+          "duracaoSegundos": 25,
+          "intensidade": {
+            "modo": "percepcao-livre",
+            "valor": "maxima"
+          }
+        },
+        "recuperacao": {
+          "duracaoSegundos": 35,
+          "intensidade": {
+            "modo": "percepcao-livre",
+            "valor": "leve"
+          }
+        }
+      },
+      "observacao": "Pode ser feito em qualquer bicicleta ergométrica disponível — não é preciso ter equipamento em casa.",
+      "status": "ativo",
+      "versao": 1
+    },
+    {
+      "id": "peso-corporal-c-cardio",
+      "nome": "Intervalado progressivo — Peso corporal C",
+      "modalidadeId": "bicicleta-ergometrica",
+      "treino": {
+        "tipo": "intervalado",
+        "series": 10,
+        "estimulo": {
+          "duracaoSegundos": 20,
+          "intensidade": {
+            "modo": "percepcao-livre",
+            "valor": "maxima"
+          }
+        },
+        "recuperacao": {
+          "duracaoSegundos": 40,
+          "intensidade": {
+            "modo": "percepcao-livre",
+            "valor": "leve"
+          }
+        }
+      },
+      "observacao": "Pode ser feito em qualquer bicicleta ergométrica disponível — não é preciso ter equipamento em casa.",
+      "status": "ativo",
+      "versao": 1
+    }
+  ],
+  "treinosAlongamento": [
+    {
+      "id": "peso-corporal-a-alongamento",
+      "nome": "Alongamento — Peso corporal A — fundamentos",
+      "momento": "apos-cardio-ou-musculacao",
+      "nivel": "iniciante",
+      "observacao": "Sequência definida conforme os principais grupos musculares trabalhados na sessão.",
+      "status": "ativo",
+      "versao": 1,
+      "alongamentos": [
+        {
+          "alongamentoId": "piriforme-em-figura-quatro-deitado",
+          "ordem": 10,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 20,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "gluteo-maximo-joelho-ao-ombro-oposto",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "quadriceps-deitado-de-lado",
+          "ordem": 20,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 20,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "reto-femoral-meio-ajoelhado-com-pe-seguro",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "ombros-em-extensao-com-maos-entrelacadas",
+          "ordem": 30,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 20,
+              "unidade": "segundos"
+            },
+            "porLado": false,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "manguito-posterior-em-decubito-lateral",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            },
+            {
+              "alongamentoId": "deltoide-posterior-com-braco-cruzado",
+              "prioridade": 2,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "postura-da-crianca",
+          "ordem": 40,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 20,
+              "unidade": "segundos"
+            },
+            "porLado": false,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "postura-da-crianca-lateral",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            },
+            {
+              "alongamentoId": "livro-aberto",
+              "prioridade": 2,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        }
+      ]
+    },
+    {
+      "id": "peso-corporal-b-alongamento",
+      "nome": "Alongamento — Peso corporal B — unilateral e core",
+      "momento": "apos-cardio-ou-musculacao",
+      "nivel": "iniciante",
+      "observacao": "Sequência definida conforme os principais grupos musculares trabalhados na sessão.",
+      "status": "ativo",
+      "versao": 1,
+      "alongamentos": [
+        {
+          "alongamentoId": "esfinge",
+          "ordem": 10,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 20,
+              "unidade": "segundos"
+            },
+            "porLado": false,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "cobra-com-bracos-parcialmente-estendidos",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            },
+            {
+              "alongamentoId": "gato-vaca",
+              "prioridade": 2,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "quadriceps-deitado-de-lado",
+          "ordem": 20,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 20,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "reto-femoral-meio-ajoelhado-com-pe-seguro",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "piriforme-em-figura-quatro-deitado",
+          "ordem": 30,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 20,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "gluteo-maximo-joelho-ao-ombro-oposto",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "triceps-acima-da-cabeca",
+          "ordem": 40,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 20,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        }
+      ]
+    },
+    {
+      "id": "peso-corporal-c-alongamento",
+      "nome": "Alongamento — Peso corporal C — condicionamento e controle",
+      "momento": "apos-cardio-ou-musculacao",
+      "nivel": "iniciante",
+      "observacao": "Sequência definida conforme os principais grupos musculares trabalhados na sessão.",
+      "status": "ativo",
+      "versao": 1,
+      "alongamentos": [
+        {
+          "alongamentoId": "esfinge",
+          "ordem": 10,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 20,
+              "unidade": "segundos"
+            },
+            "porLado": false,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "cobra-com-bracos-parcialmente-estendidos",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            },
+            {
+              "alongamentoId": "gato-vaca",
+              "prioridade": 2,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "deltoide-posterior-com-braco-cruzado",
+          "ordem": 20,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 20,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "ombros-em-extensao-com-maos-entrelacadas",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            },
+            {
+              "alongamentoId": "manguito-posterior-em-decubito-lateral",
+              "prioridade": 2,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "piriforme-em-figura-quatro-deitado",
+          "ordem": 30,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 20,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "gluteo-maximo-joelho-ao-ombro-oposto",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "quadriceps-deitado-de-lado",
+          "ordem": 40,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 20,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "reto-femoral-meio-ajoelhado-com-pe-seguro",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        }
+      ]
+    }
+  ]
+}

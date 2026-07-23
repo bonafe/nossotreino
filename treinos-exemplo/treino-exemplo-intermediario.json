@@ -24,7 +24,12 @@
       "condicionamento-fisico"
     ],
     "nivel": "intermediario",
-    "carater": "exemplo-generico-nao-individualizado"
+    "carater": "exemplo-generico-nao-individualizado",
+    "equipamentos": {
+      "ambiente": "academia",
+      "obrigatorios": [],
+      "observacao": "Plano com máquinas e pesos livres; consultar as alternativas de cada exercício."
+    }
   },
   "distribuicaoSemanal": [
     {
@@ -295,10 +300,20 @@
           "superset": null
         }
       ],
-      "cardio": [],
+      "cardio": [
+        {
+          "treinoCardioId": "intermediario-superior-a-cardio",
+          "momento": "apos-musculacao"
+        }
+      ],
       "status": "ativo",
       "versao": 1,
-      "alongamento": []
+      "alongamento": [
+        {
+          "treinoAlongamentoId": "intermediario-superior-a-alongamento",
+          "momento": "apos-cardio-ou-musculacao"
+        }
+      ]
     },
     {
       "id": "intermediario-inferior-a",
@@ -481,10 +496,20 @@
           "superset": null
         }
       ],
-      "cardio": [],
+      "cardio": [
+        {
+          "treinoCardioId": "intermediario-inferior-a-cardio",
+          "momento": "apos-musculacao"
+        }
+      ],
       "status": "ativo",
       "versao": 1,
-      "alongamento": []
+      "alongamento": [
+        {
+          "treinoAlongamentoId": "intermediario-inferior-a-alongamento",
+          "momento": "apos-cardio-ou-musculacao"
+        }
+      ]
     },
     {
       "id": "intermediario-superior-b",
@@ -691,10 +716,20 @@
           "superset": null
         }
       ],
-      "cardio": [],
+      "cardio": [
+        {
+          "treinoCardioId": "intermediario-superior-b-cardio",
+          "momento": "apos-musculacao"
+        }
+      ],
       "status": "ativo",
       "versao": 1,
-      "alongamento": []
+      "alongamento": [
+        {
+          "treinoAlongamentoId": "intermediario-superior-b-alongamento",
+          "momento": "apos-cardio-ou-musculacao"
+        }
+      ]
     },
     {
       "id": "intermediario-inferior-b",
@@ -877,12 +912,628 @@
           "superset": null
         }
       ],
-      "cardio": [],
+      "cardio": [
+        {
+          "treinoCardioId": "intermediario-inferior-b-cardio",
+          "momento": "apos-musculacao"
+        }
+      ],
       "status": "ativo",
       "versao": 1,
-      "alongamento": []
+      "alongamento": [
+        {
+          "treinoAlongamentoId": "intermediario-inferior-b-alongamento",
+          "momento": "apos-cardio-ou-musculacao"
+        }
+      ]
     }
   ],
-  "treinosCardio": [],
-  "treinosAlongamento": []
+  "treinosCardio": [
+    {
+      "id": "intermediario-superior-a-cardio",
+      "nome": "Intervalado — Superior A",
+      "modalidadeId": "bicicleta-ergometrica",
+      "treino": {
+        "tipo": "intervalado",
+        "series": 12,
+        "estimulo": {
+          "duracaoSegundos": 30,
+          "intensidade": {
+            "modo": "percepcao-livre",
+            "valor": "maxima"
+          }
+        },
+        "recuperacao": {
+          "duracaoSegundos": 30,
+          "intensidade": {
+            "modo": "percepcao-livre",
+            "valor": "leve"
+          }
+        }
+      },
+      "observacao": null,
+      "status": "ativo",
+      "versao": 1
+    },
+    {
+      "id": "intermediario-inferior-a-cardio",
+      "nome": "Recuperação aeróbica — Inferior A",
+      "modalidadeId": "bicicleta-ergometrica",
+      "treino": {
+        "tipo": "intervalado",
+        "series": 10,
+        "estimulo": {
+          "duracaoSegundos": 20,
+          "intensidade": {
+            "modo": "percepcao-livre",
+            "valor": "maxima"
+          }
+        },
+        "recuperacao": {
+          "duracaoSegundos": 40,
+          "intensidade": {
+            "modo": "percepcao-livre",
+            "valor": "leve"
+          }
+        }
+      },
+      "observacao": "Volta mais leve, pensada pra depois de um treino de membros inferiores.",
+      "status": "ativo",
+      "versao": 1
+    },
+    {
+      "id": "intermediario-superior-b-cardio",
+      "nome": "Intervalado — Superior B",
+      "modalidadeId": "bicicleta-ergometrica",
+      "treino": {
+        "tipo": "intervalado",
+        "series": 14,
+        "estimulo": {
+          "duracaoSegundos": 30,
+          "intensidade": {
+            "modo": "percepcao-livre",
+            "valor": "maxima"
+          }
+        },
+        "recuperacao": {
+          "duracaoSegundos": 30,
+          "intensidade": {
+            "modo": "percepcao-livre",
+            "valor": "leve"
+          }
+        }
+      },
+      "observacao": null,
+      "status": "ativo",
+      "versao": 1
+    },
+    {
+      "id": "intermediario-inferior-b-cardio",
+      "nome": "Intervalado controlado — Inferior B",
+      "modalidadeId": "bicicleta-ergometrica",
+      "treino": {
+        "tipo": "intervalado",
+        "series": 12,
+        "estimulo": {
+          "duracaoSegundos": 25,
+          "intensidade": {
+            "modo": "percepcao-livre",
+            "valor": "maxima"
+          }
+        },
+        "recuperacao": {
+          "duracaoSegundos": 35,
+          "intensidade": {
+            "modo": "percepcao-livre",
+            "valor": "leve"
+          }
+        }
+      },
+      "observacao": null,
+      "status": "ativo",
+      "versao": 1
+    }
+  ],
+  "treinosAlongamento": [
+    {
+      "id": "intermediario-superior-a-alongamento",
+      "nome": "Alongamento — Superior A — força e base",
+      "momento": "apos-cardio-ou-musculacao",
+      "nivel": "intermediario",
+      "observacao": "Sequência definida conforme os principais grupos musculares trabalhados na sessão.",
+      "status": "ativo",
+      "versao": 1,
+      "alongamentos": [
+        {
+          "alongamentoId": "deltoide-posterior-com-braco-cruzado",
+          "ordem": 10,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "manguito-posterior-em-decubito-lateral",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "romboides-com-maos-entrelacadas",
+          "ordem": 20,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": false,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "abraco-escapular",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "triceps-acima-da-cabeca",
+          "ordem": 30,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "supinadores-do-antebraco",
+          "ordem": 40,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "pronadores-do-antebraco",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            },
+            {
+              "alongamentoId": "punhos-em-oracao",
+              "prioridade": 2,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "ombros-em-extensao-com-maos-entrelacadas",
+          "ordem": 50,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": false,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "manguito-posterior-em-decubito-lateral",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        }
+      ]
+    },
+    {
+      "id": "intermediario-inferior-a-alongamento",
+      "nome": "Alongamento — Inferior A — agachamento",
+      "momento": "apos-cardio-ou-musculacao",
+      "nivel": "intermediario",
+      "observacao": "Sequência definida conforme os principais grupos musculares trabalhados na sessão.",
+      "status": "ativo",
+      "versao": 1,
+      "alongamentos": [
+        {
+          "alongamentoId": "piriforme-em-figura-quatro-deitado",
+          "ordem": 10,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "gluteo-maximo-joelho-ao-ombro-oposto",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "posteriores-de-coxa-sentado-unilateral",
+          "ordem": 20,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "quadriceps-deitado-de-lado",
+          "ordem": 30,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "reto-femoral-meio-ajoelhado-com-pe-seguro",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "posteriores-de-coxa-em-pe-bilateral",
+          "ordem": 40,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": false,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "posterior-de-coxa-com-joelho-levemente-flexionado",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "esfinge",
+          "ordem": 50,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": false,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "cobra-com-bracos-parcialmente-estendidos",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            },
+            {
+              "alongamentoId": "gato-vaca",
+              "prioridade": 2,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        }
+      ]
+    },
+    {
+      "id": "intermediario-superior-b-alongamento",
+      "nome": "Alongamento — Superior B — hipertrofia",
+      "momento": "apos-cardio-ou-musculacao",
+      "nivel": "intermediario",
+      "observacao": "Sequência definida conforme os principais grupos musculares trabalhados na sessão.",
+      "status": "ativo",
+      "versao": 1,
+      "alongamentos": [
+        {
+          "alongamentoId": "triceps-acima-da-cabeca",
+          "ordem": 10,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "deltoide-posterior-com-braco-cruzado",
+          "ordem": 20,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "manguito-posterior-em-decubito-lateral",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "romboides-com-maos-entrelacadas",
+          "ordem": 30,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": false,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "abraco-escapular",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "ombros-em-extensao-com-maos-entrelacadas",
+          "ordem": 40,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": false,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "manguito-posterior-em-decubito-lateral",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "supinadores-do-antebraco",
+          "ordem": 50,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "pronadores-do-antebraco",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            },
+            {
+              "alongamentoId": "punhos-em-oracao",
+              "prioridade": 2,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        }
+      ]
+    },
+    {
+      "id": "intermediario-inferior-b-alongamento",
+      "nome": "Alongamento — Inferior B — quadril e unilateral",
+      "momento": "apos-cardio-ou-musculacao",
+      "nivel": "intermediario",
+      "observacao": "Sequência definida conforme os principais grupos musculares trabalhados na sessão.",
+      "status": "ativo",
+      "versao": 1,
+      "alongamentos": [
+        {
+          "alongamentoId": "quadriceps-deitado-de-lado",
+          "ordem": 10,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "reto-femoral-meio-ajoelhado-com-pe-seguro",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "piriforme-em-figura-quatro-deitado",
+          "ordem": 20,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "gluteo-maximo-joelho-ao-ombro-oposto",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "posteriores-de-coxa-sentado-unilateral",
+          "ordem": 30,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": true,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "posteriores-de-coxa-em-pe-bilateral",
+          "ordem": 40,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": false,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "posterior-de-coxa-com-joelho-levemente-flexionado",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        },
+        {
+          "alongamentoId": "esfinge",
+          "ordem": 50,
+          "prescricao": {
+            "series": 1,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "fixo",
+              "valor": 30,
+              "unidade": "segundos"
+            },
+            "porLado": false,
+            "intensidade": "tensao-confortavel-sem-dor"
+          },
+          "alternativas": [
+            {
+              "alongamentoId": "cobra-com-bracos-parcialmente-estendidos",
+              "prioridade": 1,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            },
+            {
+              "alongamentoId": "gato-vaca",
+              "prioridade": 2,
+              "motivo": "mesma-regiao-ou-musculatura-alvo-com-posicao-ou-metodo-diferente"
+            }
+          ],
+          "observacao": "Respirar continuamente; não usar rebotes e interromper se houver dor."
+        }
+      ]
+    }
+  ]
 }

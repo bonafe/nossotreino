@@ -63,16 +63,19 @@ de musculação como complemento (seção 4.2).
 ```
 sistema.html
    └─> treino_alongamento_menu.html   (lista treinosAlongamento[])
-          ├─> treino_alongamento_novo.html                          (criar treino novo, seção 6)
-          └─> treino_alongamento.html?treino=<id>[&origem=<treinoMusculacaoId>]   (motor genérico, seção 5)
+          ├─> treino_alongamento_novo.html                          (criar treino novo, seção 4.1)
+          └─> treino_alongamento_exercicios.html?treino=<id>[&origem=<treinoMusculacaoId>]   (lista os alongamentos do treino, seção 6)
+                 └─> treino_alongamento.html?treino=<id>[&alongamento=<alongamentoId>][&origem=<treinoMusculacaoId>]   (motor genérico, seção 5)
+                        └─> treino_alongamento_progresso.html?alongamento=<id>&treino=<treinoAlongamentoId>   (progresso do alongamento, seção 6.2)
 ```
 
 Fluxo independente do de exercícios/bicicleta — dá pra fazer uma sessão de
-alongamento avulsa sem passar por um treino de musculação. O card
-"Alongamento complementar" de `treino_exercicios.html` também linka pra cá
-(seção 6.2 de
-[treino-exercicios-especificacao.md](./treino-exercicios-especificacao.md)),
-usando `treino=<treinoAlongamentoId>&origem=<treinoMusculacaoId>`.
+alongamento avulsa sem passar por um treino de musculação. Mirror direto do
+fluxo de musculação (lista → execução → progresso, seção 6.2 de
+[treino-exercicios-especificacao.md](./treino-exercicios-especificacao.md)):
+o card "Alongamento complementar" de `treino_exercicios.html` linka pra
+`treino_alongamento_exercicios.html`, usando
+`treino=<treinoAlongamentoId>&origem=<treinoMusculacaoId>`.
 
 ### 4. Menu (`treino_alongamento_menu.html`)
 
@@ -83,8 +86,11 @@ de barras D3 (`historico.sessaoAlongamento.v1`, seção 7, mesmo componente
 cartão por entrada de `dados.treinosAlongamento || []`: nome, `momento`
 (quando referenciado por algum treino de musculação — informativo, não
 bloqueia o uso avulso) e quantidade de alongamentos. Cada cartão linka
-para `treino_alongamento.html?treino=<id>`. Sem nenhuma entrada, mostra
-"Nenhum treino de alongamento cadastrado ainda."
+para `treino_alongamento_exercicios.html?treino=<id>` (a lista de
+alongamentos do treino, seção 6 — mirror de
+`treino_exercicios_menu.html` linkando pra `treino_exercicios.html`, não
+direto pro motor). Sem nenhuma entrada, mostra "Nenhum treino de
+alongamento cadastrado ainda."
 
 ### 4.1 Criar treino de alongamento (`treino_alongamento_novo.html`)
 
@@ -133,8 +139,9 @@ Modelado em `treino_execucao.html`/`treino-execucao.js` (musculação), mas
 sugerido, nem substituto/alternativas (a lista de alongamentos não tem
 essas opções, seção 2):
 
-- Lê `?treino=<treinoAlongamentoId>` (obrigatório) e o opcional
-  `?origem=<treinoMusculacaoId>` (seção 5.3).
+- Lê `?treino=<treinoAlongamentoId>` (obrigatório), o opcional
+  `?origem=<treinoMusculacaoId>` (seção 5.3) e o opcional
+  `?alongamento=<alongamentoId>` (seção 5.4, pular direto pra um item).
 - Monta uma fila sequencial de slots a partir de
   `treinoAlongamento.alongamentos` (ordenado por `ordem`) — um slot por
   alongamento, sem opções alternativas (diferente da musculação, aqui cada
@@ -164,10 +171,17 @@ essas opções, seção 2):
   padrão de 15–30s quando ausente (treino de alongamento não tem
   `orientacoesGerais.descansoPadrao` — não é um treino de musculação).
 - Concluída a última série do último slot, mostra a tela de conclusão
-  (mesmo padrão "🎉 Treino concluído!") e volta ao menu.
+  (mesmo padrão "🎉 Treino concluído!") e volta ao menu — estático, sempre
+  `treino_alongamento_menu.html`, mesmo comportamento (também estático) de
+  `treino_execucao.html` ao concluir.
 - Progresso persistido em `execucao.alongamento.<treinoId>.v1` (seção 7),
   endereçado por `alongamentoId`, pra retomar depois de fechar o
   navegador — mesmo princípio de `execucao.musculacao.<treinoId>.v2`.
+- A cada série concluída, grava tanto em `historico.sessaoAlongamento.v1`
+  (ao terminar o item inteiro) quanto em `historico.serieAlongamento.v1`
+  (uma entrada por série, seção 7) — mirror exato de
+  `historico.serieMusculacao.v1`/`historico.sessaoMusculacao.v1` na
+  musculação.
 - Se faltar `treino=`, a entrada não existir, ou o carregamento falhar,
   mostra mensagem de erro.
 
@@ -185,17 +199,67 @@ seção 8).
 
 ### 5.3 Botão de voltar
 
-Mesmo padrão da bike (seção 5.2.1 de
-[treino-bicicleta-especificacao.md](./treino-bicicleta-especificacao.md)):
+Diferente de antes: sempre volta pra
+`treino_alongamento_exercicios.html?treino=<treinoAlongamentoId>`,
+repassando `?origem=` quando presente — é essa tela (seção 6) que decide
+o próximo passo (voltar pro treino de musculação de origem ou pro menu de
+alongamento). Mirror exato de como `treino_execucao.html` sempre volta
+pra `treino_exercicios.html?treino=<id>` (nunca direto pro
+`treino_exercicios_menu.html`).
 
-- Com `?origem=<treinoMusculacaoId>`: volta para
-  `treino_exercicios.html?treino=<origem>`.
-- Sem `origem`: volta para `treino_alongamento_menu.html`.
+### 5.4 Pular direto para um alongamento (`?alongamento=`)
 
-## 6. (reservado)
+Mirror de `?exercicio=`/`?opcao=` na musculação (seção 8.2.1 de
+[treino-exercicios-especificacao.md](./treino-exercicios-especificacao.md)),
+mas sem par de parâmetros — um slot de alongamento tem sempre uma única
+opção (seção 5.2), então basta `?alongamento=<alongamentoId>`. Se o id
+existir entre os slots, o progresso é resetado pra começar dali (série 1,
+tempo acumulado zerado) e a URL é limpa via `history.replaceState` pra
+`treino_alongamento.html?treino=<id>[&origem=...]`, sem o parâmetro
+`alongamento` — mesmo tratamento da musculação. Usado pelo clique num
+card de `treino_alongamento_exercicios.html` (seção 6).
 
-Ver seção 4.1 — a tela de criação já está descrita ali, ao lado do menu
-que ela alimenta.
+## 6. Página do treino e progresso
+
+### 6.1 Lista de alongamentos (`treino_alongamento_exercicios.html`)
+
+Mirror de `treino_exercicios.html` (seção 6.2 de
+[treino-exercicios-especificacao.md](./treino-exercicios-especificacao.md)),
+mas sem aquecimento/superset/circuito/cardio/alongamento complementar
+(nada disso existe num treino de alongamento, seção 8):
+
+- Lê `?treino=<treinoAlongamentoId>` e o opcional
+  `?origem=<treinoMusculacaoId>`.
+- Um card por item de `treinoAlongamento.alongamentos` (ordenado por
+  `ordem`): imagem sempre visível (`ligarImagemExercicio(..., "alongamento")`),
+  nome, grupos musculares, "Série X" + métrica formatada, botão
+  "Ver vídeo" e link "Ver progresso →" pra
+  `treino_alongamento_progresso.html?alongamento=<id>&treino=<treinoAlongamentoId>`.
+  Clicar no card (fora do link/botão) navega direto pra
+  `treino_alongamento.html?treino=<treinoAlongamentoId>&alongamento=<id>[&origem=...]`
+  — entra já executando aquele item.
+- Botão "Iniciar treino →" no topo, virando "Continuar treino →" quando
+  já existe `execucao.alongamento.<id>.v1` salvo — mesma checagem que
+  `treino_exercicios.html` já faz com `execucao.musculacao.<id>.v2`.
+- Botão de voltar: com `origem` → `treino_exercicios.html?treino=<origem>`;
+  sem `origem` → `treino_alongamento_menu.html`.
+
+### 6.2 Progresso do alongamento (`treino_alongamento_progresso.html`)
+
+Mirror de `treino_exercicio_progresso.html` (seção 9 de
+[treino-exercicios-especificacao.md](./treino-exercicios-especificacao.md)),
+mas com **uma métrica só** (tempo sustentado, em segundos — sem
+carga/repetições):
+
+- Lê `?alongamento=<alongamentoId>&treino=<treinoAlongamentoId>`.
+- `TreinosStorage.lerHistoricoAgregadoDoPlanoAtivo(TreinosStorage.chaves.historicoSerieAlongamento)`,
+  filtrado por `alongamentoId` — mesmo padrão da tela de musculação.
+- Aba Gráfico: linha única (tempo médio do dia, `GraficoProgressoAlongamento`
+  em `js/grafico-linha.js`, ao lado de `GraficoProgressoExercicio`).
+- Aba Tabela: colunas Série / Tempo / Hora.
+- Botão de voltar → `treino_alongamento_exercicios.html?treino=<treinoAlongamentoId>`.
+- Estado vazio: "Nenhuma série registrada ainda para este alongamento."
+  quando não há entradas em `historico.serieAlongamento.v1` pra esse id.
 
 ## 7. Histórico local (localStorage)
 
@@ -219,6 +283,28 @@ avulsos também contarem) em `historico.sessaoAlongamento.v1`:
 [treino-bicicleta-especificacao.md](./treino-bicicleta-especificacao.md)):
 `null` quando a sessão foi feita direto pelo menu, ou o `id` do treino de
 musculação de origem quando veio de um card "Alongamento complementar".
+
+Além disso, mirror de `historico.serieMusculacao.v1`: um registro por
+**série concluída** (não só por alongamento inteiro), gravado em
+`historico.serieAlongamento.v1` a cada "Concluir série" — é o que
+alimenta `treino_alongamento_progresso.html` (seção 6.2) com
+gráfico/tabela por item:
+
+```json
+{
+  "treinoId": "mobilidade-quadril-pos-treino",
+  "treinoNome": "Mobilidade de quadril pós-treino",
+  "alongamentoId": "alongamento-de-posteriores-em-pe",
+  "alongamentoNome": "Alongamento de posteriores em pé",
+  "serie": 1,
+  "duracaoSegundos": 22,
+  "dataHora": "2026-07-21T18:45:08.112Z"
+}
+```
+
+Sem `cargaKg`/`repeticoes` (não se aplicam, seção 8). Os dois históricos
+convivem, mesma relação de `historico.sessaoMusculacao.v1` com
+`historico.serieMusculacao.v1` na musculação.
 
 ## 8. Fora de escopo
 

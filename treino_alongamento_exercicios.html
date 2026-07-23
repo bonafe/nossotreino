@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Treino de Alongamento</title>
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/componentes.css" />
+  <link rel="stylesheet" href="css/paginas/treino-exercicios.css" />
+</head>
+<body>
+  <main>
+    <header class="top">
+      <a id="voltarLink" class="voltar-icon" href="treino_alongamento_menu.html" aria-label="Voltar">←</a>
+      <div>
+        <h1 id="titulo">Carregando…</h1>
+      </div>
+    </header>
+
+    <a id="iniciarTreino" class="iniciar" href="#" hidden>Iniciar treino →</a>
+
+    <div id="blocos"></div>
+
+    <div id="vazio" class="estado" hidden>Nenhum alongamento cadastrado ainda para este treino.</div>
+
+    <div id="carregando" class="estado">Carregando treino…</div>
+
+    <div id="erro" class="estado" hidden></div>
+
+    <p class="rodape-apoio"><a href="index.html#apoio">❤️ Apoiar o Nosso Treino</a></p>
+  </main>
+
+  <div id="videoOverlay" class="overlay" hidden>
+    <div class="video-card">
+      <button id="videoFechar" class="video-fechar" type="button" aria-label="Fechar vídeo">✕</button>
+      <video id="videoPlayer" controls playsinline></video>
+    </div>
+  </div>
+
+  <div id="imagemOverlay" class="overlay" hidden>
+    <div class="imagem-card">
+      <button id="imagemFechar" class="video-fechar" type="button" aria-label="Fechar imagem">✕</button>
+      <img id="imagemModalImg" alt="" />
+    </div>
+  </div>
+
+  <script type="module" src="js/paginas/treino-alongamento-exercicios.js"></script>
+</body>
+</html>
