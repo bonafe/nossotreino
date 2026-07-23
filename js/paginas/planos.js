@@ -89,9 +89,10 @@ class PlanosController {
     const dados = TreinosStorage.lerJSONDoPlano(plano.id, "dados.v1", null);
     const planejamento = dados && dados.metadata && dados.metadata.planejamento;
     const titulo =
-      planejamento && (planejamento.inicio || planejamento.fim)
+      plano.nome ||
+      (planejamento && (planejamento.inicio || planejamento.fim)
         ? `Ciclo ${planejamento.inicio || "?"} – ${planejamento.fim || "?"}`
-        : `Plano criado em ${Formatadores.dataHora(plano.criadoEm)}`;
+        : `Plano criado em ${Formatadores.dataHora(plano.criadoEm)}`);
 
     card.innerHTML = `
       <div class="plano-card-topo">
@@ -106,6 +107,10 @@ class PlanosController {
       </p>
 
       <div class="plano-card-editar" hidden>
+        <div class="campo">
+          <label>Nome do plano <span class="opcional">(opcional)</span></label>
+          <input type="text" data-campo="nome" autocomplete="off" />
+        </div>
         <div class="campo">
           <label>Nome do professor</label>
           <input type="text" data-campo="professor" autocomplete="off" />
@@ -169,7 +174,8 @@ class PlanosController {
       TreinosStorage.atualizarMetadataPlano(id, {
         professor: valores.professor,
         inicio: valores.inicio,
-        fim: valores.fim
+        fim: valores.fim,
+        nome: valores.nome
       });
       this.#renderizarLista();
       return;
@@ -272,8 +278,10 @@ class PlanosController {
     const dados = TreinosStorage.lerDadosDoPlano(id);
     const metadata = (dados && dados.metadata) || {};
     const planejamento = metadata.planejamento || {};
+    const plano = TreinosStorage.listarPlanos().find((p) => p.id === id);
 
     const painel = card.querySelector(".plano-card-editar");
+    painel.querySelector('[data-campo="nome"]').value = (plano && plano.nome) || "";
     painel.querySelector('[data-campo="professor"]').value = metadata.professor || "";
     painel.querySelector('[data-campo="inicio"]').value = planejamento.inicio || "";
     painel.querySelector('[data-campo="fim"]').value = planejamento.fim || "";

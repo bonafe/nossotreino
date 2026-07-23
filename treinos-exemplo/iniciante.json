@@ -1,0 +1,705 @@
+{
+  "schema": "plano-de-treino",
+  "schemaVersion": "1.3",
+  "biblioteca": {
+    "arquivo": "biblioteca-exercicios.json"
+  },
+  "origem": {
+    "arquivo": null,
+    "tipo": "treino-exemplo",
+    "dataConversao": "2026-07-22",
+    "paginasComPrescricoes": []
+  },
+  "metadata": {
+    "professor": null,
+    "consultoria": "Nosso Treino",
+    "aluno": "Exemplo — iniciante",
+    "planejamento": {
+      "inicio": null,
+      "fim": null
+    },
+    "objetivos": [
+      "saude",
+      "aprendizado-tecnico",
+      "condicionamento-fisico"
+    ],
+    "nivel": "iniciante",
+    "carater": "exemplo-generico-nao-individualizado"
+  },
+  "distribuicaoSemanal": [
+    {
+      "dia": "segunda-feira",
+      "treinoId": "iniciante-a"
+    },
+    {
+      "dia": "terca-feira",
+      "treinoId": null
+    },
+    {
+      "dia": "quarta-feira",
+      "treinoId": "iniciante-b"
+    },
+    {
+      "dia": "quinta-feira",
+      "treinoId": null
+    },
+    {
+      "dia": "sexta-feira",
+      "treinoId": "iniciante-c"
+    },
+    {
+      "dia": "sabado",
+      "treinoId": null
+    },
+    {
+      "dia": "domingo",
+      "treinoId": null
+    }
+  ],
+  "regraContinuidade": "Se não for possível treinar no dia programado, continuar pela próxima sessão da sequência, sem tentar compensar com duas sessões no mesmo dia.",
+  "orientacoesGerais": {
+    "ajusteCarga": {
+      "regra": "Começar com carga confortável. Aumentar somente quando todas as séries atingirem o máximo da faixa com técnica estável e sem dor.",
+      "aplicacao": "exercicios-com-faixa-de-repeticoes"
+    },
+    "cadenciaPadrao": {
+      "modo": "qualitativo",
+      "concentrica": "controlada",
+      "excentrica": "controlada"
+    },
+    "descansoPadrao": {
+      "modo": "prescrito-ou-autosselecionado",
+      "minSegundos": 60,
+      "maxSegundos": 120
+    },
+    "superset": {
+      "regra": "Quando houver marcadores 1 e 2, combinar os exercícios pela ordem relativa: o primeiro exercício 1 com o primeiro 2, e assim sucessivamente.",
+      "modelagem": "Exercícios sem marcador são executados individualmente."
+    },
+    "isometria": {
+      "duracaoSegundos": 15,
+      "momento": "final-da-serie",
+      "posicao": "maior-contracao",
+      "aplicacao": {
+        "ultimasSeries": 1
+      }
+    },
+    "circuito": {
+      "regra": "Quando prescrito, realizar uma série de cada exercício em sequência e descansar somente após completar a volta."
+    }
+  },
+  "treinos": [
+    {
+      "id": "iniciante-a",
+      "nome": "Corpo inteiro A — máquinas",
+      "tipo": "musculacao",
+      "aquecimento": {
+        "protocolos": [
+          {
+            "tipo": "mobilidade-alongamento",
+            "series": 1,
+            "dosagem": {
+              "valor": 10,
+              "unidade": "segundos-ou-repeticoes"
+            },
+            "videoUrl": null,
+            "observacao": "Priorizar as articulações envolvidas no treino do dia."
+          },
+          {
+            "tipo": "serie-preparatoria-do-exercicio",
+            "alvo": "primeiro-exercicio-do-treino",
+            "series": 1,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "fixo",
+              "valor": 15
+            },
+            "observacao": "Usar carga leve e praticar a técnica antes das séries válidas."
+          }
+        ]
+      },
+      "exercicios": [
+        {
+          "exercicioId": "leg-press-45-graus",
+          "ordem": 10,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 10,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 90,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "supino-reto-na-maquina",
+          "ordem": 20,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 10,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 90,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "remada-baixa-com-triangulo",
+          "ordem": 30,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 10,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 90,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "cadeira-flexora",
+          "ordem": 40,
+          "prescricao": {
+            "series": 2,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 12,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 75,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "desenvolvimento-na-maquina",
+          "ordem": 50,
+          "prescricao": {
+            "series": 2,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 10,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 75,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "abdominal-na-maquina",
+          "ordem": 60,
+          "prescricao": {
+            "series": 2,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 12,
+              "max": 20
+            },
+            "carga": null,
+            "descansoSegundos": 60,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        }
+      ],
+      "cardio": [],
+      "status": "ativo",
+      "versao": 1,
+      "alongamento": []
+    },
+    {
+      "id": "iniciante-b",
+      "nome": "Corpo inteiro B — fundamentos",
+      "tipo": "musculacao",
+      "aquecimento": {
+        "protocolos": [
+          {
+            "tipo": "mobilidade-alongamento",
+            "series": 1,
+            "dosagem": {
+              "valor": 10,
+              "unidade": "segundos-ou-repeticoes"
+            },
+            "videoUrl": null,
+            "observacao": "Priorizar as articulações envolvidas no treino do dia."
+          },
+          {
+            "tipo": "serie-preparatoria-do-exercicio",
+            "alvo": "primeiro-exercicio-do-treino",
+            "series": 1,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "fixo",
+              "valor": 15
+            },
+            "observacao": "Usar carga leve e praticar a técnica antes das séries válidas."
+          }
+        ]
+      },
+      "exercicios": [
+        {
+          "exercicioId": "agachamento-goblet",
+          "ordem": 10,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 10,
+              "max": 12
+            },
+            "carga": null,
+            "descansoSegundos": 90,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "puxada-frontal-neutra",
+          "ordem": 20,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 10,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 90,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "supino-inclinado-com-halteres",
+          "ordem": 30,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 10,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 90,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "hip-thrust-na-maquina",
+          "ordem": 40,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 10,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 90,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "rosca-martelo",
+          "ordem": 50,
+          "prescricao": {
+            "series": 2,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 12,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 60,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "triceps-pulley-com-corda",
+          "ordem": 60,
+          "prescricao": {
+            "series": 2,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 12,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 60,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "prancha-com-joelhos-apoiados",
+          "ordem": 70,
+          "prescricao": {
+            "series": 2,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "faixa",
+              "min": 20,
+              "max": 40,
+              "unidade": "segundos"
+            },
+            "carga": null,
+            "descansoSegundos": 60,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        }
+      ],
+      "cardio": [],
+      "status": "ativo",
+      "versao": 1,
+      "alongamento": []
+    },
+    {
+      "id": "iniciante-c",
+      "nome": "Corpo inteiro C — consolidação",
+      "tipo": "musculacao",
+      "aquecimento": {
+        "protocolos": [
+          {
+            "tipo": "mobilidade-alongamento",
+            "series": 1,
+            "dosagem": {
+              "valor": 10,
+              "unidade": "segundos-ou-repeticoes"
+            },
+            "videoUrl": null,
+            "observacao": "Priorizar as articulações envolvidas no treino do dia."
+          },
+          {
+            "tipo": "serie-preparatoria-do-exercicio",
+            "alvo": "primeiro-exercicio-do-treino",
+            "series": 1,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "fixo",
+              "valor": 15
+            },
+            "observacao": "Usar carga leve e praticar a técnica antes das séries válidas."
+          }
+        ]
+      },
+      "exercicios": [
+        {
+          "exercicioId": "leg-press-horizontal",
+          "ordem": 10,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 12,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 90,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "remada-baixa-com-barra-reta",
+          "ordem": 20,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 10,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 90,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "floor-press-com-halteres",
+          "ordem": 30,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 10,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 90,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "mesa-flexora",
+          "ordem": 40,
+          "prescricao": {
+            "series": 2,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 12,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 75,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "elevacao-lateral-na-maquina",
+          "ordem": 50,
+          "prescricao": {
+            "series": 2,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 12,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 60,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "panturrilha-no-leg-press",
+          "ordem": 60,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 12,
+              "max": 20
+            },
+            "carga": null,
+            "descansoSegundos": 60,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "prancha-alta",
+          "ordem": 70,
+          "prescricao": {
+            "series": 2,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "faixa",
+              "min": 20,
+              "max": 40,
+              "unidade": "segundos"
+            },
+            "carga": null,
+            "descansoSegundos": 60,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        }
+      ],
+      "cardio": [],
+      "status": "ativo",
+      "versao": 1,
+      "alongamento": []
+    }
+  ],
+  "treinosCardio": [],
+  "treinosAlongamento": []
+}

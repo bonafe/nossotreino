@@ -4,6 +4,7 @@ const erroEl = document.getElementById("erro");
 const formEl = document.getElementById("formPlano");
 const tituloEl = document.getElementById("titulo");
 const voltarLinkEl = document.getElementById("voltarLink");
+const nomeInputEl = document.getElementById("nomeInput");
 const professorInputEl = document.getElementById("professorInput");
 const inicioInputEl = document.getElementById("inicioInput");
 const fimInputEl = document.getElementById("fimInput");
@@ -33,11 +34,12 @@ if (!aluno) {
   voltarLinkEl.href = `planos.html?aluno=${encodeURIComponent(alunoId)}`;
 
   criarBtnEl.addEventListener("click", () => {
+    const nome = nomeInputEl.value.trim();
     const professor = professorInputEl.value.trim();
     const inicio = inicioInputEl.value;
     const fim = fimInputEl.value;
 
-    TreinosStorage.criarPlano({ alunoId, professor, inicio, fim });
+    TreinosStorage.criarPlano({ alunoId, professor, inicio, fim, nome });
     window.location.href = "sistema.html";
   });
 }

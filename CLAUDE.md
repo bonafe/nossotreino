@@ -51,7 +51,12 @@ completo):
   estiver ativo ainda). Telas de estatística (gráficos de sessões,
   progresso por exercício) somam o histórico de **todos os planos do
   aluno ativo**, não só do ciclo atual (`TreinosStorage.lerHistoricoAgregadoDoAluno`,
-  seção 3.5 do mesmo documento).
+  seção 3.5 do mesmo documento). Única exceção a "nunca no código":
+  `treinos-exemplo/*.json` (iniciante/intermediário/avançado,
+  genéricos, sem dado pessoal de ninguém) — `js/treinos-exemplo.js`
+  semeia um aluno "Meu perfil" com esses 3 planos na primeira visita a
+  `alunos.html`, se o navegador estiver genuinamente vazio (seção 3.1.1
+  de `docs/armazenamento-local-especificacao.md`).
 
 Páginas que mostram nome/vídeo/grupo muscular de um exercício carregam os
 dois em paralelo e cruzam por `exercicioId`.

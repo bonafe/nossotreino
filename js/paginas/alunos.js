@@ -2,6 +2,7 @@ import { TreinosStorage } from "../storage.js";
 import { Formatadores } from "../formatadores.js";
 import { carregarBiblioteca } from "../biblioteca-exercicios.js";
 import { VideosTorrent } from "../videos-torrent.js";
+import { semearContaDeExemplo } from "../treinos-exemplo.js";
 
 // Mesmos campos exigidos de um plano avulso colado/importado (não um
 // backup) — ver seção 2.2 de especificacao-biblioteca-exercicios.md.
@@ -29,7 +30,7 @@ class AlunosController {
   #idParaExcluir = null;
   #dadosParaImportar = null;
 
-  iniciar() {
+  async iniciar() {
     this.#confirmCancelarEl.addEventListener("click", () => this.#fecharConfirmacao());
     this.#confirmOkEl.addEventListener("click", () => this.#confirmarExclusao());
     this.#arquivoInputEl.addEventListener("change", (evento) => this.#aoEscolherArquivo(evento));
@@ -41,7 +42,17 @@ class AlunosController {
     this.#importarAlunoSelectEl.addEventListener("change", () => this.#atualizarVisibilidadeNomeNovo());
     this.#importarCancelarEl.addEventListener("click", () => this.#fecharImportacao());
     this.#importarConfirmarEl.addEventListener("click", () => this.#confirmarImportacao());
+
+    const semeado = await semearContaDeExemplo();
     this.#renderizarLista();
+    if (semeado) {
+      this.#mostrarMensagem(
+        'Criamos um perfil de exemplo ("Meu perfil") com 3 planos de treino ' +
+          "(Iniciante, Intermediário, Avançado) pra você já explorar o sistema " +
+          "— pode renomear ou excluir quando quiser.",
+        "sucesso"
+      );
+    }
 
     if (!TreinosStorage.lerJSONGlobal(TreinosStorage.chaves.avisoIaAceito, false)) {
       this.#avisoIaOverlayEl.hidden = false;

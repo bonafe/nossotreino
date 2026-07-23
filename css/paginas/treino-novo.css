@@ -202,6 +202,12 @@ button.primary:active {
   color: #fb7185;
 }
 
+.mensagem.sucesso {
+  background: rgba(190, 242, 100, 0.14);
+  border: 1px solid rgba(190, 242, 100, 0.4);
+  color: #bef264;
+}
+
 /* Modal de busca/prescrição */
 
 .picker-card {

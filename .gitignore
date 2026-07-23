@@ -1,5 +1,6 @@
 dados/
 referencias/
+treinos/
 src/python/.env
 src/python/.venv/
 __pycache__/

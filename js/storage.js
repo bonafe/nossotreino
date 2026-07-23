@@ -318,11 +318,11 @@ export class TreinosStorage {
     salvarBruto("planoAtivoId.v1", id);
   }
 
-  static criarPlano({ alunoId, professor, inicio, fim }) {
+  static criarPlano({ alunoId, professor, inicio, fim, nome }) {
     const planos = TreinosStorage.listarPlanos();
     const id = gerarIdUnico(alunoId || professor || "plano", new Set(planos.map((p) => p.id)), "plano");
     const agora = new Date().toISOString();
-    planos.push({ id, alunoId, professor, criadoEm: agora, atualizadoEm: agora });
+    planos.push({ id, alunoId, professor, nome: nome || "", criadoEm: agora, atualizadoEm: agora });
     salvarBruto("planos.v1", planos);
 
     const aluno = TreinosStorage.listarAlunos().find((a) => a.id === alunoId);
@@ -371,7 +371,14 @@ export class TreinosStorage {
 
     const novoId = gerarIdUnico(`${alunoIdDestino}-ciclo`, new Set(planos.map((p) => p.id)), "plano");
     const agora = new Date().toISOString();
-    planos.push({ id: novoId, alunoId: alunoIdDestino, professor: origem.professor, criadoEm: agora, atualizadoEm: agora });
+    planos.push({
+      id: novoId,
+      alunoId: alunoIdDestino,
+      professor: origem.professor,
+      nome: origem.nome || "",
+      criadoEm: agora,
+      atualizadoEm: agora
+    });
     salvarBruto("planos.v1", planos);
 
     const alunoDestino = TreinosStorage.listarAlunos().find((a) => a.id === alunoIdDestino);
@@ -382,11 +389,12 @@ export class TreinosStorage {
     return novoId;
   }
 
-  static atualizarMetadataPlano(id, { professor, inicio, fim }) {
+  static atualizarMetadataPlano(id, { professor, inicio, fim, nome }) {
     const planos = TreinosStorage.listarPlanos();
     const entrada = planos.find((p) => p.id === id);
     if (!entrada) return;
     entrada.professor = professor;
+    if (nome !== undefined) entrada.nome = nome;
     entrada.atualizadoEm = new Date().toISOString();
     salvarBruto("planos.v1", planos);
 

@@ -21,7 +21,11 @@ do navegador para três propósitos:
    é um arquivo estático versionado no repositório e carregado por
    `fetch` a cada página, sem passar por `localStorage` (ver
    [especificacao-biblioteca-exercicios.md](./especificacao-biblioteca-exercicios.md)
-   seção 2.1).
+   seção 2.1). Única exceção deliberada à regra de "plano nunca no
+   código": `treinos-exemplo/*.json` (seção 3.1.1) — 3 planos
+   **genéricos, não individualizados** (`metadata.carater:
+   "exemplo-generico-nao-individualizado"`, sem nome de aluno/professor
+   real) usados só pra popular a conta de quem nunca usou o site.
 3. **Histórico de execução** — guardar, no próprio navegador de quem
    usa, o que foi realmente feito em cada treino (treinos de bike
    concluídos, séries de musculação com carga/repetições). Cada plano
@@ -185,6 +189,32 @@ escolhido (pra não ficar com o nome de origem depois de reatribuído) e
 só então `TreinosStorage.importarPlano(dados, alunoId)` +
 `ativarPlano(id)`, indo pra `sistema.html`.
 
+#### 3.1.1 Onboarding automático (`js/treinos-exemplo.js`)
+
+Em `iniciar()`, antes de renderizar a lista, `alunos.html` chama
+`semearContaDeExemplo()` (`js/treinos-exemplo.js`). Só faz algo quando o
+navegador está **genuinamente vazio** — `listarAlunos().length === 0 &&
+listarPlanos().length === 0` (não confundir com a migração de planos
+antigos sem `alunoId`, seção 5.1, que já rodou dentro dessas duas
+chamadas e por si só não conta como "vazio"):
+
+1. Cria um aluno `"Meu perfil"` (`criarAluno`).
+2. Busca (`fetch`) os 3 arquivos de `treinos-exemplo/` (iniciante,
+   intermediário, avançado — planos genéricos, ver seção 1), sobrescreve
+   `dados.metadata.aluno` pro nome desse aluno (mesmo ajuste feito em
+   qualquer importação, seção 3.1) e importa cada um
+   (`TreinosStorage.importarPlano(dados, alunoId)`).
+3. Rotula cada plano importado com `TreinosStorage.atualizarMetadataPlano(id, {..., nome: "Iniciante"|"Intermediário"|"Avançado"})`
+   — necessário porque os 3 arquivos têm `planejamento.inicio`/`fim`
+   nulos, então sem esse rótulo os três cards em `planos.html` cairiam
+   no mesmo título ("Plano criado em ...").
+
+Se `fetch` falhar (sem conexão na primeira visita, antes do service
+worker cachear `treinos-exemplo/*.json`), o nível problemático é só
+pulado — não impede os outros nem quebra a tela. Depois de semeado,
+`alunos.html` mostra uma mensagem explicando o que aconteceu e que dá
+pra renomear/excluir.
+
 ### 3.2 `planos.html` + `plano_novo.html`
 
 Sempre acessada com `?aluno=<alunoId>` na URL — sem isso (ou com um id
@@ -198,7 +228,8 @@ ações:
 
 - **Entrar** — `TreinosStorage.ativarPlano(id)` (só grava
   `planoAtivoId.v1`) e navega pra `sistema.html`.
-- **Editar** — formulário inline (professor, início/fim do ciclo) →
+- **Editar** — formulário inline (nome do plano — opcional, rótulo do
+  card — professor, início/fim do ciclo) →
   `TreinosStorage.atualizarMetadataPlano(id, {...})`. Não tem campo de
   aluno — quem o plano pertence já é fixo pelo `alunoId`; reatribuir um
   plano a outro aluno fica fora de escopo (seção 7).
@@ -226,10 +257,10 @@ ações:
   índice e todas as chaves físicas daquele plano (`plano.<id>.*`).
   Se o plano excluído era o ativo, `planoAtivoId.v1` volta pra `null`.
 
-`plano_novo.html?aluno=<alunoId>` (2 campos: professor, início/fim do
-ciclo — sem campo de aluno, fixo pela URL) chama
-`TreinosStorage.criarPlano({alunoId, professor, inicio, fim})`: gera um
-id único, adiciona ao índice, ativa e grava um esqueleto vazio
+`plano_novo.html?aluno=<alunoId>` (3 campos: nome do plano — opcional —,
+professor, início/fim do ciclo — sem campo de aluno, fixo pela URL)
+chama `TreinosStorage.criarPlano({alunoId, professor, inicio, fim, nome})`:
+gera um id único, adiciona ao índice, ativa e grava um esqueleto vazio
 (`treinos`, `treinosCardio`, `treinosAlongamento` vazios,
 `distribuicaoSemanal` com todos os dias sem treino, `orientacoesGerais: null` —
 código já trata essa ausência graciosamente, ver seção 6 de
@@ -359,9 +390,9 @@ TreinosStorage.lerHistoricoAgregadoDoPlanoAtivo(chave) // atalho: resolve o alun
 TreinosStorage.listarPlanos()
 TreinosStorage.obterPlanoAtivoId()
 TreinosStorage.ativarPlano(id)
-TreinosStorage.criarPlano({alunoId, professor, inicio, fim})
+TreinosStorage.criarPlano({alunoId, professor, inicio, fim, nome})  // nome é opcional, rótulo do card
 TreinosStorage.duplicarPlano(id, alunoIdDestino)  // mesmo aluno (novo ciclo) ou outro — decidido na confirmação de duplicar
-TreinosStorage.atualizarMetadataPlano(id, {professor, inicio, fim})
+TreinosStorage.atualizarMetadataPlano(id, {professor, inicio, fim, nome})
 TreinosStorage.excluirPlano(id)
 TreinosStorage.importarPlano(dadosPlano, alunoId)  // alunos.html, seção 3.1 — alunoId decidido na confirmação de importação
 TreinosStorage.lerDadosDoPlano(id)

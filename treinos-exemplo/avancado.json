@@ -1,0 +1,1113 @@
+{
+  "schema": "plano-de-treino",
+  "schemaVersion": "1.3",
+  "biblioteca": {
+    "arquivo": "biblioteca-exercicios.json"
+  },
+  "origem": {
+    "arquivo": null,
+    "tipo": "treino-exemplo",
+    "dataConversao": "2026-07-22",
+    "paginasComPrescricoes": []
+  },
+  "metadata": {
+    "professor": null,
+    "consultoria": "Nosso Treino",
+    "aluno": "Exemplo — avançado",
+    "planejamento": {
+      "inicio": null,
+      "fim": null
+    },
+    "objetivos": [
+      "forca",
+      "hipertrofia",
+      "potencia",
+      "condicionamento-fisico"
+    ],
+    "nivel": "avancado",
+    "carater": "exemplo-generico-nao-individualizado"
+  },
+  "distribuicaoSemanal": [
+    {
+      "dia": "segunda-feira",
+      "treinoId": "avancado-push"
+    },
+    {
+      "dia": "terca-feira",
+      "treinoId": "avancado-pull"
+    },
+    {
+      "dia": "quarta-feira",
+      "treinoId": "avancado-pernas"
+    },
+    {
+      "dia": "quinta-feira",
+      "treinoId": null
+    },
+    {
+      "dia": "sexta-feira",
+      "treinoId": "avancado-superior"
+    },
+    {
+      "dia": "sabado",
+      "treinoId": "avancado-potencia-inferior"
+    },
+    {
+      "dia": "domingo",
+      "treinoId": null
+    }
+  ],
+  "regraContinuidade": "Se não for possível treinar no dia programado, continuar pela próxima sessão da sequência, sem tentar compensar com duas sessões no mesmo dia.",
+  "orientacoesGerais": {
+    "ajusteCarga": {
+      "regra": "Progredir carga ou repetições apenas quando o desempenho estiver estável. Nos exercícios principais, preservar velocidade, amplitude e técnica.",
+      "aplicacao": "exercicios-com-faixa-de-repeticoes"
+    },
+    "cadenciaPadrao": {
+      "modo": "qualitativo",
+      "concentrica": "intencao-maxima",
+      "excentrica": "controlada"
+    },
+    "descansoPadrao": {
+      "modo": "prescrito-ou-autosselecionado",
+      "minSegundos": 60,
+      "maxSegundos": 180
+    },
+    "superset": {
+      "regra": "Quando houver marcadores 1 e 2, combinar os exercícios pela ordem relativa: o primeiro exercício 1 com o primeiro 2, e assim sucessivamente.",
+      "modelagem": "Exercícios sem marcador são executados individualmente."
+    },
+    "isometria": {
+      "duracaoSegundos": 15,
+      "momento": "final-da-serie",
+      "posicao": "maior-contracao",
+      "aplicacao": {
+        "ultimasSeries": 1
+      }
+    },
+    "circuito": {
+      "regra": "Quando prescrito, realizar uma série de cada exercício em sequência e descansar somente após completar a volta."
+    }
+  },
+  "treinos": [
+    {
+      "id": "avancado-push",
+      "nome": "Push — peito, ombros e tríceps",
+      "tipo": "musculacao",
+      "aquecimento": {
+        "protocolos": [
+          {
+            "tipo": "mobilidade-alongamento",
+            "series": 2,
+            "dosagem": {
+              "valor": 10,
+              "unidade": "segundos-ou-repeticoes"
+            },
+            "videoUrl": null,
+            "observacao": "Priorizar as articulações envolvidas no treino do dia."
+          },
+          {
+            "tipo": "serie-preparatoria-do-exercicio",
+            "alvo": "primeiro-exercicio-do-treino",
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "fixo",
+              "valor": 8
+            },
+            "observacao": "Fazer séries de aproximação progressivas, sem gerar fadiga."
+          }
+        ]
+      },
+      "exercicios": [
+        {
+          "exercicioId": "supino-com-pausa",
+          "ordem": 10,
+          "prescricao": {
+            "series": 5,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 4,
+              "max": 6
+            },
+            "carga": null,
+            "descansoSegundos": 180,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "supino-inclinado-com-barra",
+          "ordem": 20,
+          "prescricao": {
+            "series": 4,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 6,
+              "max": 10
+            },
+            "carga": null,
+            "descansoSegundos": 150,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "push-press-com-barra",
+          "ordem": 30,
+          "prescricao": {
+            "series": 4,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 4,
+              "max": 6
+            },
+            "carga": null,
+            "descansoSegundos": 180,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "crossover-na-polia-baixa",
+          "ordem": 40,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 10,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 75,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": 1
+        },
+        {
+          "exercicioId": "elevacao-lateral-deitado-no-banco-inclinado",
+          "ordem": 50,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 12,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 75,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "isometria",
+                "duracaoSegundos": 10,
+                "posicao": "maior-contracao",
+                "momento": "final-da-serie",
+                "aplicacao": {
+                  "ultimasSeries": 1
+                }
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": 1
+        },
+        {
+          "exercicioId": "triceps-testa-na-polia",
+          "ordem": 60,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 8,
+              "max": 12
+            },
+            "carga": null,
+            "descansoSegundos": 75,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": 2
+        },
+        {
+          "exercicioId": "triceps-pulley-com-corda",
+          "ordem": 70,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 12,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 75,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": 2
+        }
+      ],
+      "cardio": [],
+      "status": "ativo",
+      "versao": 1,
+      "alongamento": []
+    },
+    {
+      "id": "avancado-pull",
+      "nome": "Pull — costas e bíceps",
+      "tipo": "musculacao",
+      "aquecimento": {
+        "protocolos": [
+          {
+            "tipo": "mobilidade-alongamento",
+            "series": 2,
+            "dosagem": {
+              "valor": 10,
+              "unidade": "segundos-ou-repeticoes"
+            },
+            "videoUrl": null,
+            "observacao": "Priorizar as articulações envolvidas no treino do dia."
+          },
+          {
+            "tipo": "serie-preparatoria-do-exercicio",
+            "alvo": "primeiro-exercicio-do-treino",
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "fixo",
+              "valor": 8
+            },
+            "observacao": "Fazer séries de aproximação progressivas, sem gerar fadiga."
+          }
+        ]
+      },
+      "exercicios": [
+        {
+          "exercicioId": "levantamento-terra-convencional",
+          "ordem": 10,
+          "prescricao": {
+            "series": 5,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 3,
+              "max": 5
+            },
+            "carga": null,
+            "descansoSegundos": 180,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "remada-pendlay",
+          "ordem": 20,
+          "prescricao": {
+            "series": 4,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 5,
+              "max": 8
+            },
+            "carga": null,
+            "descansoSegundos": 150,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "barra-fixa-pronada",
+          "ordem": 30,
+          "prescricao": {
+            "series": 4,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 6,
+              "max": 10
+            },
+            "carga": null,
+            "descansoSegundos": 120,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": "Adicionar carga externa quando o máximo da faixa for atingido com técnica.",
+          "superset": null
+        },
+        {
+          "exercicioId": "remada-renegade",
+          "ordem": 40,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 8,
+              "max": 12
+            },
+            "carga": null,
+            "descansoSegundos": 105,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "crucifixo-inverso-na-polia",
+          "ordem": 50,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 12,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 75,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": 1
+        },
+        {
+          "exercicioId": "rosca-inclinada-com-halteres",
+          "ordem": 60,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 8,
+              "max": 12
+            },
+            "carga": null,
+            "descansoSegundos": 75,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": 2
+        }
+      ],
+      "cardio": [],
+      "status": "ativo",
+      "versao": 1,
+      "alongamento": []
+    },
+    {
+      "id": "avancado-pernas",
+      "nome": "Pernas — agachamento e cadeia posterior",
+      "tipo": "musculacao",
+      "aquecimento": {
+        "protocolos": [
+          {
+            "tipo": "mobilidade-alongamento",
+            "series": 2,
+            "dosagem": {
+              "valor": 10,
+              "unidade": "segundos-ou-repeticoes"
+            },
+            "videoUrl": null,
+            "observacao": "Priorizar as articulações envolvidas no treino do dia."
+          },
+          {
+            "tipo": "serie-preparatoria-do-exercicio",
+            "alvo": "primeiro-exercicio-do-treino",
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "fixo",
+              "valor": 8
+            },
+            "observacao": "Fazer séries de aproximação progressivas, sem gerar fadiga."
+          }
+        ]
+      },
+      "exercicios": [
+        {
+          "exercicioId": "agachamento-com-pausa",
+          "ordem": 10,
+          "prescricao": {
+            "series": 5,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 4,
+              "max": 6
+            },
+            "carga": null,
+            "descansoSegundos": 180,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "levantamento-terra-romeno-com-barra",
+          "ordem": 20,
+          "prescricao": {
+            "series": 4,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 6,
+              "max": 10
+            },
+            "carga": null,
+            "descansoSegundos": 150,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "agachamento-bulgaro-com-barra",
+          "ordem": 30,
+          "prescricao": {
+            "series": 4,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 8,
+              "max": 10
+            },
+            "carga": null,
+            "descansoSegundos": 120,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "hip-thrust-com-barra",
+          "ordem": 40,
+          "prescricao": {
+            "series": 4,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 8,
+              "max": 12
+            },
+            "carga": null,
+            "descansoSegundos": 120,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "isometria",
+                "duracaoSegundos": 15,
+                "posicao": "maior-contracao",
+                "momento": "final-da-serie",
+                "aplicacao": {
+                  "ultimasSeries": 1
+                }
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "panturrilha-donkey",
+          "ordem": 50,
+          "prescricao": {
+            "series": 5,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 10,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 75,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "prancha-copenhagen",
+          "ordem": 60,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "tempo",
+              "modo": "faixa",
+              "min": 20,
+              "max": 40,
+              "unidade": "segundos"
+            },
+            "carga": null,
+            "descansoSegundos": 75,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        }
+      ],
+      "cardio": [],
+      "status": "ativo",
+      "versao": 1,
+      "alongamento": []
+    },
+    {
+      "id": "avancado-superior",
+      "nome": "Superior — volume complementar",
+      "tipo": "musculacao",
+      "aquecimento": {
+        "protocolos": [
+          {
+            "tipo": "mobilidade-alongamento",
+            "series": 2,
+            "dosagem": {
+              "valor": 10,
+              "unidade": "segundos-ou-repeticoes"
+            },
+            "videoUrl": null,
+            "observacao": "Priorizar as articulações envolvidas no treino do dia."
+          },
+          {
+            "tipo": "serie-preparatoria-do-exercicio",
+            "alvo": "primeiro-exercicio-do-treino",
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "fixo",
+              "valor": 8
+            },
+            "observacao": "Fazer séries de aproximação progressivas, sem gerar fadiga."
+          }
+        ]
+      },
+      "exercicios": [
+        {
+          "exercicioId": "supino-spoto",
+          "ordem": 10,
+          "prescricao": {
+            "series": 4,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 5,
+              "max": 8
+            },
+            "carga": null,
+            "descansoSegundos": 150,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "remada-curvada-com-barra-supinada",
+          "ordem": 20,
+          "prescricao": {
+            "series": 4,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 6,
+              "max": 10
+            },
+            "carga": null,
+            "descansoSegundos": 150,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "desenvolvimento-militar-com-barra",
+          "ordem": 30,
+          "prescricao": {
+            "series": 4,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 6,
+              "max": 10
+            },
+            "carga": null,
+            "descansoSegundos": 120,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "puxada-unilateral-na-polia-alta",
+          "ordem": 40,
+          "prescricao": {
+            "series": 4,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 8,
+              "max": 12
+            },
+            "carga": null,
+            "descansoSegundos": 105,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "crossover-na-polia-baixa",
+          "ordem": 50,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 12,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 75,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "rosca-inclinada-com-halteres",
+          "ordem": 60,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 10,
+              "max": 12
+            },
+            "carga": null,
+            "descansoSegundos": 75,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": 1
+        },
+        {
+          "exercicioId": "triceps-testa-na-polia",
+          "ordem": 70,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 10,
+              "max": 12
+            },
+            "carga": null,
+            "descansoSegundos": 75,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": 2
+        }
+      ],
+      "cardio": [],
+      "status": "ativo",
+      "versao": 1,
+      "alongamento": []
+    },
+    {
+      "id": "avancado-potencia-inferior",
+      "nome": "Potência e inferior",
+      "tipo": "musculacao",
+      "aquecimento": {
+        "protocolos": [
+          {
+            "tipo": "mobilidade-alongamento",
+            "series": 2,
+            "dosagem": {
+              "valor": 10,
+              "unidade": "segundos-ou-repeticoes"
+            },
+            "videoUrl": null,
+            "observacao": "Priorizar as articulações envolvidas no treino do dia."
+          },
+          {
+            "tipo": "serie-preparatoria-do-exercicio",
+            "alvo": "primeiro-exercicio-do-treino",
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "fixo",
+              "valor": 8
+            },
+            "observacao": "Fazer séries de aproximação progressivas, sem gerar fadiga."
+          }
+        ]
+      },
+      "exercicios": [
+        {
+          "exercicioId": "power-clean",
+          "ordem": 10,
+          "prescricao": {
+            "series": 5,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "fixo",
+              "valor": 3
+            },
+            "carga": null,
+            "descansoSegundos": 180,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": "Priorizar velocidade e técnica; encerrar a série se houver perda de potência.",
+          "superset": null
+        },
+        {
+          "exercicioId": "agachamento-frontal-com-barra",
+          "ordem": 20,
+          "prescricao": {
+            "series": 5,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 4,
+              "max": 6
+            },
+            "carga": null,
+            "descansoSegundos": 180,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "levantamento-terra-sumo",
+          "ordem": 30,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 4,
+              "max": 6
+            },
+            "carga": null,
+            "descansoSegundos": 180,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "passada-caminhando-com-barra",
+          "ordem": 40,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 8,
+              "max": 12
+            },
+            "carga": null,
+            "descansoSegundos": 120,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "cadeira-flexora",
+          "ordem": 50,
+          "prescricao": {
+            "series": 4,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 10,
+              "max": 15
+            },
+            "carga": null,
+            "descansoSegundos": 90,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "panturrilha-em-pe-na-maquina",
+          "ordem": 60,
+          "prescricao": {
+            "series": 5,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 12,
+              "max": 20
+            },
+            "carga": null,
+            "descansoSegundos": 75,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        },
+        {
+          "exercicioId": "roda-abdominal-em-pe",
+          "ordem": 70,
+          "prescricao": {
+            "series": 3,
+            "metrica": {
+              "tipo": "repeticoes",
+              "modo": "faixa",
+              "min": 5,
+              "max": 10
+            },
+            "carga": null,
+            "descansoSegundos": 90,
+            "cadencia": null,
+            "tecnicas": [
+              {
+                "tipo": "tradicional"
+              }
+            ],
+            "intensidade": null
+          },
+          "alternativas": [],
+          "observacao": null,
+          "superset": null
+        }
+      ],
+      "cardio": [],
+      "status": "ativo",
+      "versao": 1,
+      "alongamento": []
+    }
+  ],
+  "treinosCardio": [],
+  "treinosAlongamento": []
+}
