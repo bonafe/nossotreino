@@ -8,6 +8,7 @@ import { criarVideoPlayerModal, ligarBotaoVideo } from "../video-player-modal.js
 import { ligarImagemExercicio, prefetchImagensDoTreino } from "../imagem-exercicio.js";
 import { criarDetalhesModal } from "../detalhes-modal.js";
 import { deveExibirPedidoApoio, renderizarPedidoApoio } from "../apoio.js";
+import { TelaAtiva } from "../tela-ativa.js";
 
 // Motor sequencial simplificado, modelado em treino-execucao.js (musculação)
 // — sem carga, repetições realizadas, ajuste de carga ou substituto, já
@@ -16,6 +17,7 @@ import { deveExibirPedidoApoio, renderizarPedidoApoio } from "../apoio.js";
 // slot tem uma única opção, sem alternativas.
 class TreinoAlongamentoController {
   #sinal = new SinalSonoro();
+  #telaAtiva = new TelaAtiva();
   #videoModal = criarVideoPlayerModal();
   #detalhesModal = criarDetalhesModal(this.#videoModal);
   #verVideoToken = 0;
@@ -344,6 +346,8 @@ class TreinoAlongamentoController {
   }
 
   #concluirTreino() {
+    this.#telaAtiva.liberar();
+
     const historico = TreinosStorage.lerJSON(TreinosStorage.chaves.historicoSessaoAlongamento, []);
     const duracaoSegundos = historico
       .filter((e) => e.treinoId === this.#treinoAlongamento.id && e.concluidoEm >= this.#progresso.iniciadoEm)
@@ -439,6 +443,7 @@ class TreinoAlongamentoController {
     this.#tituloEl.textContent = this.#treinoAlongamento.nome;
     this.#carregandoEl.hidden = true;
     this.#execucaoEl.hidden = false;
+    this.#telaAtiva.ativar();
 
     this.#renderAlongamentoAtual();
   }

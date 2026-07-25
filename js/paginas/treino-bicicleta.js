@@ -4,9 +4,11 @@ import { SinalSonoro } from "../sinal-sonoro.js";
 import { Cronometro } from "../cronometro.js";
 import { Formatadores } from "../formatadores.js";
 import { deveExibirPedidoApoio, renderizarPedidoApoio } from "../apoio.js";
+import { TelaAtiva } from "../tela-ativa.js";
 
 class TreinoBicicletaController {
   #sinal = new SinalSonoro();
+  #telaAtiva = new TelaAtiva();
   #cronometro = new Cronometro({ aoTick: (segundos) => this.#tick(segundos) });
 
   #config = null;
@@ -158,6 +160,7 @@ class TreinoBicicletaController {
     if (this.#elapsed >= this.#totalSegundos) {
       this.#elapsed = this.#totalSegundos;
       this.#cronometro.pausar();
+      this.#telaAtiva.liberar();
       this.#render();
       this.#somConcluido();
       this.#registrarSessaoConcluida();
@@ -183,12 +186,14 @@ class TreinoBicicletaController {
       this.#ultimaFase = info.intensidade;
       if (this.#elapsed === 0) this.#estilosIntensidade[info.intensidade].som();
       this.#cronometro.iniciar();
+      this.#telaAtiva.ativar();
       this.#render();
     }
   }
 
   #pausar() {
     this.#cronometro.pausar();
+    this.#telaAtiva.liberar();
     this.#render();
   }
 

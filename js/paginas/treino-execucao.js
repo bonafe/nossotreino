@@ -8,9 +8,11 @@ import { criarVideoPlayerModal, ligarBotaoVideo } from "../video-player-modal.js
 import { ligarImagemExercicio, prefetchImagensDoTreino } from "../imagem-exercicio.js";
 import { criarDetalhesModal } from "../detalhes-modal.js";
 import { deveExibirPedidoApoio, renderizarPedidoApoio } from "../apoio.js";
+import { TelaAtiva } from "../tela-ativa.js";
 
 class TreinoExecucaoController {
   #sinal = new SinalSonoro();
+  #telaAtiva = new TelaAtiva();
   #videoModal = criarVideoPlayerModal();
   #detalhesModal = criarDetalhesModal(this.#videoModal);
   #verVideoToken = 0;
@@ -472,6 +474,8 @@ class TreinoExecucaoController {
   }
 
   #concluirTreino() {
+    this.#telaAtiva.liberar();
+
     const item = this.#itemAtual();
     const exercicio = this.#bibliotecaExercicios.bibliotecas.exercicios[item.exercicioId];
     this.#registrarExercicioConcluido(item, exercicio);
@@ -572,6 +576,7 @@ class TreinoExecucaoController {
     this.#tituloEl.textContent = this.#treino.nome;
     this.#carregandoEl.hidden = true;
     this.#execucaoEl.hidden = false;
+    this.#telaAtiva.ativar();
 
     this.#renderExercicioAtual();
   }
