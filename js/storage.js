@@ -3,8 +3,6 @@ import { Formatadores } from "./formatadores.js";
 import { BancoIndexedDB } from "./armazenamento-indexeddb.js";
 import "./versao.js";
 
-const PREFIXO_LOCALSTORAGE = "treinos.";
-
 // Mapa entre a chave relativa "histórica" (a mesma usada por toda página
 // desde a época do localStorage) e o `tipo` físico dentro da loja única
 // `historico` do IndexedDB (ver esquema em armazenamento-indexeddb.js).
@@ -210,12 +208,10 @@ function restaurarExportacaoCompletaDoPlano(id, exportacao) {
 // Cria um Aluno pra cada nome distinto encontrado em `planos` que ainda
 // não tenha `alunoId` (formato anterior a existir a entidade Aluno —
 // `plano.aluno` era texto livre), preenchendo `alunoId` em cada plano e
-// removendo o texto livre. Muta `planos` in place. Usada tanto na migração
-// de localStorage pro IndexedDB (garantirMigracaoDoLocalStorage) quanto ao
-// restaurar um backup salvo antes desta mudança (sem `alunos` no JSON) —
-// exemplo canônico do padrão "preguiçosa, idempotente, silenciosa" que
-// toda migração nova deve seguir (ver seção 2 de
-// docs/armazenamento-local-especificacao.md).
+// removendo o texto livre. Muta `planos` in place. Usada por
+// migrarBackupDe1Para2 (abaixo) — exemplo canônico do padrão "preguiçosa,
+// idempotente, silenciosa" que toda migração nova deve seguir (ver seção 2
+// de docs/armazenamento-local-especificacao.md).
 function migrarAlunosApartirDePlanos(planos) {
   const alunos = [];
   const nomeParaId = new Map();
@@ -240,113 +236,68 @@ function migrarAlunosApartirDePlanos(planos) {
   return alunos;
 }
 
-function lerLocalStorageBruto(chaveRelativa) {
-  try {
-    const bruto = localStorage.getItem(PREFIXO_LOCALSTORAGE + chaveRelativa);
-    return bruto ? JSON.parse(bruto) : null;
-  } catch (erro) {
-    return null;
-  }
-}
-
-function listarChavesFisicasDoLocalStorage() {
-  const chaves = [];
-  try {
-    for (let indice = 0; indice < localStorage.length; indice++) {
-      const chaveCompleta = localStorage.key(indice);
-      if (chaveCompleta && chaveCompleta.startsWith(PREFIXO_LOCALSTORAGE)) {
-        chaves.push(chaveCompleta.slice(PREFIXO_LOCALSTORAGE.length));
-      }
-    }
-  } catch (erro) {
-    // localStorage indisponível — segue com lista vazia (equivale a
-    // instalação nova nesse navegador, nada pra migrar).
-  }
-  return chaves;
-}
-
-// Migração única, no atacado: lê tudo que ainda está em `localStorage`
-// (chaves com prefixo "treinos.") e grava no IndexedDB. Roda uma vez por
-// navegador, dentro de hidratar(), antes de qualquer leitura das lojas.
-// Idempotente por dois mecanismos (flag em `meta` + teste de banco já
-// populado) e NUNCA apaga o localStorage de origem — o dado antigo fica
-// intacto como rede de segurança; liberar esse espaço é uma decisão
-// separada e posterior. Ver seção 5.1 de
+// --- Migração de formato: plano (schemaVersion) ---
+//
+// Cada mudança de schemaVersion do documento do plano precisa de uma
+// função aqui, migrando de UMA versão pra a seguinte (nunca pulando
+// versões) — nunca editar uma migração já publicada, só acrescentar a
+// próxima quando o formato mudar de novo. Ver seção 2 de
 // docs/armazenamento-local-especificacao.md.
-async function garantirMigracaoDoLocalStorage() {
-  const marca = await BancoIndexedDB.ler("meta", "migracaoLocalStorage");
-  if (marca) return;
+const SCHEMA_VERSION_PLANO_ATUAL = "1.3";
 
-  const [alunosNoBanco, planosNoBanco] = await Promise.all([BancoIndexedDB.lerTodos("alunos"), BancoIndexedDB.lerTodos("planos")]);
-  if (alunosNoBanco.length || planosNoBanco.length) {
-    await BancoIndexedDB.gravar("meta", {
-      chave: "migracaoLocalStorage",
-      valor: { concluidaEm: new Date().toISOString(), origem: "banco-ja-tinha-dados" }
-    });
-    return;
+const MIGRACOES_PLANO = {
+  // "1.2": migrarPlanoDe12Para13 — formato 1.2 (cardio/alongamento
+  // embutidos em treino.cardio[]/treino.alongamento[], sem id/nome
+  // próprios) não tem nenhuma instância real conhecida sobrevivendo hoje;
+  // se aparecer um arquivo nesse formato, escreva a função a partir desse
+  // exemplar real (ver docs/especificacao-biblioteca-exercicios.md §16
+  // pro shape antigo de referência) em vez de reconstruir de memória.
+};
+
+// Aplica a cadeia de migrações até chegar em SCHEMA_VERSION_PLANO_ATUAL.
+// Se a versão não tiver migração cadastrada (desconhecida, ou mais nova
+// que a atual), devolve o documento como veio — nunca modifica sem saber
+// como.
+function migrarPlanoParaVersaoAtual(dados) {
+  if (!dados) return dados;
+  let atual = dados;
+  let seguranca = 0;
+  while (atual.schemaVersion !== SCHEMA_VERSION_PLANO_ATUAL && seguranca < 20) {
+    const migracao = MIGRACOES_PLANO[atual.schemaVersion];
+    if (!migracao) return atual;
+    atual = migracao(atual);
+    seguranca += 1;
   }
+  return atual;
+}
 
-  const chavesFisicas = listarChavesFisicasDoLocalStorage();
-  if (!chavesFisicas.length) {
-    await BancoIndexedDB.gravar("meta", {
-      chave: "migracaoLocalStorage",
-      valor: { concluidaEm: new Date().toISOString(), origem: "localStorage-vazio" }
-    });
-    return;
+// --- Migração de formato: envelope de backup (versao) ---
+
+const VERSAO_BACKUP_ATUAL = 2;
+
+const MIGRACOES_BACKUP = {
+  1: migrarBackupDe1Para2
+};
+
+// Formato 1: sem `alunos` (entidade Aluno ainda não existia) — deriva a
+// partir de `planos[].aluno` (texto livre), mesma lógica de
+// migrarAlunosApartirDePlanos.
+function migrarBackupDe1Para2(backup) {
+  const planos = backup.planos || [];
+  const alunos = backup.alunos || migrarAlunosApartirDePlanos(planos);
+  return { ...backup, versao: 2, alunos, planos };
+}
+
+function migrarBackupParaVersaoAtual(backupOriginal) {
+  let atual = { ...backupOriginal, versao: backupOriginal.versao || 1 };
+  let seguranca = 0;
+  while (atual.versao !== VERSAO_BACKUP_ATUAL && seguranca < 20) {
+    const migracao = MIGRACOES_BACKUP[atual.versao];
+    if (!migracao) return atual;
+    atual = migracao(atual);
+    seguranca += 1;
   }
-
-  const planos = lerLocalStorageBruto("planos.v1") || [];
-  const alunos = lerLocalStorageBruto("alunos.v1") || migrarAlunosApartirDePlanos(planos);
-
-  const registros = { alunos, planos, planoDados: [], historico: [], execucoes: [], preferencias: [] };
-
-  const planoAtivoId = lerLocalStorageBruto("planoAtivoId.v1");
-  if (planoAtivoId !== null) registros.preferencias.push({ chave: "planoAtivoId", valor: planoAtivoId });
-
-  ["apoio.ultimaExibicaoContador.v1", "apoio.ultimaExibicaoData.v1", "apoio.dispensadoPermanentemente.v1", "avisoIaAceito.v1"].forEach(
-    (chave) => {
-      const valor = lerLocalStorageBruto(chave);
-      if (valor !== null) registros.preferencias.push({ chave, valor });
-    }
-  );
-
-  planos.forEach((plano) => {
-    const prefixoDoPlano = `plano.${plano.id}.`;
-
-    const dados = lerLocalStorageBruto(`${prefixoDoPlano}dados.v1`);
-    if (dados !== null) registros.planoDados.push({ planoId: plano.id, dados });
-
-    Object.entries(CHAVES_HISTORICO).forEach(([chaveRelativa, tipo]) => {
-      const entradas = lerLocalStorageBruto(`${prefixoDoPlano}${chaveRelativa}`) || [];
-      entradas.forEach((entrada) => registros.historico.push({ planoId: plano.id, tipo, ...entrada }));
-    });
-
-    chavesFisicas
-      .filter((chave) => chave.startsWith(`${prefixoDoPlano}execucao.`))
-      .forEach((chaveFisica) => {
-        const chaveRelativa = chaveFisica.slice(prefixoDoPlano.length);
-        const execucao = analisarChaveExecucao(chaveRelativa);
-        if (!execucao) return;
-        const progresso = lerLocalStorageBruto(chaveFisica);
-        if (progresso !== null) {
-          registros.execucoes.push({ planoId: plano.id, tipo: execucao.tipo, treinoId: execucao.treinoId, progresso });
-        }
-      });
-  });
-
-  await Promise.all([
-    BancoIndexedDB.gravarVarios("alunos", registros.alunos),
-    BancoIndexedDB.gravarVarios("planos", registros.planos),
-    BancoIndexedDB.gravarVarios("planoDados", registros.planoDados),
-    BancoIndexedDB.gravarVarios("historico", registros.historico),
-    BancoIndexedDB.gravarVarios("execucoes", registros.execucoes),
-    BancoIndexedDB.gravarVarios("preferencias", registros.preferencias)
-  ]);
-
-  await BancoIndexedDB.gravar("meta", {
-    chave: "migracaoLocalStorage",
-    valor: { concluidaEm: new Date().toISOString(), origem: "localStorage", chavesImportadas: chavesFisicas.length }
-  });
+  return atual;
 }
 
 // Preenche o instantâneo a partir do IndexedDB, uma vez por carregamento de
@@ -357,8 +308,6 @@ async function garantirMigracaoDoLocalStorage() {
 async function hidratar() {
   const banco = await BancoIndexedDB.abrir();
   if (!banco) return;
-
-  await garantirMigracaoDoLocalStorage();
 
   const [alunos, planos, planoDadosRegistros, historicoRegistros, execucoesRegistros, preferenciasRegistros] = await Promise.all([
     BancoIndexedDB.lerTodos("alunos"),
@@ -579,7 +528,7 @@ export class TreinosStorage {
     TreinosStorage.ativarPlano(id);
     TreinosStorage.definirDadosTreinos({
       schema: "plano-de-treino",
-      schemaVersion: "1.3",
+      schemaVersion: SCHEMA_VERSION_PLANO_ATUAL,
       biblioteca: { arquivo: "biblioteca-exercicios/biblioteca-exercicios.json" },
       metadata: {
         professor,
@@ -684,8 +633,11 @@ export class TreinosStorage {
   }
 
   // Plano avulso recebido de fora — alunoId decidido por quem chama
-  // (tela de confirmação de importação).
-  static importarPlano(dadosPlano, alunoId) {
+  // (tela de confirmação de importação). Migra pra SCHEMA_VERSION_PLANO_ATUAL
+  // antes de gravar: é o único jeito de um documento em formato antigo
+  // entrar no sistema (o outro é restaurarBackup, abaixo).
+  static importarPlano(dadosPlanoOriginal, alunoId) {
+    const dadosPlano = migrarPlanoParaVersaoAtual(dadosPlanoOriginal);
     const planos = TreinosStorage.listarPlanos();
     const id = gerarIdUnico(alunoId, new Set(planos.map((p) => p.id)), "plano");
     const agora = new Date().toISOString();
@@ -729,7 +681,7 @@ export class TreinosStorage {
 
     return {
       tipo: "backup-treinos",
-      versao: 2,
+      versao: VERSAO_BACKUP_ATUAL,
       exportadoEm: new Date().toISOString(),
       planoAtivoId: obterPlanoAtivoId(),
       alunos: TreinosStorage.listarAlunos(),
@@ -738,8 +690,11 @@ export class TreinosStorage {
     };
   }
 
-  static restaurarBackup(backup) {
+  static restaurarBackup(backupOriginal) {
+    const backup = migrarBackupParaVersaoAtual(backupOriginal);
     const planos = backup.planos || [];
+    // Defensivo além da cadeia de migração acima: cobre um arquivo
+    // adulterado à mão que declare `versao` atual sem de fato ter `alunos`.
     const alunos = backup.alunos || migrarAlunosApartirDePlanos(planos);
 
     instantaneo.alunos = alunos;
@@ -759,6 +714,7 @@ export class TreinosStorage {
     TreinosStorage.ativarPlano(backup.planoAtivoId || null);
 
     Object.entries(backup.dadosPorPlano || {}).forEach(([id, exportacao]) => {
+      exportacao.dadosTreinos = migrarPlanoParaVersaoAtual(exportacao.dadosTreinos);
       restaurarExportacaoCompletaDoPlano(id, exportacao);
     });
   }
@@ -781,9 +737,8 @@ function registrarServiceWorker() {
 registrarServiceWorker();
 
 // Top-level await: como storage.js é importado por toda página, nenhum
-// controller começa a rodar antes do IndexedDB estar lido e migrado —
-// resolve de graça a corrida entre "página lê dado" e "migração ainda não
-// terminou". Ver seção 0/2 do plano de migração e seção 5 de
-// docs/armazenamento-local-especificacao.md.
+// controller começa a rodar antes do IndexedDB estar lido — resolve de
+// graça a corrida entre "página lê dado" e "hidratação ainda não
+// terminou". Ver seção 5 de docs/armazenamento-local-especificacao.md.
 export const pronto = hidratar();
 await pronto;

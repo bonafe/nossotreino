@@ -1,12 +1,12 @@
-# Especificação — Armazenamento local (localStorage)
+# Especificação — Armazenamento local (IndexedDB)
 
 ## 1. Objetivo
 
 O site não tem backend: cada página HTML roda isolada no navegador de
-quem usa. Esta especificação define como passamos a usar `localStorage`
-do navegador para três propósitos:
+quem usa. Esta especificação define como passamos a usar **IndexedDB**
+(banco `nossotreino`, ver seção 2) do navegador para três propósitos:
 
-1. **Alunos** — cada aluno tem um id próprio (`alunos.v1`), pra poder
+1. **Alunos** — cada aluno tem um id próprio (loja `alunos`), pra poder
    selecionar entre eles e acompanhar o progresso de um mesmo aluno ao
    longo de vários planos/ciclos (seção 3.5). Uso solo: a pessoa cria um
    aluno (o próprio) e pronto. Uso por professor: um aluno por
@@ -19,7 +19,7 @@ do navegador para três propósitos:
    (novo ciclo pro mesmo aluno). **A biblioteca de exercícios
    (`biblioteca-exercicios.json`) não entra aqui** — não é dado pessoal,
    é um arquivo estático versionado no repositório e carregado por
-   `fetch` a cada página, sem passar por `localStorage` (ver
+   `fetch` a cada página, sem passar por IndexedDB (ver
    [especificacao-biblioteca-exercicios.md](./especificacao-biblioteca-exercicios.md)
    seção 2.1). Única exceção deliberada à regra de "plano nunca no
    código": `treinos-exemplo/*.json` (seção 3.1.1) — 5 planos
@@ -32,6 +32,18 @@ do navegador para três propósitos:
    tem o seu próprio histórico, mas as telas de estatística somam o
    histórico de **todos os planos do aluno** (seção 3.5) — não só do
    ciclo ativo no momento.
+
+**Por que IndexedDB e não `localStorage`:** (a) tem versionamento nativo
+de esquema (`onupgradeneeded`, seção 2), que é o que torna sustentável a
+política de "toda mudança de formato exige migração" (seção 2.1); (b)
+guarda `Blob` nativamente, necessário pro dia em que o projeto passar a
+guardar imagens/vídeos próprios (loja dedicada futura, ver seção 2.4).
+**Isso não inclui os vídeos por torrent** (`js/videos-torrent.js`,
+`treinos-videos.v1`) — esses continuam na **Cache API**, decisão separada
+e já justificada em
+[torrent-videos-especificacao.md](./torrent-videos-especificacao.md#6-armazenamento-local-cache-api-não-localstorage-nem-indexeddb):
+vídeo é Blob binário vindo de uma origem sem `Response` HTTP real, e a
+Cache API já é a API usada pelo `sw.js` pro app shell.
 
 Isso cobre a parte de **dados** funcionando offline. A outra metade — as
 **páginas em si** (HTML/CSS/JS) abrindo sem internet, inclusive num link
@@ -57,52 +69,118 @@ publicado — é responsabilidade do service worker, ver
 através de um script único e compartilhado:
 [`storage.js`](../storage.js).
 
-## 2. Convenção de chaves
+## 2. Esquema do banco e política de versionamento
 
-Todas as chaves gravadas em `localStorage` usam o prefixo `treinos.` e
-terminam com uma versão (`.v1`), para permitir mudar o formato no futuro
-sem ter que migrar dados antigos — se o formato mudar, cria-se uma
-`.v2` e a leitura da `.v1` é simplesmente abandonada.
+Banco `nossotreino` (`js/armazenamento-indexeddb.js`), 7 object stores:
 
-Duas famílias de chave convivem em `storage.js`:
-
-### 2.1 Chaves globais (não dependem de qual plano está ativo)
-
-| Chave (sem prefixo) | Conteúdo |
-|---|---|
-| `alunos.v1` | Índice de todos os alunos guardados neste navegador: `[{id, nome, criadoEm, atualizadoEm}]` |
-| `planos.v1` | Índice de todos os planos guardados neste navegador: `[{id, alunoId, professor, criadoEm, atualizadoEm}]` — `alunoId` referencia uma entrada de `alunos.v1` |
-| `planoAtivoId.v1` | Id do plano cujas chaves escopadas (seção 2.2) estão sendo lidas/escritas agora, ou `null` se nenhum plano foi escolhido ainda |
-| `apoio.ultimaExibicaoContador.v1`, `apoio.ultimaExibicaoData.v1`, `apoio.dispensadoPermanentemente.v1` | Cadência do banner de apoio pós-treino (ver `js/apoio.js` e [apoio-especificacao.md](./apoio-especificacao.md)) |
-| `avisoIaAceito.v1` | Booleano — `true` depois que a pessoa concorda com o aviso de conteúdo gerado por IA em `alunos.html` (seção 3.1). Ausente/`false` faz o aviso aparecer de novo |
+| Loja | `keyPath` | Índices | Registro |
+|---|---|---|---|
+| `alunos` | `id` | — | `{id, nome, criadoEm, atualizadoEm}` |
+| `planos` | `id` | `porAluno`→`alunoId` | `{id, alunoId, professor, nome, criadoEm, atualizadoEm}` — `alunoId` referencia uma entrada de `alunos` |
+| `planoDados` | `planoId` | — | `{planoId, dados}` — documento opaco, a composição inteira do plano (treinos, cardio, alongamento, metadata — `metadata.aluno`/`metadata.professor` são cópias de exibição, ver seção 3.2); `dados.schemaVersion` é o eixo de versão do plano, seção 2.2 |
+| `historico` | `id` (autoIncrement) | `porPlano`→`planoId`, `porPlanoETipo`→`[planoId, tipo]` | `{id, planoId, tipo, ...entrada}` — um registro por série/sessão concluída; `tipo` é um de `sessaoBicicleta`/`serieMusculacao`/`sessaoMusculacao`/`serieAlongamento`/`sessaoAlongamento` |
+| `execucoes` | `[planoId, tipo, treinoId]` | `porPlano`→`planoId`, `porPlanoETipo`→`[planoId, tipo]` | `{planoId, tipo, treinoId, progresso}` — estado de um treino em andamento (`tipo` é `musculacao`/`alongamento`), pra retomar após fechar a página — endereçado por `exercicioId` dentro de `progresso`, não por índice posicional |
+| `preferencias` | `chave` | — | `{chave, valor}` — inclui `planoAtivoId` (id do plano cujos dados escopados estão sendo lidos/escritos agora, ou `null`), e as preferências globais (`apoio.*`, `avisoIaAceito.v1`) que não dependem de plano nenhum |
+| `meta` | `chave` | — | bookkeeping interno do próprio motor de armazenamento, nunca dado de usuário |
 
 Não existe um "aluno ativo" global: qual aluno está sendo visto é só a
 query string (`planos.html?aluno=<id>`) — nenhuma leitura/escrita de
 dados de plano depende disso, só a navegação (seção 3.1/3.2).
 
-### 2.2 Chaves escopadas por plano
+Como o id do plano é parte da chave física em `historico`/`execucoes`,
+dois planos diferentes podem ter um treino com o mesmo id (ex: ambos com
+um treino `treino-a`) sem nenhum risco de um vazar/misturar com o outro.
 
-Fisicamente gravadas como `treinos.plano.<id>.<chave>`, mas todo o
-código de página (`treino_execucao.html`, `treino_novo.html` etc.) lê e
-escreve usando só o nome relativo abaixo — `storage.js` resolve o
-`<id>` do plano ativo (`planoAtivoId.v1`) por baixo dos panos, sem que
-nenhuma dessas páginas precise saber que existe mais de um plano no
-navegador (ver seção 3.4):
+Todo o código de página (`treino_execucao.html`, `treino_novo.html` etc.)
+continua lendo/escrevendo por uma **chave relativa** (`dados.v1`,
+`historico.serieMusculacao.v1`, `execucao.musculacao.<treinoId>.v2` etc.)
+via `TreinosStorage.lerJSON`/`salvarJSON`/`chaves.*` — essas strings são a
+API pública que sobreviveu à troca de `localStorage` pra IndexedDB;
+`storage.js` que resolve por baixo dos panos pra qual loja/registro cada
+uma aponta, escopado ao plano ativo (`planoAtivoId`), sem que nenhuma
+página precise saber que existe mais de um plano no navegador nem que o
+backing store trocou (ver seção 3.4).
 
-| Chave relativa | Conteúdo |
-|---|---|
-| `dados.v1` | Composição do plano — treinos, cardio, alongamento, metadata (`metadata.aluno`/`metadata.professor` são cópias de exibição, ver seção 3.2) |
-| `historico.sessaoBicicleta.v1` | Array — um registro por treino de bike concluído por inteiro |
-| `historico.serieMusculacao.v1` | Array — um registro por série de exercício concluída (carga/repetições) |
-| `historico.sessaoMusculacao.v1` | Array — um registro por treino de exercícios concluído por inteiro |
-| `historico.serieAlongamento.v1` | Array — um registro por série de alongamento concluída (tempo sustentado, sem carga/repetições), ver seção 7 de [treino-alongamento-especificacao.md](./treino-alongamento-especificacao.md) |
-| `historico.sessaoAlongamento.v1` | Array — um registro por alongamento concluído por inteiro, ver seção 7 de [treino-alongamento-especificacao.md](./treino-alongamento-especificacao.md) |
-| `execucao.musculacao.<treinoId>.v2` | Estado do treino de exercícios em andamento (para retomar após fechar a página) — endereçado por `exercicioId`, não por índice posicional |
-| `execucao.alongamento.<alongamentoId>.v1` | Estado do treino de alongamento em andamento — mesmo princípio, endereçado por `alongamentoId` |
+### 2.1 Regra de ouro: todo dado migrado, nunca abandonado
 
-Como o id do plano já faz parte da chave física, dois planos diferentes
-podem ter um treino com o mesmo id (ex: ambos com um treino
-`treino-a`) sem nenhum risco de um vazar/misturar com o outro.
+**Nenhuma mudança de formato de dado persistido entra no projeto sem a
+função de migração correspondente.** Existem três eixos de versão
+independentes, cada um com sua própria tabela de despacho:
+
+| Eixo | Onde vive | Tipo | Tabela de despacho | Quando roda |
+|---|---|---|---|---|
+| Esquema do banco | `VERSAO_BANCO` em `armazenamento-indexeddb.js` | inteiro | `MIGRACOES_BANCO` | `onupgradeneeded`, ao abrir o banco numa versão nova |
+| Plano | `dados.schemaVersion` (dentro de `planoDados`) | string (`"1.3"`) | `MIGRACOES_PLANO` em `storage.js` | ao importar um plano avulso (`importarPlano`) e ao restaurar um backup (`restaurarBackup`) |
+| Backup | `versao` (envelope do arquivo baixado) | inteiro | `MIGRACOES_BACKUP` em `storage.js` | ao restaurar um backup (`restaurarBackup`) |
+
+Cada tabela mapeia "versão de origem → função que migra pra próxima
+versão"; a migração de um documento roda em cadeia até chegar na versão
+atual (`migrarPlanoParaVersaoAtual`/`migrarBackupParaVersaoAtual` em
+`storage.js`, `onupgradeneeded` percorrendo `oldVersion+1` até
+`newVersion` pro banco). Se a versão de origem não tiver função
+cadastrada (desconhecida, ou mais nova que a atual — ex.: um arquivo
+baixado de uma versão futura do site), o documento é devolvido como veio,
+sem modificação — nunca se arrisca a "consertar" um formato que não se
+conhece.
+
+**Nunca editar uma migração já publicada** — só acrescentar a próxima
+entrada quando o formato mudar de novo.
+
+### 2.2 Anatomia de uma migração
+
+O exemplo canônico é `migrarAlunosApartirDePlanos`/`migrarBackupDe1Para2`
+(`storage.js`): quando a entidade Aluno passou a existir, planos antigos
+tinham só `plano.aluno` como texto livre, sem `alunoId`. Essa função
+agrupa por nome distinto, cria um Aluno por grupo e substitui o texto
+livre pela referência — usada tanto na migração do envelope de backup
+(seção 2.1) quanto, no passado, na migração do próprio `localStorage`
+(seção 2.4).
+
+Toda migração nova deve ter essas quatro propriedades:
+
+- **Preguiçosa** — roda no momento em que o dado é lido/importado/restaurado,
+  não num passo de "atualização" bloqueante que trava a tela.
+- **Idempotente** — rodar de novo (ex.: reimportar o mesmo arquivo) não
+  duplica nem corrompe nada.
+- **Silenciosa** — não pede nada a quem usa, não mostra tela de progresso.
+- **Segura na falha** — se a versão de origem não for reconhecida, devolve
+  o dado como veio em vez de arriscar corrompê-lo (ver seção 2.1).
+
+### 2.3 Receita: como adicionar uma loja nova
+
+Exemplo de aplicação futura: uma loja `midias` pro recurso de
+imagens/vídeos próprios (ver seção 1).
+
+1. Em `armazenamento-indexeddb.js`: `VERSAO_BANCO` sobe de `N` pra `N+1`.
+2. Acrescenta `MIGRACOES_BANCO[N+1] = criarLojaDeMidias` — nunca editar a
+   entrada `N` já publicada.
+3. Testar manualmente: abrir o site com o banco ainda na versão `N` (um
+   perfil de navegador que não viu o deploy novo) e confirmar que
+   `onupgradeneeded` roda a migração `N+1` sem apagar nada das lojas já
+   existentes.
+4. Se for preciso mudar algo num dado já existente (não só criar uma loja
+   vazia), a migração recebe `(banco, transacao, evento)` e pode ler/escrever
+   nas lojas já existentes dentro da mesma `transacao` de upgrade.
+
+### 2.4 Migrações já aplicadas (registro histórico)
+
+Log cumulativo — cada mudança de formato nova acrescenta uma linha aqui,
+nunca reescreve uma entrada antiga:
+
+1. `planos` sem `alunoId` → entidade Aluno (`migrarAlunosApartirDePlanos`).
+2. Plano `schemaVersion` `1.2` → `1.3` (cardio/alongamento embutidos em
+   `treino.cardio[]`/`treino.alongamento[]` viraram coleções de primeira
+   classe `treinosCardio`/`treinosAlongamento`, referenciadas por id) —
+   ver seção 11.4/12.3 de
+   [especificacao-biblioteca-exercicios.md](./especificacao-biblioteca-exercicios.md).
+   **Sem instância real conhecida sobrevivendo hoje** — `MIGRACOES_PLANO`
+   não tem uma entrada `"1.2"` cadastrada; se aparecer um arquivo nesse
+   formato, escrever a função a partir desse exemplar real.
+3. Backup `versao` `1` → `2` (sem `alunos` — mesma derivação da migração 1).
+4. `localStorage` (`treinos.*`) → IndexedDB (`nossotreino` v1) — migração
+   de uma vez, já concluída e removida do código (rodou automaticamente
+   na primeira visita de cada navegador depois do deploy; não há mais
+   nenhuma leitura de `localStorage` em lugar nenhum do projeto).
 
 ## 3. Hierarquia aluno → plano → sistema
 
@@ -110,7 +188,7 @@ Nenhuma página faz `fetch()` de aluno/plano de treino. Como são dados
 pessoais e nunca publicados junto com o site (seção 1), um `fetch`
 relativo só funcionaria em desenvolvimento local, com o arquivo presente
 em disco, e falharia sempre em qualquer versão publicada do site. Em vez
-disso, o site trata `localStorage` como a **única** fonte — a biblioteca
+disso, o site trata o IndexedDB como a **única** fonte — a biblioteca
 de exercícios é o caso oposto: **sempre** vem por `fetch`, nunca por
 importação manual (ver seção 1).
 
@@ -298,7 +376,7 @@ e seção 5 de
 [treino-bicicleta-especificacao.md](./treino-bicicleta-especificacao.md)).
 A biblioteca de exercícios usa um carregamento à parte,
 `carregarBiblioteca()` (`js/biblioteca-exercicios.js`, `fetch`, sem
-`localStorage`) — páginas que mostram nome/vídeo/grupo muscular de
+IndexedDB) — páginas que mostram nome/vídeo/grupo muscular de
 exercício carregam os dois em paralelo.
 
 ### 3.4 Como o escopo por plano funciona por baixo
@@ -306,16 +384,17 @@ exercício carregam os dois em paralelo.
 `TreinosStorage.lerJSON(chave, padrao)`, `salvarJSON(chave, valor)`,
 `removerChave(chave)`, `adicionarAoHistorico(chave, entrada)` e
 `listarChavesComPrefixo(prefixo)` — usadas por praticamente toda página
-de treino — resolvem a chave física automaticamente como
-`treinos.plano.<planoAtivoId>.<chave>` internamente, usando
-`planoAtivoId.v1` (seção 2.1). Trocar de plano (`ativarPlano(id)`) é só
-regravar esse ponteiro — não há cópia de dados envolvida, e por isso não
-há risco de progresso de um plano vazar pro outro.
+de treino — resolvem a chave relativa automaticamente pra
+loja/registro certo dentro do IndexedDB (seção 2), escopado ao
+`planoAtivoId` guardado na loja `preferencias`. Trocar de plano
+(`ativarPlano(id)`) é só regravar esse ponteiro — não há cópia de dados
+envolvida, e por isso não há risco de progresso de um plano vazar pro
+outro.
 
 Preferências que não são por plano (cadência do banner de apoio, aviso
 de IA aceito) usam `lerJSONGlobal(chave, padrao)` /
-`salvarJSONGlobal(chave, valor)` em vez disso, gravando direto em
-`treinos.<chave>`, sem passar pelo plano ativo — usadas hoje só por
+`salvarJSONGlobal(chave, valor)` em vez disso, gravando direto na loja
+`preferencias` sem passar pelo plano ativo — usadas hoje só por
 `js/apoio.js` e o aviso de IA em `alunos.html`.
 
 Primitivas adicionais, usadas por `planos.html`/`alunos.html` pra operar
@@ -364,6 +443,18 @@ Os campos específicos de cada tipo de registro estão descritos em
 ## 5. `storage.js` — API
 
 ```js
+// Preenchida uma vez por carregamento de página, hidratando o instantâneo
+// em memória a partir do IndexedDB — ver seção 2 e "top-level await" logo
+// abaixo. Nenhuma das funções abaixo precisa aguardar isso: como
+// storage.js é importado por toda página, o próprio import já esperou.
+TreinosStorage.pronto                        // Promise<void>
+
+// Espera a fila de gravações em segundo plano esvaziar. Só é preciso nos
+// poucos pontos que navegam pra outra página logo depois de gravar
+// (criar aluno/plano/treino, importar backup) — sem isso a navegação
+// poderia acontecer antes da escrita assíncrona terminar.
+TreinosStorage.aguardarEscritas()            // Promise<void>
+
 // Escopadas ao plano ativo (ver seção 3.4)
 TreinosStorage.carregarDadosTreinos()        // Promise<dados> — rejeita se o plano ativo não tiver dados
 TreinosStorage.definirDadosTreinos(dados)    // grava dados + atualiza `atualizadoEm` do plano ativo
@@ -406,29 +497,27 @@ TreinosStorage.montarBackup()
 TreinosStorage.restaurarBackup(backup)
 ```
 
-`chave` nessas funções é sempre o nome relativo (sem o prefixo
-`treinos.` nem o `plano.<id>.`) — a função monta o nome físico completo
-internamente.
+`chave` nessas funções é sempre o nome relativo (`dados.v1`,
+`historico.serieMusculacao.v1`, `execucao.musculacao.<id>.v2` etc.) — a
+mesma API que existia quando isso vivia em `localStorage`; a função
+resolve internamente pra qual loja/registro do IndexedDB isso aponta
+(seção 2).
 
-Toda escrita é protegida por `try/catch`: se `localStorage` estiver
-indisponível (modo privado do navegador, quota cheia etc.), a gravação
-falha silenciosamente em vez de quebrar a página. O treino continua
-funcionando, só o histórico daquela sessão não é salvo.
-
-### 5.1 Migração automática de `planos.v1` sem `alunoId`
-
-Dados salvos antes de a entidade Aluno existir tinham `planos.v1[].aluno`
-como texto livre, sem `alunoId`. Na primeira leitura de `alunos.v1` (se a
-chave ainda não existir), `storage.js` agrupa as entradas de `planos.v1`
-pelo texto de `aluno` (normalizado), cria um `Aluno` por nome distinto,
-seta `alunoId` em cada plano correspondente e remove o texto livre —
-silencioso, roda uma vez, sem pedir nada a quem usa. O mesmo agrupamento
-é aplicado ao restaurar um backup salvo antes desta mudança (sem
-`alunos` no JSON).
+**Leitura é síncrona, escrita é assíncrona em segundo plano.**
+`storage.js` hidrata um instantâneo em memória do banco uma vez por
+carregamento de página (`await` no topo do módulo — nenhuma página
+começa a rodar antes disso terminar, seção 3.4); a partir daí, todas as
+funções acima leem/escrevem nesse instantâneo na hora (síncrono) e
+enfileiram a gravação real no IndexedDB pra rodar em segundo plano. Se o
+IndexedDB estiver indisponível (Safari em `file://`, storage desabilitado
+etc.), o instantâneo segue vazio e tudo funciona só em memória pela
+duração da página — a gravação nunca é perdida com um erro visível, só
+não sobrevive a fechar a aba. Mesma filosofia do antigo `try/catch`
+silencioso do `localStorage`, agora assíncrona.
 
 ## 6. Limitações
 
-- `localStorage` é por origem (protocolo + host + porta) **e por
+- IndexedDB é por origem (protocolo + host + porta) **e por
   navegador/aparelho** — não sincroniza entre o celular e o computador,
   por exemplo, nem entre navegadores diferentes no mesmo aparelho. Vários
   alunos e planos podem conviver no mesmo navegador (seção 3), mas não
@@ -439,10 +528,19 @@ silencioso, roda uma vez, sem pedir nada a quem usa. O mesmo agrupamento
   precisar de nenhuma ação manual.
 - Limpar dados de navegação / dados do site apaga tudo — todos os alunos
   e planos guardados nesse navegador, com histórico e progresso. A
-  biblioteca de exercícios não é afetada (não vive em `localStorage`).
-- Quota é pequena (alguns MB), mas de sobra para o volume de texto
-  gerado por esse histórico e pelos dados de treino, mesmo com vários
-  alunos/planos guardados ao mesmo tempo.
+  biblioteca de exercícios não é afetada (não vive em IndexedDB).
+- Quota é por origem e tipicamente uma fração do disco livre (bem maior
+  que os poucos MB do antigo `localStorage`), de sobra pro volume de
+  texto gerado pelo histórico e pelos dados de treino — inclusive com
+  margem pro recurso futuro de imagens/vídeos próprios (seção 1).
+- Abrir o site com o esquema do banco desatualizado enquanto outra aba já
+  está com ele aberto numa versão mais nova pode bloquear o upgrade
+  (`onupgradeneeded` não dispara até a aba antiga fechar/ceder); a aba
+  antiga cede sozinha assim que a nova tenta subir a versão
+  (`banco.onversionchange` fecha a conexão dela), então na prática isso
+  se resolve sem intervenção, só com um instante de atraso.
+- Safari não expõe IndexedDB em páginas abertas via `file://` — rodar com
+  `python3 serve.py` (ver `CLAUDE.md`) evita esse caso.
 - Quando o professor atualiza a composição de um plano à distância
   (fora do site), é preciso reimportar manualmente em `alunos.html`
   (ícone 📂) — não há aviso automático de que os dados ficaram

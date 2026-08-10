@@ -109,7 +109,7 @@ Isso quer dizer:
 - O motor hoje só sabe tocar `treino.tipo === "intervalado"` com
   `estimulo`/`recuperacao` definidos — outros tipos (ex. `continuo`) ficam
   fora de escopo (seção 8).
-- O plano vem de `TreinosStorage.carregarDadosTreinos()` (`localStorage`,
+- O plano vem de `TreinosStorage.carregarDadosTreinos()` (IndexedDB,
   sem `fetch` — o plano ativo é escolhido/criado em
   [alunos.html](../alunos.html)/[planos.html](../planos.html)); a biblioteca vem de
   `carregarBiblioteca()` (`fetch`, ver
@@ -120,8 +120,12 @@ Isso quer dizer:
 embutida em `treino.cardio[].treino`, sem `id`/`nome` próprios, endereçada
 pelo par `(treinoId, modalidadeId)`. Isso não permitia um treino de cardio
 avulso nem reuso entre treinos de musculação diferentes. Planos no formato
-antigo não são mais lidos — mesma convenção do projeto pra mudança de
-formato (sem migração automática).
+antigo migrariam automaticamente pra `1.3` (`MIGRACOES_PLANO` em
+`js/storage.js`, ver seção 2.1 de
+[armazenamento-local-especificacao.md](./armazenamento-local-especificacao.md#21-regra-de-ouro-todo-dado-migrado-nunca-abandonado))
+— na prática essa migração específica não está escrita, por falta de uma
+instância real conhecida do formato antigo (ver
+[especificacao-biblioteca-exercicios.md](./especificacao-biblioteca-exercicios.md)).
 
 ### 4.1 Conversão para os parâmetros do motor
 

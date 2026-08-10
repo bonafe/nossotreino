@@ -200,10 +200,19 @@ em vez de embutir a prescrição inteira. Isso permite: um treino de cardio
 ou de alongamento existir avulso (sem precisar de um treino de musculação
 "dono"), ser reutilizado por mais de um treino de musculação, e ser criado
 pela interface (`treino_bicicleta_novo.html`/`treino_alongamento_novo.html`)
-do mesmo jeito que `treino_novo.html` já cria treinos de musculação. Planos
-no formato `1.2` (cardio embutido em `treino.cardio[].treino`) não são mais
-lidos — mesma convenção de "mudança de formato = nova versão, sem migração
-automática" já usada no resto do projeto.
+do mesmo jeito que `treino_novo.html` já cria treinos de musculação.
+Planos no formato `1.2` (cardio embutido em `treino.cardio[].treino`)
+seriam migrados automaticamente pra `1.3` na importação/restauração de
+backup, pela tabela `MIGRACOES_PLANO` de `js/storage.js` — política do
+projeto desde que passou a exigir migração em toda mudança de formato de
+dado persistido (seção 2.1 de
+[armazenamento-local-especificacao.md](./armazenamento-local-especificacao.md)).
+Na prática, essa entrada específica (`"1.2"`) não está cadastrada: não há
+nenhuma instância real conhecida sobrevivendo hoje. Se aparecer um
+arquivo nesse formato, escreva `migrarPlanoDe12Para13` a partir desse
+exemplar real em vez de reconstruir o shape antigo de memória (a
+referência de tipos da versão `1.2` está na seção 16, mas está incompleta
+— não cobre o formato antigo de alongamento).
 
 Decisões de modelagem específicas de uma conversão (ex.: como um PDF
 ambíguo foi interpretado) não pertencem a nenhum dos dois documentos —

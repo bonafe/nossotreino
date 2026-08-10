@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## O que é este projeto
 
-Nosso Treino (nossotreino.com.br) — plataforma gratuita e de código aberto (AGPL-3.0) para treinos (musculação, aeróbico, outros), com princípio central de funcionar offline. Site estático (PWA) em português, sem build step e sem backend. Vanilla JS (ES modules), CSS puro, HTML por página. Roda 100% no navegador — o plano de treino de cada aluno nunca fica no código, só no `localStorage` de quem usa. A biblioteca de exercícios (nomes, vídeos, grupos musculares — não é dado pessoal) é o caso oposto: vem versionada no repositório e é buscada por `fetch`.
+Nosso Treino (nossotreino.com.br) — plataforma gratuita e de código aberto (AGPL-3.0) para treinos (musculação, aeróbico, outros), com princípio central de funcionar offline. Site estático (PWA) em português, sem build step e sem backend. Vanilla JS (ES modules), CSS puro, HTML por página. Roda 100% no navegador — o plano de treino de cada aluno nunca fica no código, só no IndexedDB de quem usa. A biblioteca de exercícios (nomes, vídeos, grupos musculares — não é dado pessoal) é o caso oposto: vem versionada no repositório e é buscada por `fetch`.
 
 `index.html` é a página institucional (apresentação, princípios, doações, aviso legal) — não usa `TreinosStorage` além de registrar o service worker. `alunos.html`, um nível abaixo, é a tela de seleção/gestão de alunos (entrar, criar, editar, excluir, importar, backup). Dentro de um aluno, `planos.html?aluno=<id>` lista os planos/ciclos daquele aluno (entrar, criar, duplicar, excluir). O sistema de treino em si (seletor de treinos, engrenagem de configurações), sempre operando sobre o plano ativo no momento, vive em `sistema.html`, mais um nível abaixo.
 
@@ -31,8 +31,8 @@ completo):
   `imagens/alongamento/`): buscada por `fetch` a cada
   página via `carregarBiblioteca()` (`js/biblioteca-exercicios.js`),
   cacheada pelo service worker pra funcionar offline. Nunca passa por
-  `localStorage`.
-- **Aluno** (id, nome): entidade de primeira classe (`alunos.v1`) — pra
+  IndexedDB.
+- **Aluno** (id, nome): entidade de primeira classe (loja `alunos`) — pra
   poder selecionar entre alunos e acompanhar o progresso de um mesmo
   aluno ao longo de vários planos/ciclos. Uso solo: um aluno só, o
   próprio. Uso por professor: um aluno por estudante. Gerido em
@@ -63,14 +63,17 @@ Páginas que mostram nome/vídeo/grupo muscular de um exercício carregam os
 dois em paralelo e cruzam por `exercicioId`.
 
 Histórico de execução (séries, sessões concluídas, progresso em
-andamento) é gravado direto no `localStorage` pelas próprias páginas, com
-chaves versionadas (`.v1`, `.v2`...) — ver `js/storage.js`
-(`TreinosStorage.chaves`) e `docs/armazenamento-local-especificacao.md`
-para a lista completa e a convenção de nomes.
+andamento) é gravado no IndexedDB pelas próprias páginas via
+`TreinosStorage`, endereçado por chaves relativas versionadas (`.v1`,
+`.v2`...) — ver `js/storage.js` (`TreinosStorage.chaves`) e
+`docs/armazenamento-local-especificacao.md` para a lista completa e a
+convenção de nomes.
 
-Toda leitura/escrita de `localStorage` passa por `js/storage.js` — nunca chamar `localStorage` direto de uma página. Escritas são protegidas por `try/catch` silencioso (quota cheia, modo privado etc. não devem quebrar a tela).
+Toda leitura/escrita de dados de aluno/plano/histórico passa por `js/storage.js` — nunca chamar `indexedDB`/`localStorage` direto de uma página. Por baixo, `js/storage.js` guarda tudo em **IndexedDB** (banco `nossotreino`, motor de baixo nível em `js/armazenamento-indexeddb.js`): ao carregar, hidrata um instantâneo em memória (`await` no topo do módulo — nenhuma página começa a rodar antes disso terminar), leituras são síncronas sobre esse instantâneo, escritas mutam na hora e são enfileiradas pra gravação real em segundo plano (`TreinosStorage.aguardarEscritas()` nos poucos pontos que navegam logo depois de gravar). Falha de gravação nunca quebra a tela — mesma filosofia do antigo `try/catch` silencioso, agora assíncrona. Ver seção 2 de `docs/armazenamento-local-especificacao.md`.
 
-`js/storage.js` também registra o service worker (`sw.js`) — é importado por toda página, então esse é o único lugar que faz isso.
+**Toda mudança de formato de dado persistido exige migração — nunca abandone dado antigo em silêncio.** Isso vale nos três eixos de versão do projeto: esquema do banco (`VERSAO_BANCO`/`onupgradeneeded` em `armazenamento-indexeddb.js`), `schemaVersion` do plano (`MIGRACOES_PLANO` em `storage.js`) e `versao` do envelope de backup (`MIGRACOES_BACKUP` em `storage.js`). Cada mudança futura acrescenta uma função nova na tabela correspondente — nunca editar uma migração já publicada. O exemplo canônico do padrão a seguir (preguiçosa, idempotente, silenciosa, segura na falha) é `migrarAlunosApartirDePlanos`/`migrarBackupDe1Para2` em `storage.js`. Ver seção 2 de `docs/armazenamento-local-especificacao.md`.
+
+`js/storage.js` também registra o service worker (`sw.js`) — é importado por toda página, então esse é o único lugar que faz isso. `js/versao.js` (também importado por `storage.js`, então roda em toda página) define `VERSAO_APP` — um número visível no rodapé, bumpado à mão, independente do `CACHE_NOME` do service worker — serve pra confirmar visualmente que um deploy chegou (ex.: no celular).
 
 ### Motor genérico + JSON de dados
 
@@ -105,7 +108,7 @@ Vídeos de exercício (`bibliotecas.exercicios[id].midia.videoMagnet`, magnet UR
 ### Organização de arquivos
 
 - `js/paginas/*.js` — um controller por página HTML (`treino-execucao.js` ↔ `treino_execucao.html`), carregado via `<script type="module">`.
-- `js/*.js` (fora de `paginas/`) — utilitários compartilhados entre páginas: `storage.js` (localStorage), `biblioteca-exercicios.js` (fetch da biblioteca), `prescricao-formatadores.js`, `formatadores.js`, `cronometro.js`, `sinal-sonoro.js`, `grafico-barras.js`/`grafico-linha.js` (D3), `videos-torrent.js`/`video-player-modal.js` (vídeos por torrent), `imagem-exercicio.js` (imagens de exercício geradas por IA).
+- `js/*.js` (fora de `paginas/`) — utilitários compartilhados entre páginas: `storage.js` (API de domínio sobre aluno/plano/histórico) + `armazenamento-indexeddb.js` (motor IndexedDB de baixo nível, sem regra de negócio), `versao.js` (versão visível no rodapé), `biblioteca-exercicios.js` (fetch da biblioteca), `prescricao-formatadores.js`, `formatadores.js`, `cronometro.js`, `sinal-sonoro.js`, `grafico-barras.js`/`grafico-linha.js` (D3), `videos-torrent.js`/`video-player-modal.js` (vídeos por torrent, Cache API — não passa por `storage.js`), `imagem-exercicio.js` (imagens de exercício geradas por IA).
 - `css/paginas/*.css` — estilos específicos de cada página; `css/base.css` e `css/componentes.css` são compartilhados.
 - `biblioteca-exercicios/` (json + `imagens/musculacao/` + `imagens/alongamento/`) / `d3.v7.min.js` / `webtorrent.min.js` — vendorizados/versionados na raiz (não CDN, não gitignorado), pra continuar funcionando offline.
 - `docs/*-especificacao.md` — as specs vivas de cada área (armazenamento local, PWA/offline, bike, alongamento, exercícios, biblioteca de exercícios, apoio ao projeto). Ao mudar comportamento coberto por uma spec, atualize o documento junto.
@@ -113,5 +116,5 @@ Vídeos de exercício (`bibliotecas.exercicios[id].midia.videoMagnet`, magnet UR
 ### Convenções
 
 - Nomes de variáveis, funções, classes e comentários em português (mesmo padrão do resto do código).
-- Chaves de `localStorage` sempre com sufixo de versão (`.v1`) — mudança de formato = nova versão, sem migração da antiga.
+- Toda mudança de formato de dado persistido (banco, plano, backup) exige uma função de migração — ver seção "Fluxo de dados" acima e seção 2 de `docs/armazenamento-local-especificacao.md`. Nunca abandonar dado antigo em silêncio.
 - Sem frameworks, sem bundler: manter o padrão de ES modules nativos + CSS simples.
