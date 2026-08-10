@@ -1,6 +1,7 @@
 import { gerarIdUnico } from "./identificadores.js";
 import { Formatadores } from "./formatadores.js";
 import { BancoIndexedDB } from "./armazenamento-indexeddb.js";
+import "./versao.js";
 
 const PREFIXO_LOCALSTORAGE = "treinos.";
 

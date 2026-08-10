@@ -310,6 +310,13 @@
   text-decoration: none;
 }
 
+.rodape-versao {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
 .apoio-banner {
   margin-top: 18px;
   background: rgba(190, 242, 100, 0.08);
