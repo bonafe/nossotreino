@@ -517,7 +517,7 @@ class TreinoNovoController {
     this.#mensagemEl.textContent = texto;
   }
 
-  #salvarTreino() {
+  async #salvarTreino() {
     const nome = this.#nomeInputEl.value.trim();
     if (!nome) {
       this.#mostrarMensagem("Dê um nome ao treino antes de salvar.");
@@ -555,6 +555,7 @@ class TreinoNovoController {
     this.#dados.treinos.push(treino);
     TreinosStorage.definirDadosTreinos(this.#dados);
 
+    await TreinosStorage.aguardarEscritas();
     window.location.href = `treino_exercicios.html?treino=${encodeURIComponent(id)}`;
   }
 }

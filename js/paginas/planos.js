@@ -142,9 +142,10 @@ class PlanosController {
     return card;
   }
 
-  #aoEscolherAcao(id, acao, card) {
+  async #aoEscolherAcao(id, acao, card) {
     if (acao === "entrar") {
       TreinosStorage.ativarPlano(id);
+      await TreinosStorage.aguardarEscritas();
       window.location.href = "sistema.html";
       return;
     }
@@ -244,7 +245,7 @@ class PlanosController {
     this.#idParaDuplicar = null;
   }
 
-  #confirmarDuplicacao() {
+  async #confirmarDuplicacao() {
     const id = this.#idParaDuplicar;
     if (!id) return;
 
@@ -264,6 +265,7 @@ class PlanosController {
     if (alunoIdDestino === this.#alunoId) {
       this.#renderizarLista();
     } else {
+      await TreinosStorage.aguardarEscritas();
       window.location.href = `planos.html?aluno=${encodeURIComponent(alunoIdDestino)}`;
     }
   }

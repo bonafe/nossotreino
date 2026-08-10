@@ -78,7 +78,7 @@ class AlunosController {
     evento.target.value = "";
   }
 
-  #aoCarregarConteudo(texto) {
+  async #aoCarregarConteudo(texto) {
     let dados;
     try {
       dados = JSON.parse(texto);
@@ -90,6 +90,7 @@ class AlunosController {
     if (dados && dados.tipo === "backup-treinos") {
       TreinosStorage.restaurarBackup(dados);
       this.#prefetchVideosDaBiblioteca();
+      await TreinosStorage.aguardarEscritas();
       window.location.href = "sistema.html";
       return;
     }
@@ -133,7 +134,7 @@ class AlunosController {
     this.#dadosParaImportar = null;
   }
 
-  #confirmarImportacao() {
+  async #confirmarImportacao() {
     const dados = this.#dadosParaImportar;
     if (!dados) return;
 
@@ -154,6 +155,7 @@ class AlunosController {
     TreinosStorage.ativarPlano(id);
     this.#fecharImportacao();
     this.#prefetchVideosDaBiblioteca();
+    await TreinosStorage.aguardarEscritas();
     window.location.href = "sistema.html";
   }
 

@@ -1,4 +1,4 @@
-const CACHE_NOME = "treinos-shell-v19";
+const CACHE_NOME = "treinos-shell-v20";
 
 const ARQUIVOS_PARA_CACHE = [
   "index.html",
@@ -44,6 +44,7 @@ const ARQUIVOS_PARA_CACHE = [
   "css/paginas/treino-exercicio-progresso.css",
   "css/paginas/treino-novo.css",
   "js/storage.js",
+  "js/armazenamento-indexeddb.js",
   "js/treinos-exemplo.js",
   "js/biblioteca-exercicios.js",
   "js/prescricao-formatadores.js",

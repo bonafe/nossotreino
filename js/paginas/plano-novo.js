@@ -33,13 +33,14 @@ if (!aluno) {
   tituloEl.textContent = `Novo plano para ${aluno.nome}`;
   voltarLinkEl.href = `planos.html?aluno=${encodeURIComponent(alunoId)}`;
 
-  criarBtnEl.addEventListener("click", () => {
+  criarBtnEl.addEventListener("click", async () => {
     const nome = nomeInputEl.value.trim();
     const professor = professorInputEl.value.trim();
     const inicio = inicioInputEl.value;
     const fim = fimInputEl.value;
 
     TreinosStorage.criarPlano({ alunoId, professor, inicio, fim, nome });
+    await TreinosStorage.aguardarEscritas();
     window.location.href = "sistema.html";
   });
 }

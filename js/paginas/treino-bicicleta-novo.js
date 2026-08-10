@@ -75,7 +75,7 @@ class TreinoBicicletaNovoController {
     this.#mensagemEl.textContent = texto;
   }
 
-  #salvarTreino() {
+  async #salvarTreino() {
     const nome = this.#nomeInputEl.value.trim();
     if (!nome) {
       this.#mostrarMensagem("Dê um nome ao treino antes de salvar.");
@@ -120,6 +120,7 @@ class TreinoBicicletaNovoController {
     this.#dados.treinosCardio.push(treinoCardio);
     TreinosStorage.definirDadosTreinos(this.#dados);
 
+    await TreinosStorage.aguardarEscritas();
     window.location.href = "treino_bicicleta_menu.html";
   }
 }

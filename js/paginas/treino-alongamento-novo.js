@@ -428,7 +428,7 @@ class TreinoAlongamentoNovoController {
     this.#mensagemEl.textContent = texto;
   }
 
-  #salvarTreino() {
+  async #salvarTreino() {
     const nome = this.#nomeInputEl.value.trim();
     if (!nome) {
       this.#mostrarMensagem("Dê um nome ao treino antes de salvar.");
@@ -452,6 +452,7 @@ class TreinoAlongamentoNovoController {
     this.#dados.treinosAlongamento.push(treinoAlongamento);
     TreinosStorage.definirDadosTreinos(this.#dados);
 
+    await TreinosStorage.aguardarEscritas();
     window.location.href = "treino_alongamento_menu.html";
   }
 }

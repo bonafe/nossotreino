@@ -10,7 +10,7 @@ function mostrarMensagem(texto) {
   mensagemEl.textContent = texto;
 }
 
-criarBtnEl.addEventListener("click", () => {
+criarBtnEl.addEventListener("click", async () => {
   const nome = nomeInputEl.value.trim();
 
   if (!nome) {
@@ -19,5 +19,6 @@ criarBtnEl.addEventListener("click", () => {
   }
 
   const id = TreinosStorage.criarAluno(nome);
+  await TreinosStorage.aguardarEscritas();
   window.location.href = `planos.html?aluno=${encodeURIComponent(id)}`;
 });
