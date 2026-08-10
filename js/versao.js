@@ -5,10 +5,17 @@
 export const VERSAO_APP = "2026.08.10";
 
 function exibirNoRodape() {
+  // `body` é `display: flex` (ver css/base.css) com `<main>` como único
+  // filho visível — anexar direto em `body` vira um segundo item flex e
+  // espreme o layout. Tem que entrar dentro de `<main>`, igual ao resto do
+  // conteúdo de cada página.
+  const main = document.querySelector("main");
+  if (!main) return;
+
   const rodape = document.createElement("p");
   rodape.className = "rodape-versao";
   rodape.textContent = `v${VERSAO_APP}`;
-  document.body.appendChild(rodape);
+  main.appendChild(rodape);
 }
 
 exibirNoRodape();
