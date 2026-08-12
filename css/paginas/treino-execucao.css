@@ -232,14 +232,16 @@ a.iniciar:active {
 .imagem-exercicio-wrap {
   position: relative;
   min-height: 44px;
-  margin-top: 16px;
+  min-width: 120px;
+  width: fit-content;
+  max-width: 100%;
+  margin: 16px auto 0;
 }
 
 .imagem-exercicio {
   display: block;
-  width: 100%;
+  max-width: 100%;
   max-height: 320px;
-  object-fit: contain;
   border-radius: 16px;
   background: rgba(15, 23, 42, 0.4);
 }
