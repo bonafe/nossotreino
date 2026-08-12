@@ -41,6 +41,19 @@
     <div class="imagem-card">
       <button id="imagemFechar" class="video-fechar" type="button" aria-label="Fechar imagem">✕</button>
       <img id="imagemModalImg" alt="" />
+      <button type="button" id="imagemCriticaBtn" class="critica-badge" aria-label="Relatar sobre este item">💬 Relatar</button>
+    </div>
+  </div>
+
+  <div id="criticaOverlay" class="overlay" hidden>
+    <div class="confirm-card">
+      <button type="button" id="criticaFechar" class="video-fechar" aria-label="Fechar">✕</button>
+      <p id="criticaTexto"></p>
+      <div class="confirm-botoes criticas">
+        <button type="button" id="criticaErro" class="secondary">🐞 Erro</button>
+        <button type="button" id="criticaSugestao" class="secondary">💡 Sugestão</button>
+        <button type="button" id="criticaOutro" class="secondary">💬 Outro</button>
+      </div>
     </div>
   </div>
 

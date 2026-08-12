@@ -139,7 +139,22 @@
       <h2 id="detalhesNome"></h2>
       <button type="button" id="detalhesVideoBtn" class="video-botao" hidden disabled>Vídeo…</button>
       <div id="detalhesConteudo" class="detalhes-conteudo"></div>
-      <img id="detalhesImagem" class="detalhes-imagem" alt="" hidden />
+      <div class="detalhes-imagem-wrap">
+        <img id="detalhesImagem" class="detalhes-imagem" alt="" hidden />
+        <button type="button" id="detalhesCriticaBtn" class="critica-badge" aria-label="Relatar">💬 Relatar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="criticaOverlay" class="overlay" hidden>
+    <div class="confirm-card">
+      <button type="button" id="criticaFechar" class="video-fechar" aria-label="Fechar">✕</button>
+      <p id="criticaTexto"></p>
+      <div class="confirm-botoes criticas">
+        <button type="button" id="criticaErro" class="secondary">🐞 Erro</button>
+        <button type="button" id="criticaSugestao" class="secondary">💡 Sugestão</button>
+        <button type="button" id="criticaOutro" class="secondary">💬 Outro</button>
+      </div>
     </div>
   </div>
 

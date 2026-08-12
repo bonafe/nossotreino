@@ -3,5 +3,7 @@ referencias/
 treinos/
 src/python/.env
 src/python/.venv/
+src/python/whatsapp/.env
+src/python/whatsapp/.venv/
 __pycache__/
 .env

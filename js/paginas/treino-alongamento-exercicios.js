@@ -3,6 +3,7 @@ import { carregarBiblioteca } from "../biblioteca-exercicios.js";
 import { PrescricaoFormatadores } from "../prescricao-formatadores.js";
 import { criarVideoPlayerModal, ligarBotaoVideo } from "../video-player-modal.js";
 import { criarImagemModal, ligarImagemExercicio } from "../imagem-exercicio.js";
+import { criarCriticaModal, ligarBotaoCritica } from "../critica-comunidade.js";
 
 // Mirror de treino-exercicios.js, mas pro schema mais simples do
 // alongamento (sem aquecimento/superset/circuito/alternativas/cardio —
@@ -10,6 +11,7 @@ import { criarImagemModal, ligarImagemExercicio } from "../imagem-exercicio.js";
 class TreinoAlongamentoExerciciosController {
   #videoModal = criarVideoPlayerModal();
   #imagemModal = criarImagemModal();
+  #criticaModal = criarCriticaModal();
   #origemTreinoId = null;
 
   #itemCard({ alongamentoId, prescricao, bibliotecaExercicios, treinoAlongamentoId }) {
@@ -44,7 +46,10 @@ class TreinoAlongamentoExerciciosController {
             <a class="ver-progresso" href="${progressoUrl}">Ver progresso →</a>
           </div>
         </div>
-        <img class="item-imagem" alt="" hidden />
+        <div class="item-imagem-col">
+          <img class="item-imagem" alt="" hidden />
+          <button type="button" class="critica-botao-imagem">💬 Relatar</button>
+        </div>
       </div>
     `;
 
@@ -65,10 +70,21 @@ class TreinoAlongamentoExerciciosController {
     imagemEl.addEventListener("click", (evento) => {
       evento.stopPropagation();
       this.#imagemModal.abrir(imagemEl.src, nome);
+      ligarBotaoCritica(document.getElementById("imagemCriticaBtn"), this.#criticaModal, {
+        dominio: "alongamento",
+        id: alongamentoId,
+        nome
+      });
     });
 
     div.querySelector(".ver-progresso").addEventListener("click", (evento) => {
       evento.stopPropagation();
+    });
+
+    ligarBotaoCritica(div.querySelector(".critica-botao-imagem"), this.#criticaModal, {
+      dominio: "alongamento",
+      id: alongamentoId,
+      nome
     });
 
     return div;

@@ -1,5 +1,6 @@
 import { caminhoImagemExercicio } from "./imagem-exercicio.js";
 import { ligarBotaoVideo } from "./video-player-modal.js";
+import { ligarBotaoCritica } from "./critica-comunidade.js";
 
 // Exercícios (bibliotecas.exercicios) e alongamentos (bibliotecas.alongamentos)
 // têm o mesmo formato pros campos usados aqui (nome, descricao,
@@ -74,13 +75,20 @@ function montarSecaoRestricoes(restricoes) {
  * `videoModal` é a instância de `criarVideoPlayerModal()` (video-player-modal.js)
  * já criada pela página hospedeira — reaproveitada aqui pro botão "Ver
  * vídeo" em vez de cada página precisar tratar isso por conta própria.
+ * `criticaModal`, mesma ideia, pra `criarCriticaModal()`
+ * (critica-comunidade.js) — como este modal é o único ponto de "ver
+ * detalhes" comum a treino_novo.html/treino_alongamento_novo.html (onde
+ * não existe card de item com imagem própria) e às telas de execução, é
+ * aqui que o botão de crítica precisa existir pra cobrir as quatro
+ * páginas de uma vez.
  */
-export function criarDetalhesModal(videoModal) {
+export function criarDetalhesModal(videoModal, criticaModal) {
   const overlayEl = document.getElementById("detalhesOverlay");
   const nomeEl = document.getElementById("detalhesNome");
   const conteudoEl = document.getElementById("detalhesConteudo");
   const fecharEl = document.getElementById("detalhesFechar");
   const videoBtnEl = document.getElementById("detalhesVideoBtn");
+  const criticaBtnEl = document.getElementById("detalhesCriticaBtn");
   const imagemEl = document.getElementById("detalhesImagem");
 
   function fechar() {
@@ -119,6 +127,7 @@ export function criarDetalhesModal(videoModal) {
         : '<p class="detalhes-vazio">Nenhum detalhe cadastrado ainda.</p>';
 
       ligarBotaoVideo(videoBtnEl, item.midia, videoModal);
+      ligarBotaoCritica(criticaBtnEl, criticaModal, { dominio, id: item.id, nome: item.nome });
 
       // Foto sempre por último — mesmo padrão de "tentar carregar e tratar
       // ausência" de ligarImagemExercicio (nem todo item tem imagem gerada).

@@ -5,6 +5,7 @@ import { LABEL_CATEGORIA_EXERCICIO } from "../constantes.js";
 import { normalizar, gerarIdUnico } from "../identificadores.js";
 import { criarDetalhesModal } from "../detalhes-modal.js";
 import { criarVideoPlayerModal } from "../video-player-modal.js";
+import { criarCriticaModal } from "../critica-comunidade.js";
 
 const LABEL_METRICA = {
   repeticoes: "Repetições",
@@ -18,7 +19,8 @@ class TreinoNovoController {
   #editandoIndex = null;
   #exercicioEscolhidoId = null;
   #videoModal = criarVideoPlayerModal();
-  #detalhesModal = criarDetalhesModal(this.#videoModal);
+  #criticaModal = criarCriticaModal();
+  #detalhesModal = criarDetalhesModal(this.#videoModal, this.#criticaModal);
 
   #carregandoEl = document.getElementById("carregando");
   #erroEl = document.getElementById("erro");

@@ -72,6 +72,7 @@
 }
 
 .confirm-card {
+  position: relative;
   background: rgba(15, 23, 42, 0.98);
   border: 1px solid rgba(148, 163, 184, 0.25);
   border-radius: 20px;
@@ -93,6 +94,10 @@
   color: #e2e8f0;
   font-size: 0.95rem;
   line-height: 1.5;
+}
+
+#criticaTexto {
+  margin-right: 34px;
 }
 
 .confirm-botoes {
@@ -164,6 +169,30 @@
   width: 100%;
   max-height: 80vh;
   object-fit: contain;
+}
+
+.critica-badge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  z-index: 1;
+  appearance: none;
+  cursor: pointer;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  color: #e2e8f0;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.critica-badge:active {
+  transform: translateY(1px) scale(0.94);
 }
 
 .video-fechar {
@@ -238,6 +267,10 @@
   gap: 8px;
 }
 
+.confirm-botoes.criticas {
+  flex-direction: column;
+}
+
 .detalhes-card {
   position: relative;
   width: min(560px, 100%);
@@ -259,6 +292,12 @@
 
 .detalhes-card .video-botao {
   margin-bottom: 12px;
+}
+
+.detalhes-imagem-wrap {
+  position: relative;
+  min-height: 44px;
+  margin-top: 14px;
 }
 
 .detalhes-conteudo p {
@@ -290,7 +329,6 @@
   max-height: 320px;
   object-fit: contain;
   border-radius: 14px;
-  margin-top: 14px;
   background: rgba(15, 23, 42, 0.4);
 }
 

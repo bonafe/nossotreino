@@ -97,6 +97,14 @@ Exemplos:
 | Carga, descanso e cadência | Prescrição do item de exercício |
 | Observação específica para o aluno | Item do treino |
 
+A biblioteca é mantida com apoio de geração por IA e melhora continuamente
+com o retorno de quem usa — ver
+[critica-comunidade-especificacao.md](./critica-comunidade-especificacao.md).
+Por isso `classificacao.categoria` (§5.3) e `movimento.padrao` (§5.4) são
+deliberadamente listas abertas de "valores sugeridos", não enums fechados:
+uma nova modalidade (ex.: um passo de dança) entra como um novo item de
+`bibliotecas.exercicios` com uma `categoria` nova, sem mudança de schema.
+
 ## 2. Estrutura geral do domínio
 
 A partir da versão 1.2, a biblioteca e o plano de treino são dois **documentos

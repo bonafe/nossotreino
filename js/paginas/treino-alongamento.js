@@ -6,6 +6,7 @@ import { SinalSonoro } from "../sinal-sonoro.js";
 import { Cronometro } from "../cronometro.js";
 import { criarVideoPlayerModal, ligarBotaoVideo } from "../video-player-modal.js";
 import { ligarImagemExercicio, prefetchImagensDoTreino } from "../imagem-exercicio.js";
+import { criarCriticaModal, ligarBotaoCritica } from "../critica-comunidade.js";
 import { criarDetalhesModal } from "../detalhes-modal.js";
 import { deveExibirPedidoApoio, renderizarPedidoApoio } from "../apoio.js";
 import { TelaAtiva } from "../tela-ativa.js";
@@ -19,7 +20,8 @@ class TreinoAlongamentoController {
   #sinal = new SinalSonoro();
   #telaAtiva = new TelaAtiva();
   #videoModal = criarVideoPlayerModal();
-  #detalhesModal = criarDetalhesModal(this.#videoModal);
+  #criticaModal = criarCriticaModal();
+  #detalhesModal = criarDetalhesModal(this.#videoModal, this.#criticaModal);
   #verVideoToken = 0;
   #imagemToken = 0;
   #cronometroSerie = new Cronometro({ aoTick: () => this.#atualizarSerieTimerTela() });
@@ -55,6 +57,7 @@ class TreinoAlongamentoController {
   #concluirSerieEl = document.getElementById("concluirSerie");
   #verVideoEl = document.getElementById("verVideo");
   #imagemAlongamentoEl = document.getElementById("imagemAlongamento");
+  #criticaBtnEl = document.getElementById("criticaBtn");
   #descansoEl = document.getElementById("descanso");
   #descansoTempoEl = document.getElementById("descansoTempo");
   #descansoMinEl = document.getElementById("descansoMin");
@@ -173,6 +176,11 @@ class TreinoAlongamentoController {
     this.#imagemToken += 1;
     const token = this.#imagemToken;
     ligarImagemExercicio(this.#imagemAlongamentoEl, alongamentoId, nome, () => token === this.#imagemToken, "alongamento");
+    ligarBotaoCritica(this.#criticaBtnEl, this.#criticaModal, {
+      dominio: "alongamento",
+      id: alongamentoId,
+      nome
+    });
   }
 
   #itemAtual() {

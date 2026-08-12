@@ -5,6 +5,7 @@ import { Formatadores } from "../formatadores.js";
 import { LABEL_TIPO } from "../constantes.js";
 import { criarVideoPlayerModal, ligarBotaoVideo } from "../video-player-modal.js";
 import { criarImagemModal, ligarImagemExercicio } from "../imagem-exercicio.js";
+import { criarCriticaModal, ligarBotaoCritica } from "../critica-comunidade.js";
 
 const MOMENTO_LABEL = {
   "final-da-serie": "ao final da série",
@@ -27,6 +28,7 @@ function formatarPosicaoIsometria(posicao) {
 class TreinoExerciciosController {
   #videoModal = criarVideoPlayerModal();
   #imagemModal = criarImagemModal();
+  #criticaModal = criarCriticaModal();
 
   #montarGuia(orientacoesGerais) {
     if (!orientacoesGerais) return "";
@@ -148,7 +150,10 @@ class TreinoExerciciosController {
             <a class="ver-progresso" href="${progressoUrl}">Ver progresso →</a>
           </div>
         </div>
-        <img class="item-imagem" alt="" hidden />
+        <div class="item-imagem-col">
+          <img class="item-imagem" alt="" hidden />
+          <button type="button" class="critica-botao-imagem">💬 Relatar</button>
+        </div>
       </div>
     `;
 
@@ -169,10 +174,21 @@ class TreinoExerciciosController {
     imagemEl.addEventListener("click", (evento) => {
       evento.stopPropagation();
       this.#imagemModal.abrir(imagemEl.src, nome);
+      ligarBotaoCritica(document.getElementById("imagemCriticaBtn"), this.#criticaModal, {
+        dominio: "musculacao",
+        id: exercicioId,
+        nome
+      });
     });
 
     div.querySelector(".ver-progresso").addEventListener("click", (evento) => {
       evento.stopPropagation();
+    });
+
+    ligarBotaoCritica(div.querySelector(".critica-botao-imagem"), this.#criticaModal, {
+      dominio: "musculacao",
+      id: exercicioId,
+      nome
     });
 
     return div;
