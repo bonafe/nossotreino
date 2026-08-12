@@ -17,11 +17,14 @@ class TreinoNovoController {
   #bibliotecaExercicios = null;
   #exercicios = [];
   #editandoIndex = null;
+  #treinoIdEditando = null;
   #exercicioEscolhidoId = null;
   #videoModal = criarVideoPlayerModal();
   #criticaModal = criarCriticaModal();
   #detalhesModal = criarDetalhesModal(this.#videoModal, this.#criticaModal);
 
+  #voltarIconEl = document.getElementById("voltarIcon");
+  #tituloEl = document.getElementById("titulo");
   #carregandoEl = document.getElementById("carregando");
   #erroEl = document.getElementById("erro");
   #formEl = document.getElementById("formTreino");
@@ -125,8 +128,38 @@ class TreinoNovoController {
     }
 
     this.#popularFiltros();
+
+    const treinoId = new URLSearchParams(window.location.search).get("treino");
+    if (treinoId) {
+      const treino = this.#dados.treinos.find((t) => t.id === treinoId);
+      if (!treino) {
+        this.#mostrarErro("Este treino não foi encontrado.");
+        return;
+      }
+      this.#carregarTreinoParaEdicao(treino);
+    }
+
     this.#carregandoEl.hidden = true;
     this.#formEl.hidden = false;
+  }
+
+  // Reaproveita a mesma tela/estado de criação pra editar um treino já
+  // existente — só pré-popula nome/tipo/exercícios (clonados, pra não
+  // mutar `this.#dados.treinos` antes de salvar) e troca os textos.
+  // `#editarExercicio` (linha 473+) já sabia repopular o formulário de
+  // prescrição a partir de um item existente; aqui é o mesmo princípio
+  // aplicado ao treino inteiro.
+  #carregarTreinoParaEdicao(treino) {
+    this.#treinoIdEditando = treino.id;
+    this.#nomeInputEl.value = treino.nome;
+    this.#tipoInputEl.value = treino.tipo;
+    this.#exercicios = treino.exercicios.map((item) => structuredClone(item));
+    this.#renderListaExercicios();
+
+    this.#tituloEl.textContent = "Editar treino";
+    document.title = `Editar ${treino.nome} — Nosso Treino`;
+    this.#salvarBtnEl.textContent = "Salvar alterações";
+    this.#voltarIconEl.href = `treino_exercicios.html?treino=${encodeURIComponent(treino.id)}`;
   }
 
   #popularFiltros() {
@@ -527,9 +560,40 @@ class TreinoNovoController {
       return;
     }
 
+    const temCircuito = this.#exercicios.some((item) => item.circuito != null);
+
+    if (this.#treinoIdEditando) {
+      // Preserva tudo que esta tela não edita (aquecimento, referências de
+      // cardio/alongamento complementares, versao) em vez de resetar —
+      // só sobrescreve os campos que passaram pelo formulário.
+      const index = this.#dados.treinos.findIndex((t) => t.id === this.#treinoIdEditando);
+      const treino = {
+        ...this.#dados.treinos[index],
+        nome,
+        tipo: this.#tipoInputEl.value,
+        exercicios: this.#exercicios,
+        status: this.#exercicios.length ? "ativo" : "rascunho"
+      };
+
+      if (temCircuito) {
+        treino.configuracaoCircuito = {
+          ativo: true,
+          modoExecucao: "uma-serie-de-cada-exercicio-em-sequencia"
+        };
+      } else {
+        delete treino.configuracaoCircuito;
+      }
+
+      this.#dados.treinos[index] = treino;
+      TreinosStorage.definirDadosTreinos(this.#dados);
+
+      await TreinosStorage.aguardarEscritas();
+      window.location.href = `treino_exercicios.html?treino=${encodeURIComponent(treino.id)}`;
+      return;
+    }
+
     const idsExistentes = new Set(this.#dados.treinos.map((t) => t.id));
     const id = gerarIdUnico(nome, idsExistentes);
-    const temCircuito = this.#exercicios.some((item) => item.circuito != null);
 
     const treino = {
       id,

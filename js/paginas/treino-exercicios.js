@@ -381,6 +381,10 @@ class TreinoExerciciosController {
     document.title = `${treino.nome} — Treino de Exercícios`;
     document.getElementById("titulo").textContent = treino.nome;
 
+    const editarEl = document.getElementById("editarTreinoLink");
+    editarEl.href = `treino_novo.html?treino=${encodeURIComponent(treino.id)}`;
+    editarEl.hidden = false;
+
     const tipoTagEl = document.getElementById("tipoTag");
     tipoTagEl.hidden = false;
     tipoTagEl.textContent = LABEL_TIPO[treino.tipo] || treino.tipo;
