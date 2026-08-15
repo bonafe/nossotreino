@@ -427,14 +427,41 @@ class TreinoNovoController {
     if (this.#editandoIndex !== null) {
       item.ordem = this.#exercicios[this.#editandoIndex].ordem;
       this.#exercicios[this.#editandoIndex] = item;
+      this.#reposicionarParaGrupo(this.#editandoIndex);
       this.#fecharPicker();
     } else {
       this.#exercicios.push(item);
-      this.#renumerarOrdem();
+      this.#reposicionarParaGrupo(this.#exercicios.length - 1);
       this.#abrirPickerBusca();
     }
 
+    this.#renumerarOrdem();
     this.#renderListaExercicios();
+  }
+
+  // Superset/circuito só faz sentido como exercícios em sequência — se o
+  // número atribuído já existe em outro ponto da lista (ex.: A=Superset 1,
+  // B=Superset 2, C=Superset 1 de novo), o item precisa ficar adjacente ao
+  // resto do grupo, senão a exibição mostraria "Superset 1" duas vezes
+  // separadas. Sem grupo existente, não mexe em nada.
+  #reposicionarParaGrupo(index) {
+    const item = this.#exercicios[index];
+    const tipo = item.superset != null ? "superset" : item.circuito != null ? "circuito" : null;
+    if (!tipo) return;
+    const numero = item.superset ?? item.circuito;
+
+    let ultimoIndexDoGrupo = -1;
+    this.#exercicios.forEach((outro, i) => {
+      if (i === index) return;
+      const outroTipo = outro.superset != null ? "superset" : outro.circuito != null ? "circuito" : null;
+      const outroNumero = outro.superset ?? outro.circuito;
+      if (outroTipo === tipo && outroNumero === numero) ultimoIndexDoGrupo = i;
+    });
+    if (ultimoIndexDoGrupo === -1) return;
+
+    const [removido] = this.#exercicios.splice(index, 1);
+    const alvo = index < ultimoIndexDoGrupo ? ultimoIndexDoGrupo : ultimoIndexDoGrupo + 1;
+    this.#exercicios.splice(alvo, 0, removido);
   }
 
   #renumerarOrdem() {

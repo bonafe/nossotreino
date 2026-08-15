@@ -198,7 +198,13 @@ class TreinoExerciciosController {
   // marcadores numéricos (`superset`/`circuito`) em cada item — itens
   // consecutivos com o mesmo marcador viram um grupo visual, mesma
   // aparência de "bloco" de antes, só que calculado aqui em vez de vir
-  // pronto no JSON.
+  // pronto no JSON. `treino_novo.html` já reposiciona o exercício pra
+  // manter o grupo contíguo ao atribuir o número (ver
+  // `#reposicionarParaGrupo` em treino-novo.js), mas isso aqui é a rede de
+  // segurança: se um número acabar repetido fora de sequência mesmo assim
+  // (reordenar manualmente pelas setas, ou dado legado/importado), funde
+  // com o grupo já existente em vez de abrir um bloco "Superset N"
+  // duplicado.
   #agruparPorMarcador(exercicios) {
     const ordenados = [...exercicios].sort((a, b) => a.ordem - b.ordem);
     const grupos = [];
@@ -222,6 +228,15 @@ class TreinoExerciciosController {
 
       if (mesmoGrupo) {
         anterior.itens.push(item);
+        return;
+      }
+
+      const grupoExistente =
+        marcador &&
+        grupos.find((g) => g.marcador && g.marcador.tipo === marcador.tipo && g.marcador.numero === marcador.numero);
+
+      if (grupoExistente) {
+        grupoExistente.itens.push(item);
       } else {
         grupos.push({ marcador, itens: [item] });
       }

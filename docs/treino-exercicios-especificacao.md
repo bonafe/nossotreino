@@ -168,10 +168,14 @@ este treino", botão "Iniciar treino" oculto), sem quebrar.
   alternativa como um card adicional logo depois do item principal,
   esmaecido e marcado "Substituto" (mesmo efeito visual de antes) — não é
   mais um item-irmão no JSON, é um array aninhado no item que substitui.
-- **Superset**: itens consecutivos (após ordenar por `ordem`) com o mesmo
-  `superset` são agrupados visualmente sob um heading "Superset N — fazer
-  em sequência", calculado pela página a partir da lista plana (não vem
-  pronto no JSON).
+- **Superset**: itens com o mesmo `superset` são agrupados visualmente sob
+  um heading único "Superset N — fazer em sequência", calculado pela
+  página a partir da lista plana (não vem pronto no JSON) — mesmo que não
+  apareçam em sequência na lista. `treino_novo.html` já reposiciona o
+  exercício pra manter o grupo contíguo no momento em que o número é
+  atribuído (`#reposicionarParaGrupo`); o agrupamento na exibição também
+  funde números repetidos fora de sequência como rede de segurança
+  (reordenar manualmente, dado legado/importado).
 - **Circuito**: mesma lógica de agrupamento, heading "Circuito N — uma
   série de cada por volta", a partir do marcador `circuito`.
 - **Isometria**: item com `prescricao.tecnicas` contendo `{tipo:
