@@ -77,7 +77,7 @@ function montarSecaoRestricoes(restricoes) {
  * vídeo" em vez de cada página precisar tratar isso por conta própria.
  * `criticaModal`, mesma ideia, pra `criarCriticaModal()`
  * (critica-comunidade.js) — como este modal é o único ponto de "ver
- * detalhes" comum a treino_novo.html/treino_alongamento_novo.html (onde
+ * detalhes" comum a treino_musculacao_novo.html/treino_alongamento_novo.html (onde
  * não existe card de item com imagem própria) e às telas de execução, é
  * aqui que o botão de crítica precisa existir pra cobrir as quatro
  * páginas de uma vez.
@@ -89,6 +89,7 @@ export function criarDetalhesModal(videoModal, criticaModal) {
   const fecharEl = document.getElementById("detalhesFechar");
   const videoBtnEl = document.getElementById("detalhesVideoBtn");
   const criticaBtnEl = document.getElementById("detalhesCriticaBtn");
+  const editarBtnEl = document.getElementById("detalhesEditarBtn");
   const imagemEl = document.getElementById("detalhesImagem");
 
   function fechar() {
@@ -128,6 +129,12 @@ export function criarDetalhesModal(videoModal, criticaModal) {
 
       ligarBotaoVideo(videoBtnEl, item.midia, videoModal);
       ligarBotaoCritica(criticaBtnEl, criticaModal, { dominio, id: item.id, nome: item.nome });
+      // Nova aba — mesmo motivo de abrirCriticaWhatsApp usar window.open em
+      // vez de navegar a própria aba: evita perder o que a pessoa já
+      // montou na tela de origem (ex.: treino em construção em
+      // treino_musculacao_novo.html) ao editar um item da biblioteca.
+      const urlAtual = window.location.pathname.split("/").pop() + window.location.search;
+      editarBtnEl.href = `exercicio_novo.html?dominio=${encodeURIComponent(dominio)}&id=${encodeURIComponent(item.id)}&voltar=${encodeURIComponent(urlAtual)}`;
 
       // Foto sempre por último — mesmo padrão de "tentar carregar e tratar
       // ausência" de ligarImagemExercicio (nem todo item tem imagem gerada).

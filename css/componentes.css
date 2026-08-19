@@ -191,7 +191,14 @@
   white-space: nowrap;
 }
 
-.critica-badge:active {
+.editar-badge {
+  left: 8px;
+  right: auto;
+  text-decoration: none;
+}
+
+.critica-badge:active,
+.editar-badge:active {
   transform: translateY(1px) scale(0.94);
 }
 

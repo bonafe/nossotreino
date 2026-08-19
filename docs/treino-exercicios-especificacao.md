@@ -171,7 +171,7 @@ este treino", botão "Iniciar treino" oculto), sem quebrar.
 - **Superset**: itens com o mesmo `superset` são agrupados visualmente sob
   um heading único "Superset N — fazer em sequência", calculado pela
   página a partir da lista plana (não vem pronto no JSON) — mesmo que não
-  apareçam em sequência na lista. `treino_novo.html` já reposiciona o
+  apareçam em sequência na lista. `treino_musculacao_novo.html` já reposiciona o
   exercício pra manter o grupo contíguo no momento em que o número é
   atribuído (`#reposicionarParaGrupo`); o agrupamento na exibição também
   funde números repetidos fora de sequência como rede de segurança
@@ -198,12 +198,12 @@ este treino", botão "Iniciar treino" oculto), sem quebrar.
 
 ```
 sistema.html
-   └─> treino_exercicios_menu.html   (lista treinos do plano carregado)
-          └─> treino_exercicios.html?treino=<id>   (exibe aquecimento, exercícios e cardio do treino)
+   └─> treino_musculacao_menu.html   (lista treinos do plano carregado)
+          └─> treino_musculacao_exercicios.html?treino=<id>   (exibe aquecimento, exercícios e cardio do treino)
                  └─> treino_execucao.html?treino=<id>   (execução guiada, um exercício por vez — ver seção 8)
 ```
 
-### 6.1 Menu (`treino_exercicios_menu.html`)
+### 6.1 Menu (`treino_musculacao_menu.html`)
 
 A ordem de exibição na tela é: botão "Continuar de onde parou" (seção
 6.1.1, se houver alguma execução em andamento), gráfico de histórico
@@ -214,16 +214,16 @@ A ordem de exibição na tela é: botão "Continuar de onde parou" (seção
   (`treino.exercicios.length`); marca o treino de hoje comparando
   `distribuicaoSemanal[].dia` (`"segunda-feira"`…`"domingo"`) com o dia
   atual.
-- Cada cartão é um link para `treino_exercicios.html?treino=<id>`.
+- Cada cartão é um link para `treino_musculacao_exercicios.html?treino=<id>`.
 
 #### 6.1.1 Botão "Continuar de onde parou"
 
-O botão "Continuar treino →" que já existe em `treino_exercicios.html`
+O botão "Continuar treino →" que já existe em `treino_musculacao_exercicios.html`
 (seção 6.2) só aparece depois de entrar no treino específico que está em
 andamento — útil quando é o treino do dia, mas obriga a lembrar/adivinhar
 qual treino estava pendente quando não é. Este botão resolve isso: acessa
 diretamente a execução em andamento **de qualquer treino**, direto do
-menu, sem passar por `treino_exercicios.html`.
+menu, sem passar por `treino_musculacao_exercicios.html`.
 
 - Ao carregar a tela, busca todas as chaves com prefixo
   `execucao.musculacao.` via `TreinosStorage.listarChavesComPrefixo(...)`
@@ -231,7 +231,7 @@ menu, sem passar por `treino_exercicios.html`.
   treino com progresso salvo (seção 8.3). Extrai o `treinoId` de cada
   chave (formato `execucao.musculacao.<treinoId>.v2`).
 - Considera "em andamento" o mesmo critério já usado em
-  `treino_exercicios.html` (seção 6.2): `progresso.exercicioId &&
+  `treino_musculacao_exercicios.html` (seção 6.2): `progresso.exercicioId &&
   progresso.serieAtual >= 1`.
 - **Vários treinos em andamento ao mesmo tempo** (caso raro, mas
   possível — nada impede começar um treino diferente sem finalizar o
@@ -279,7 +279,7 @@ distingue) por dia ou mês.
 - Mesma cor de barra (`#bef264`) e mesma cor de rótulo (`#e2e8f0`), única
   série.
 
-### 6.2 Página do treino (`treino_exercicios.html`)
+### 6.2 Página do treino (`treino_musculacao_exercicios.html`)
 
 - Lê o parâmetro de query `?treino=<id>`.
 - Carrega o plano (`TreinosStorage.carregarDadosTreinos()`) e a biblioteca
@@ -309,7 +309,7 @@ distingue) por dia ou mês.
   `serieAtual >= 1`). Quando `exercicios` estiver vazio (`flexibilidade`),
   o botão não aparece.
 - Cada card de exercício é clicável (a caixa inteira, igual ao cartão de
-  treino em `treino_exercicios_menu.html`) e leva direto para aquele
+  treino em `treino_musculacao_menu.html`) e leva direto para aquele
   exercício específico em
   `treino_execucao.html?treino=<id>&exercicio=<exercicioId>&opcao=<opcaoExercicioId>`
   (o item principal usa `opcao` igual ao próprio `exercicioId`; cada
@@ -376,7 +376,7 @@ Cada alternativa herda a `prescricao` do item principal quando não
 declara a própria (ver seção 10.10 de
 [especificacao-biblioteca-exercicios.md](./especificacao-biblioteca-exercicios.md)).
 
-`treino_exercicios.html` usa o `exercicioId` de cada item/alternativa
+`treino_musculacao_exercicios.html` usa o `exercicioId` de cada item/alternativa
 diretamente para montar o link de cada card — ver seção 6.2.
 
 Assim que os slots são montados, a página dispara
@@ -395,7 +395,7 @@ do pré-carregamento de vídeo (biblioteca inteira, seção 8 de
 [torrent-videos-especificacao.md](./torrent-videos-especificacao.md)),
 aqui o escopo é só os exercícios deste treino — a pasta de imagens já
 passa de 40 MB, então baixar a biblioteca inteira de uma vez seria
-desperdício. `treino_exercicios.html` (seção 6.2) já cobre isso hoje sem
+desperdício. `treino_musculacao_exercicios.html` (seção 6.2) já cobre isso hoje sem
 precisar dessa função: como monta um card por item/alternativa de uma
 vez, cada `ligarImagemExercicio` já dispara o carregamento daquela
 imagem como efeito colateral.
@@ -403,7 +403,7 @@ imagem como efeito colateral.
 ### 8.2.1 Pular direto para um exercício (`?exercicio=` e `?opcao=`)
 
 Além de `?treino=<id>`, a página aceita `?exercicio=<exercicioId>` e,
-opcionalmente, `?opcao=<opcaoExercicioId>` (usado por `treino_exercicios.html`
+opcionalmente, `?opcao=<opcaoExercicioId>` (usado por `treino_musculacao_exercicios.html`
 ao linkar um card específico). Quando presentes e válidos:
 
 1. Carrega/retoma o progresso salvo normalmente (seção 8.3).
@@ -465,7 +465,7 @@ Para a opção atual do slot atual, mostrar:
   grupos musculares detalhados (principais/secundários/estabilizadores),
   equipamentos, instruções de execução, respiração, erros comuns,
   cuidados e restrições do exercício atual — mesmo componente
-  reaproveitado em `treino_novo.html` (picker de busca e lista de
+  reaproveitado em `treino_musculacao_novo.html` (picker de busca e lista de
   exercícios já adicionados) e no motor de alongamento
   ([treino-alongamento-especificacao.md](./treino-alongamento-especificacao.md)).
   O overlay também tem um botão "Ver vídeo" (`ligarBotaoVideo`, quando
@@ -586,7 +586,7 @@ série"** — não há avanço automático.
 Os alvos vêm de `prescricao.descansoSegundos` do item atual quando
 definido (mín. = máx. = esse valor); senão, de
 `orientacoesGerais.descansoPadrao.{minSegundos,maxSegundos}` (o mesmo
-texto exibido no "Guia rápido" de `treino_exercicios.html`, seção 3.3
+texto exibido no "Guia rápido" de `treino_musculacao_exercicios.html`, seção 3.3
 deste documento); na ausência de ambos, 60–120s:
 
 - Ao atingir o mínimo: toca um sinal sonoro (três bipes iguais, mesmo
@@ -634,7 +634,7 @@ Quando a última série do último slot é concluída:
 - Remove a chave `execucao.musculacao.<treinoId>.v2` (não há mais
   progresso em aberto para retomar).
 - Mostra uma tela de conclusão simples ("Treino concluído 🎉") com link
-  de volta para `treino_exercicios_menu.html`.
+  de volta para `treino_musculacao_menu.html`.
 
 ### 8.8 Erros
 
@@ -737,11 +737,11 @@ ainda...") e não renderiza as abas.
   série" daquele exercício, com o cronômetro zerado (a série anterior,
   se já tinha sido concluída, continua salva normalmente).
 
-## 11. Criar treino novo (`treino_novo.html`)
+## 11. Criar treino novo (`treino_musculacao_novo.html`)
 
 Primeira tela de edição do plano pela interface: monta um treino do zero
 e anexa a `dados.treinos`. Acessível por um botão "+" no cabeçalho de
-`treino_exercicios_menu.html` (`.icon-btn`, mesma aparência do
+`treino_musculacao_menu.html` (`.icon-btn`, mesma aparência do
 `voltar-icon`, alinhado à direita).
 
 ### 11.1 Carregamento
@@ -812,7 +812,7 @@ tela, editável só no JSON depois (seção 12.3 de
 sem nenhum), empurra em `dados.treinos` e regrava o plano inteiro com
 `TreinosStorage.definirDadosTreinos(dados)` — mesma função já usada por
 `plano-novo.js` (criar) e `alunos.js` (importar), sem mudar assinatura.
-Redireciona pra `treino_exercicios.html?treino=<id>`.
+Redireciona pra `treino_musculacao_exercicios.html?treino=<id>`.
 
 ### 11.5 Fora de escopo desta tela
 

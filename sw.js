@@ -1,4 +1,4 @@
-const CACHE_NOME = "treinos-shell-v21";
+const CACHE_NOME = "treinos-shell-v22";
 
 const ARQUIVOS_PARA_CACHE = [
   "index.html",
@@ -20,11 +20,11 @@ const ARQUIVOS_PARA_CACHE = [
   "treino_alongamento.html",
   "treino_alongamento_novo.html",
   "treino_alongamento_progresso.html",
-  "treino_exercicios_menu.html",
-  "treino_exercicios.html",
+  "treino_musculacao_menu.html",
+  "treino_musculacao_exercicios.html",
   "treino_execucao.html",
   "treino_exercicio_progresso.html",
-  "treino_novo.html",
+  "treino_musculacao_novo.html",
   "biblioteca-exercicios/biblioteca-exercicios.json",
   "d3.v7.min.js",
   "webtorrent.min.js",
@@ -38,11 +38,11 @@ const ARQUIVOS_PARA_CACHE = [
   "css/paginas/planos.css",
   "css/paginas/treino-bicicleta-menu.css",
   "css/paginas/treino-bicicleta.css",
-  "css/paginas/treino-exercicios-menu.css",
-  "css/paginas/treino-exercicios.css",
+  "css/paginas/treino-musculacao-menu.css",
+  "css/paginas/treino-musculacao-exercicios.css",
   "css/paginas/treino-execucao.css",
   "css/paginas/treino-exercicio-progresso.css",
-  "css/paginas/treino-novo.css",
+  "css/paginas/treino-musculacao-novo.css",
   "js/storage.js",
   "js/armazenamento-indexeddb.js",
   "js/versao.js",
@@ -76,11 +76,11 @@ const ARQUIVOS_PARA_CACHE = [
   "js/paginas/treino-alongamento.js",
   "js/paginas/treino-alongamento-novo.js",
   "js/paginas/treino-alongamento-progresso.js",
-  "js/paginas/treino-exercicios-menu.js",
-  "js/paginas/treino-exercicios.js",
+  "js/paginas/treino-musculacao-menu.js",
+  "js/paginas/treino-musculacao-exercicios.js",
   "js/paginas/treino-execucao.js",
   "js/paginas/treino-exercicio-progresso.js",
-  "js/paginas/treino-novo.js"
+  "js/paginas/treino-musculacao-novo.js"
 ];
 
 // cache.addAll é tudo-ou-nada: se um único arquivo falhar, nenhum entra no

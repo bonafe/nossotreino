@@ -77,7 +77,7 @@ class TreinoExerciciosMenuController {
     const a = document.createElement("a");
     const ehHoje = treino.id === idTreinoHoje;
     a.className = ehHoje ? "treino hoje" : "treino";
-    a.href = `treino_exercicios.html?treino=${encodeURIComponent(treino.id)}`;
+    a.href = `treino_musculacao_exercicios.html?treino=${encodeURIComponent(treino.id)}`;
 
     const qtdExercicios = this.#contarExercicios(treino);
     const resumo = qtdExercicios === 0

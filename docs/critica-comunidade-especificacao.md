@@ -46,8 +46,8 @@ anglicismo "Feedback" no rótulo clicável) e nunca fica solto/flutuante
 sem contexto: sempre dentro do fluxo normal de botões da tela, nunca
 sobreposto (`position: absolute`) a uma imagem que pode nem existir ainda.
 
-- **Telas de lista** (`treino_exercicios.html`, `treino_alongamento_exercicios.html`,
-  via `#itemCard` de `js/paginas/treino-exercicios.js`/`treino-alongamento-exercicios.js`):
+- **Telas de lista** (`treino_musculacao_exercicios.html`, `treino_alongamento_exercicios.html`,
+  via `#itemCard` de `js/paginas/treino-musculacao-exercicios.js`/`treino-alongamento-exercicios.js`):
   botão de texto+ícone (`.critica-botao`, tom neutro — mesma família visual
   de `.video-botao`) na `.item-acoes`, ao lado de "Ver progresso"/"Ver
   vídeo".
@@ -62,7 +62,7 @@ sobreposto (`position: absolute`) a uma imagem que pode nem existir ainda.
   sobreposição nela.
 - **Modal de detalhes** (`#detalhesOverlay`/`.detalhes-card`, aberto pelo
   botão ⓘ): botão `#detalhesCriticaBtn`, ao lado de "Vídeo…" — é o único
-  ponto de acesso em `treino_novo.html`/`treino_alongamento_novo.html`
+  ponto de acesso em `treino_musculacao_novo.html`/`treino_alongamento_novo.html`
   (tela de montagem de treino, que não tem card de item com imagem
   própria), e um ponto adicional nas telas de execução.
 

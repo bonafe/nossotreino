@@ -1,0 +1,81 @@
+.badge-personalizado {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  background: rgba(190, 242, 100, 0.18);
+  color: #bef264;
+  vertical-align: middle;
+}
+
+.picker-resultado-acoes {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.editar-link {
+  text-decoration: none;
+  font-size: 0.95rem;
+  line-height: 1;
+  padding: 4px;
+}
+
+.picker-resultado-linha {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.picker-resultado-imagem {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  object-fit: cover;
+  background: rgba(148, 163, 184, 0.12);
+}
+
+.picker-resultado-conteudo {
+  flex: 1;
+  min-width: 0;
+}
+
+.filtros-biblioteca {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.filtros-biblioteca-grupos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filtros-biblioteca-grupos .filtro-grupo {
+  position: relative;
+  flex: 1 1 160px;
+}
+
+.filtros-biblioteca-grupos .filtro-toggle {
+  width: 100%;
+}
+
+.filtros-biblioteca-grupos .filtro-opcoes {
+  position: absolute;
+  z-index: 2;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  background: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 12px;
+  padding: 8px;
+}

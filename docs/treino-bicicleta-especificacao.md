@@ -181,10 +181,10 @@ sistema.html
 ```
 
 Esse fluxo é independente do fluxo de exercícios
-(`treino_exercicios_menu.html` → `treino_exercicios.html` →
+(`treino_musculacao_menu.html` → `treino_musculacao_exercicios.html` →
 `treino_execucao.html`) — dá para entrar direto no cronômetro de bicicleta
 sem passar pelo treino de musculação. O card "Cardio complementar" de
-`treino_exercicios.html` também linka pra cá, usando o mesmo
+`treino_musculacao_exercicios.html` também linka pra cá, usando o mesmo
 `treino=<treinoCardioId>` mais um `origem=<treinoMusculacaoId>` (só nesse
 caso) — ver seção 5.2.1.
 
@@ -192,7 +192,7 @@ caso) — ver seção 5.2.1.
 
 A primeira coisa exibida na tela, antes da lista de treinos, é o gráfico de
 histórico (seção 5.1.1). A lista de treinos disponíveis vem depois. O
-cabeçalho tem um botão "+" (mesmo padrão de `treino_exercicios_menu.html`)
+cabeçalho tem um botão "+" (mesmo padrão de `treino_musculacao_menu.html`)
 que leva a `treino_bicicleta_novo.html` (seção 5.3).
 
 - Carrega o plano (`TreinosStorage.carregarDadosTreinos()`) e a biblioteca
@@ -280,13 +280,13 @@ minutos.
 #### 5.2.1 Botão de voltar
 
 O ícone `←` no topo da tela (mesmo padrão visual de
-`treino_exercicios.html`/`treino_execucao.html`) depende de como a página
+`treino_musculacao_exercicios.html`/`treino_execucao.html`) depende de como a página
 foi aberta:
 
 - Com `?origem=<treinoMusculacaoId>` na URL (entrou pelo card "Cardio
-  complementar" de `treino_exercicios.html`, seção 6.2 de
+  complementar" de `treino_musculacao_exercicios.html`, seção 6.2 de
   [treino-exercicios-especificacao.md](./treino-exercicios-especificacao.md)):
-  volta para `treino_exercicios.html?treino=<origem>`.
+  volta para `treino_musculacao_exercicios.html?treino=<origem>`.
 - Sem `origem` (entrou direto pelo menu de bicicleta, seção 5.1): volta
   para `treino_bicicleta_menu.html`.
 
@@ -302,7 +302,7 @@ pequena, um `<select>` basta): nome, modalidade
 intensidade (leve/máxima), tempo de recuperação + intensidade. Tipo fixo
 `"intervalado"` (seção 8 — único suportado pelo motor). Ao salvar, gera um
 `id` único (reaproveitando `js/identificadores.js`, mesmo helper usado por
-`treino_novo.html`) e dá `push` em `dados.treinosCardio`, depois volta
+`treino_musculacao_novo.html`) e dá `push` em `dados.treinosCardio`, depois volta
 para `treino_bicicleta_menu.html`. Anexar esse treino a um treino de
 musculação existente como complemento continua sendo manual (editar
 `treino.cardio[]` daquele treino, seção 4.2) — fora de escopo desta tela.

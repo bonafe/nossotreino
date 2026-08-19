@@ -56,8 +56,8 @@ publicado — é responsabilidade do service worker, ver
 [treino_bicicleta.html](../treino_bicicleta.html),
 [treino_bicicleta_menu.html](../treino_bicicleta_menu.html),
 [treino_bicicleta_novo.html](../treino_bicicleta_novo.html),
-[treino_exercicios_menu.html](../treino_exercicios_menu.html),
-[treino_exercicios.html](../treino_exercicios.html),
+[treino_musculacao_menu.html](../treino_musculacao_menu.html),
+[treino_musculacao_exercicios.html](../treino_musculacao_exercicios.html),
 [treino_execucao.html](../treino_execucao.html),
 [treino_exercicio_progresso.html](../treino_exercicio_progresso.html),
 [treino_alongamento_menu.html](../treino_alongamento_menu.html),
@@ -71,7 +71,7 @@ através de um script único e compartilhado:
 
 ## 2. Esquema do banco e política de versionamento
 
-Banco `nossotreino` (`js/armazenamento-indexeddb.js`), 7 object stores:
+Banco `nossotreino` (`js/armazenamento-indexeddb.js`), 8 object stores:
 
 | Loja | `keyPath` | Índices | Registro |
 |---|---|---|---|
@@ -82,6 +82,7 @@ Banco `nossotreino` (`js/armazenamento-indexeddb.js`), 7 object stores:
 | `execucoes` | `[planoId, tipo, treinoId]` | `porPlano`→`planoId`, `porPlanoETipo`→`[planoId, tipo]` | `{planoId, tipo, treinoId, progresso}` — estado de um treino em andamento (`tipo` é `musculacao`/`alongamento`), pra retomar após fechar a página — endereçado por `exercicioId` dentro de `progresso`, não por índice posicional |
 | `preferencias` | `chave` | — | `{chave, valor}` — inclui `planoAtivoId` (id do plano cujos dados escopados estão sendo lidos/escritos agora, ou `null`), e as preferências globais (`apoio.*`, `avisoIaAceito.v1`) que não dependem de plano nenhum |
 | `meta` | `chave` | — | bookkeeping interno do próprio motor de armazenamento, nunca dado de usuário |
+| `bibliotecaPersonalizada` | `[dominio, id]` | — | `{dominio, id, origem, baseadoEmVersao, entrada, criadoEm, atualizadoEm}` — exercícios/alongamentos novos ou editados localmente, escopo global (não por aluno/plano). Ver seção 26 de [especificacao-biblioteca-exercicios.md](./especificacao-biblioteca-exercicios.md) |
 
 Não existe um "aluno ativo" global: qual aluno está sendo visto é só a
 query string (`planos.html?aluno=<id>`) — nenhuma leitura/escrita de
@@ -91,7 +92,7 @@ Como o id do plano é parte da chave física em `historico`/`execucoes`,
 dois planos diferentes podem ter um treino com o mesmo id (ex: ambos com
 um treino `treino-a`) sem nenhum risco de um vazar/misturar com o outro.
 
-Todo o código de página (`treino_execucao.html`, `treino_novo.html` etc.)
+Todo o código de página (`treino_execucao.html`, `treino_musculacao_novo.html` etc.)
 continua lendo/escrevendo por uma **chave relativa** (`dados.v1`,
 `historico.serieMusculacao.v1`, `execucao.musculacao.<treinoId>.v2` etc.)
 via `TreinosStorage.lerJSON`/`salvarJSON`/`chaves.*` — essas strings são a
@@ -181,6 +182,12 @@ nunca reescreve uma entrada antiga:
    de uma vez, já concluída e removida do código (rodou automaticamente
    na primeira visita de cada navegador depois do deploy; não há mais
    nenhuma leitura de `localStorage` em lugar nenhum do projeto).
+5. `VERSAO_BANCO` `1` → `2` — loja `bibliotecaPersonalizada` nova (só
+   `createObjectStore`, sem tocar nas lojas existentes) — ver seção 26 de
+   [especificacao-biblioteca-exercicios.md](./especificacao-biblioteca-exercicios.md).
+6. Backup `versao` `2` → `3` — campo `bibliotecaPersonalizada` novo no
+   envelope (`migrarBackupDe2Para3`); backup antigo simplesmente não tinha
+   nenhum personalizado pra trazer, então migra pra `[]`.
 
 ## 3. Hierarquia aluno → plano → sistema
 
@@ -204,7 +211,7 @@ index.html
 
 Primeira tela depois de `index.html`. Segue **o mesmo padrão visual das
 outras telas de menu** (`treino_bicicleta_menu.html`,
-`treino_exercicios_menu.html`, `treino_alongamento_menu.html`): cabeçalho
+`treino_musculacao_menu.html`, `treino_alongamento_menu.html`): cabeçalho
 `header.top` com seta de voltar à esquerda e um botão "+" à direita
 (`.icon-btn`) que leva pra uma tela dedicada de criação — aqui,
 `aluno_novo.html` — em vez de um formulário embutido na própria lista.
@@ -298,7 +305,7 @@ pra renomear/excluir.
 
 Sempre acessada com `?aluno=<alunoId>` na URL — sem isso (ou com um id
 que não existe), mostra erro com link de volta pra `alunos.html` (mesmo
-padrão de `treino_novo.html` quando falta contexto). Cabeçalho mostra o
+padrão de `treino_musculacao_novo.html` quando falta contexto). Cabeçalho mostra o
 nome do aluno no título ("Planos de João"); voltar → `alunos.html`; "+"
 → `plano_novo.html?aluno=<alunoId>`.
 
@@ -326,8 +333,17 @@ ações:
   tudo em memória, sem precisar baixar/importar arquivo (esse caminho
   continua existindo, seção 3.1, pra mandar de fato pra outro
   aparelho/pessoa fora do navegador).
-- **Baixar plano** — `TreinosStorage.lerDadosDoPlano(id)`, baixa só a
-  composição (sem histórico) — pro professor mandar pro aluno.
+- **Baixar plano** — `TreinosStorage.montarExportacaoAvulsaDoPlano(id)`,
+  baixa a composição (sem histórico) embrulhada em
+  `{plano, bibliotecaPersonalizada}` — o segundo campo traz só os
+  exercícios/alongamentos personalizados que aquele plano de fato
+  referencia (ver seção 26 de
+  [especificacao-biblioteca-exercicios.md](./especificacao-biblioteca-exercicios.md)),
+  pra quem recebe o arquivo não perder prescrições que apontam pra um
+  item que só existe no aparelho de quem criou o plano — pro professor
+  mandar pro aluno. `TreinosStorage.importarPlano` aceita tanto esse
+  formato embrulhado quanto um arquivo antigo/cru (só o plano, sem o
+  embrulho).
 - **Baixar tudo (com estatísticas)** —
   `TreinosStorage.montarExportacaoCompletaDoPlano(id)`, baixa composição
   + histórico + progresso em andamento — pro aluno devolver pro
@@ -345,7 +361,7 @@ gera um id único, adiciona ao índice, ativa e grava um esqueleto vazio
 código já trata essa ausência graciosamente, ver seção 6 de
 [treino-exercicios-especificacao.md](./treino-exercicios-especificacao.md))
 e redireciona pra `sistema.html`. De lá, o professor usa os mesmos botões
-"+" que um aluno usa (`treino_novo.html`, `treino_bicicleta_novo.html`,
+"+" que um aluno usa (`treino_musculacao_novo.html`, `treino_bicicleta_novo.html`,
 `treino_alongamento_novo.html`) pra montar os treinos — essas telas já
 funcionam com qualquer plano ativo, não distinguem se foi importado,
 criado do zero ou duplicado.
@@ -365,7 +381,7 @@ function definirDadosTreinos(dados) {
 }
 ```
 
-Usadas por toda página que precisa da composição do plano (`treino-novo.js`,
+Usadas por toda página que precisa da composição do plano (`treino-musculacao-novo.js`,
 `treino-execucao.js`, `treino-bicicleta*.js`, `treino-alongamento*.js`
 etc.), exatamente como antes de existir mais de um plano por navegador —
 nenhuma dessas páginas muda de comportamento. Se não houver plano ativo
@@ -406,7 +422,7 @@ metadata, baixar, agregar estatísticas):
 ### 3.5 Estatísticas agregadas por aluno
 
 As telas de gráfico/estatística (sessões de bike/musculação/alongamento
-em `treino_bicicleta_menu.html`/`treino_exercicios_menu.html`/
+em `treino_bicicleta_menu.html`/`treino_musculacao_menu.html`/
 `treino_alongamento_menu.html`, e progresso por exercício em
 `treino_exercicio_progresso.html`) **não** leem só o histórico do plano
 ativo — elas resolvem o aluno do plano ativo
@@ -486,11 +502,18 @@ TreinosStorage.criarPlano({alunoId, professor, inicio, fim, nome})  // nome é o
 TreinosStorage.duplicarPlano(id, alunoIdDestino)  // mesmo aluno (novo ciclo) ou outro — decidido na confirmação de duplicar
 TreinosStorage.atualizarMetadataPlano(id, {professor, inicio, fim, nome})
 TreinosStorage.excluirPlano(id)
-TreinosStorage.importarPlano(dadosPlano, alunoId)  // alunos.html, seção 3.1 — alunoId decidido na confirmação de importação
+TreinosStorage.importarPlano(dados, alunoId)  // alunos.html, seção 3.1 — aceita plano cru ou {plano, bibliotecaPersonalizada}
 TreinosStorage.lerDadosDoPlano(id)
+TreinosStorage.montarExportacaoAvulsaDoPlano(id)      // {plano, bibliotecaPersonalizada} — botão "Baixar plano"
 TreinosStorage.montarExportacaoCompletaDoPlano(id)
 TreinosStorage.lerJSONDoPlano(id, chave, padrao)
 TreinosStorage.salvarJSONDoPlano(id, chave, valor)
+
+// Biblioteca personalizada (exercícios/alongamentos novos ou editados
+// localmente, qualquer domínio — ver seção 26 de especificacao-biblioteca-exercicios.md)
+TreinosStorage.listarBibliotecaPersonalizada()
+TreinosStorage.salvarExercicioPersonalizado({dominio, id, origem, baseadoEmVersao, entrada})
+TreinosStorage.removerExercicioPersonalizado(dominio, id)
 
 // Backup completo, todos os alunos e planos (alunos.html, seção 3.1)
 TreinosStorage.montarBackup()

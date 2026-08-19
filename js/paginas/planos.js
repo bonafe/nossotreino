@@ -182,7 +182,7 @@ class PlanosController {
     }
 
     if (acao === "baixar-plano") {
-      this.#baixarJSON(TreinosStorage.lerDadosDoPlano(id), `plano-${this.#sufixoArquivo(id)}`);
+      this.#baixarJSON(TreinosStorage.montarExportacaoAvulsaDoPlano(id), `plano-${this.#sufixoArquivo(id)}`);
       return;
     }
 

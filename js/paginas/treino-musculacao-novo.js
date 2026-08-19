@@ -1,5 +1,5 @@
 import { TreinosStorage } from "../storage.js";
-import { carregarBiblioteca } from "../biblioteca-exercicios.js";
+import { carregarBiblioteca, invalidarCacheBiblioteca } from "../biblioteca-exercicios.js";
 import { PrescricaoFormatadores } from "../prescricao-formatadores.js";
 import { LABEL_CATEGORIA_EXERCICIO } from "../constantes.js";
 import { normalizar, gerarIdUnico } from "../identificadores.js";
@@ -45,6 +45,7 @@ class TreinoNovoController {
   #pickerBuscaInputEl = document.getElementById("pickerBuscaInput");
   #pickerLimparBtnEl = document.getElementById("pickerLimparBtn");
   #pickerResultadosEl = document.getElementById("pickerResultados");
+  #criarExercicioLinkEl = document.getElementById("criarExercicioLink");
 
   #filtroGrupoBtnEl = document.getElementById("filtroGrupoBtn");
   #filtroGrupoOpcoesEl = document.getElementById("filtroGrupoOpcoes");
@@ -101,13 +102,28 @@ class TreinoNovoController {
     this.#prescricaoAgrupamentoTipoInputEl.addEventListener("change", () => this.#atualizarVisibilidadeAgrupamento());
     this.#prescricaoConfirmarBtnEl.addEventListener("click", () => this.#confirmarPrescricao());
 
+    // "Criar exercício novo" abre numa aba própria (ver #carregarDados) —
+    // ao voltar pra esta aba, reflete o que foi criado/editado/excluído
+    // lá sem recarregar a página (perderia o treino em construção).
+    window.addEventListener("focus", () => this.#atualizarBibliotecaEmFoco());
+
     this.#carregarDados();
+  }
+
+  async #atualizarBibliotecaEmFoco() {
+    if (!this.#bibliotecaExercicios) return;
+    await TreinosStorage.recarregarBibliotecaPersonalizada();
+    invalidarCacheBiblioteca();
+    this.#bibliotecaExercicios = await carregarBiblioteca();
+    // Não rechama #popularFiltros aqui: reconstruiria os checkboxes de
+    // filtro e perderia o que a pessoa já tinha marcado no picker aberto.
+    if (!this.#pickerOverlayEl.hidden && !this.#pickerBuscaEl.hidden) this.#filtrarResultados();
   }
 
   #mostrarErro(mensagem) {
     this.#carregandoEl.hidden = true;
     this.#erroEl.hidden = false;
-    this.#erroEl.innerHTML = `${mensagem} Volte ao <a href="treino_exercicios_menu.html">menu de treinos</a>.`;
+    this.#erroEl.innerHTML = `${mensagem} Volte ao <a href="treino_musculacao_menu.html">menu de treinos</a>.`;
   }
 
   async #carregarDados() {
@@ -128,6 +144,15 @@ class TreinoNovoController {
     }
 
     this.#popularFiltros();
+
+    // Abre em nova aba (target="_blank" no HTML) — criar um exercício não
+    // pode navegar a própria aba embora, senão perde o treino em
+    // construção (nome/tipo/exercícios já adicionados, tudo em memória até
+    // "Salvar treino"). `voltar` carrega a URL atual (com `?treino=<id>`
+    // se estiver editando) pra quem sai de exercicio_novo.html por
+    // navegação (em vez de só fechar a aba) cair no lugar certo.
+    const urlAtual = window.location.pathname.split("/").pop() + window.location.search;
+    this.#criarExercicioLinkEl.href = `exercicio_novo.html?dominio=musculacao&voltar=${encodeURIComponent(urlAtual)}`;
 
     const treinoId = new URLSearchParams(window.location.search).get("treino");
     if (treinoId) {
@@ -159,7 +184,7 @@ class TreinoNovoController {
     this.#tituloEl.textContent = "Editar treino";
     document.title = `Editar ${treino.nome} — Nosso Treino`;
     this.#salvarBtnEl.textContent = "Salvar alterações";
-    this.#voltarIconEl.href = `treino_exercicios.html?treino=${encodeURIComponent(treino.id)}`;
+    this.#voltarIconEl.href = `treino_musculacao_exercicios.html?treino=${encodeURIComponent(treino.id)}`;
   }
 
   #popularFiltros() {
@@ -615,7 +640,7 @@ class TreinoNovoController {
       TreinosStorage.definirDadosTreinos(this.#dados);
 
       await TreinosStorage.aguardarEscritas();
-      window.location.href = `treino_exercicios.html?treino=${encodeURIComponent(treino.id)}`;
+      window.location.href = `treino_musculacao_exercicios.html?treino=${encodeURIComponent(treino.id)}`;
       return;
     }
 
@@ -649,7 +674,7 @@ class TreinoNovoController {
     TreinosStorage.definirDadosTreinos(this.#dados);
 
     await TreinosStorage.aguardarEscritas();
-    window.location.href = `treino_exercicios.html?treino=${encodeURIComponent(id)}`;
+    window.location.href = `treino_musculacao_exercicios.html?treino=${encodeURIComponent(id)}`;
   }
 }
 

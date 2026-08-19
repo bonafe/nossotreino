@@ -198,9 +198,9 @@ class TreinoExerciciosController {
   // marcadores numéricos (`superset`/`circuito`) em cada item — itens
   // consecutivos com o mesmo marcador viram um grupo visual, mesma
   // aparência de "bloco" de antes, só que calculado aqui em vez de vir
-  // pronto no JSON. `treino_novo.html` já reposiciona o exercício pra
+  // pronto no JSON. `treino_musculacao_novo.html` já reposiciona o exercício pra
   // manter o grupo contíguo ao atribuir o número (ver
-  // `#reposicionarParaGrupo` em treino-novo.js), mas isso aqui é a rede de
+  // `#reposicionarParaGrupo` em treino-musculacao-novo.js), mas isso aqui é a rede de
   // segurança: se um número acabar repetido fora de sequência mesmo assim
   // (reordenar manualmente pelas setas, ou dado legado/importado), funde
   // com o grupo já existente em vez de abrir um bloco "Superset N"
@@ -380,8 +380,8 @@ class TreinoExerciciosController {
     document.getElementById("carregando").hidden = true;
     const erroEl = document.getElementById("erro");
     erroEl.hidden = false;
-    erroEl.innerHTML = `${mensagem} Volte ao <a href="treino_exercicios_menu.html">menu de treinos</a>.`;
-    document.getElementById("titulo").textContent = "Treino de Exercícios";
+    erroEl.innerHTML = `${mensagem} Volte ao <a href="treino_musculacao_menu.html">menu de treinos</a>.`;
+    document.getElementById("titulo").textContent = "Treino de Musculação";
   }
 
   #iniciarComDados(dados, bibliotecaExercicios, treinoId) {
@@ -393,11 +393,11 @@ class TreinoExerciciosController {
 
     document.getElementById("carregando").hidden = true;
 
-    document.title = `${treino.nome} — Treino de Exercícios`;
+    document.title = `${treino.nome} — Treino de Musculação`;
     document.getElementById("titulo").textContent = treino.nome;
 
     const editarEl = document.getElementById("editarTreinoLink");
-    editarEl.href = `treino_novo.html?treino=${encodeURIComponent(treino.id)}`;
+    editarEl.href = `treino_musculacao_novo.html?treino=${encodeURIComponent(treino.id)}`;
     editarEl.hidden = false;
 
     const tipoTagEl = document.getElementById("tipoTag");

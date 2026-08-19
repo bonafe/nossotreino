@@ -58,7 +58,7 @@ export function prefetchImagensDoTreino(ids, dominio = "musculacao") {
 
 /**
  * Liga um <img> visível diretamente na tela ao exercício atual — usado em
- * treino_execucao.html (imagem sempre à mostra) e em treino_exercicios.html
+ * treino_execucao.html (imagem sempre à mostra) e em treino_musculacao_exercicios.html
  * (uma por card, ao lado da prescrição — abrir em tamanho maior ao clicar é
  * responsabilidade de quem chama, ver criarImagemModal). Fica `hidden` até
  * a imagem carregar de fato; se não existir, continua escondida.

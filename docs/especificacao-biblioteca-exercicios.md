@@ -208,7 +208,7 @@ em vez de embutir a prescrição inteira. Isso permite: um treino de cardio
 ou de alongamento existir avulso (sem precisar de um treino de musculação
 "dono"), ser reutilizado por mais de um treino de musculação, e ser criado
 pela interface (`treino_bicicleta_novo.html`/`treino_alongamento_novo.html`)
-do mesmo jeito que `treino_novo.html` já cria treinos de musculação.
+do mesmo jeito que `treino_musculacao_novo.html` já cria treinos de musculação.
 Planos no formato `1.2` (cardio embutido em `treino.cardio[].treino`)
 seriam migrados automaticamente pra `1.3` na importação/restauração de
 backup, pela tabela `MIGRACOES_PLANO` de `js/storage.js` — política do
@@ -3257,3 +3257,167 @@ A equipe pode começar com os campos essenciais e adotar gradualmente:
 - registro de execução real versus prescrição.
 
 A separação entre biblioteca e prescrição deve permanecer como princípio estrutural em todas as evoluções.
+
+## 26. Biblioteca personalizada (criação/edição local)
+
+A biblioteca oficial (`biblioteca-exercicios.json`, seção 2.1) continua
+estática e versionada no repositório — nunca escrita pelo app. O app
+permite criar/editar exercícios e alongamentos localmente
+(`exercicio_novo.html`/`js/paginas/exercicio-novo.js`); o que existe pra
+cada domínio (quais campos o formulário mostra, em qual coleção da
+biblioteca o item entra) é declarado em `js/dominios-biblioteca.js`, não
+hardcoded na tela — ver "Domínios futuros" no fim desta seção pro porquê.
+Isso alimenta uma segunda fonte, só local: a loja `bibliotecaPersonalizada`
+do IndexedDB (ver seção 2 de
+[armazenamento-local-especificacao.md](./armazenamento-local-especificacao.md)).
+Cada registro:
+
+```js
+{
+  dominio: "musculacao" | "alongamento", // qualquer id cadastrado em js/dominios-biblioteca.js
+  id: "...",                     // exercicioId/alongamentoId, mesma convenção da seção 3.2
+  origem: "novo" | "edicao",
+  baseadoEmVersao: number|null,  // só quando origem="edicao": `versao` oficial no momento de salvar
+  entrada: { ... },              // objeto completo no formato de bibliotecas.<colecaoDoDominio>[id]
+  criadoEm: "...", atualizadoEm: "..."
+}
+```
+
+`js/biblioteca-exercicios.js` mescla essa loja por cima do JSON oficial a
+cada carregamento (`carregarBiblioteca()`): um registro `origem: "novo"`
+entra como item novo na coleção do domínio (`colecaoPath` declarado em
+`js/dominios-biblioteca.js` — `bibliotecas.exercicios` pra `musculacao`,
+`bibliotecas.alongamentos` pra `alongamento`); um `origem: "edicao"`
+**substitui por completo** o item oficial de mesmo `id` — nunca mescla
+campo a campo. `carregarBibliotecaOficial()` (a mesma função, sem
+mesclar) fica disponível separada, sem essa substituição, especificamente
+pra comparar contra `baseadoEmVersao` e avisar quando a oficial evoluiu
+além da versão que a edição local partiu (`versao` do exercício, seção
+5.12) — a pessoa decide então manter a edição própria ou adotar a
+correção oficial. (O aviso em si — comparar as duas versões e mostrar
+algo na tela — ainda não está implementado; hoje `baseadoEmVersao` só é
+gravado.)
+
+`exercicio_novo.html?dominio=<id>&id=<id>` cobre criação (sem `?id`) e
+edição (com `?id`) na mesma tela, reaproveitando o padrão já usado por
+`treino_musculacao_novo.html`/`treino_alongamento_novo.html` (`?treino=<id>` troca
+de modo). `?voltar=<url>` decide pra onde ir depois de salvar/excluir
+(default: `js/dominios-biblioteca.js#menu` do domínio) — quem linka pra
+cá sempre passa a própria URL atual (com query string), pra devolver a
+pessoa exatamente pro contexto de onde saiu (ex.: `treino_musculacao_novo.html?treino=<id>`
+se estava editando aquele treino, não uma tela de criação em branco).
+
+Pontos de entrada, todos abrindo `exercicio_novo.html` **numa aba nova**
+(`target="_blank"`, mesmo motivo de `abrirCriticaWhatsApp` usar
+`window.open`: não perder o que a pessoa já montou na aba de origem, ex.:
+um treino em construção só guardado em memória até "Salvar treino"):
+
+- O link "+ Não achou? Criar exercício/alongamento novo" no picker de
+  `treino_musculacao_novo.html`/`treino_alongamento_novo.html`.
+- O botão "✏️ Editar" no modal de detalhes (`js/detalhes-modal.js`,
+  presente em `treino_musculacao_novo.html`, `treino_alongamento_novo.html`,
+  `treino_execucao.html`, `treino_alongamento.html` e `biblioteca.html`).
+- `biblioteca.html?dominio=<id>` — tela dedicada de navegação/gestão,
+  fora do fluxo de montar treino: lista buscável (nome/aliases/tags) de
+  todo o catálogo do domínio (oficial + personalizado, já mesclado),
+  com um badge "Personalizado"/"Editado" nos itens que têm registro
+  local, um "✏️ Editar" por item e um "+" no cabeçalho pra criar do
+  zero. Filtros (dropdowns tipo checkbox, mesmo componente visual do
+  picker de `treino_musculacao_novo.html`) vêm de `DOMINIOS[dominio].filtros`
+  em `js/dominios-biblioteca.js` — dimensão separada de `campos` porque
+  um filtro pode precisar combinar vários campos do item numa lista só
+  de valores (`extrator: "gruposMusculares"` casa contra
+  principais+sinergistas/secundarios+estabilizadores de uma vez;
+  `extrator: "equipamentos"` idem pra obrigatórios+opcionais); um filtro
+  de campo único (ex.: categoria/tipo) usa `chave` em vez de `extrator`.
+  Um domínio novo que não declarar `filtros` simplesmente não mostra
+  nenhum filtro, só a busca por texto. Alcançada pelo ícone 📚 em `treino_musculacao_menu.html`
+  (`?dominio=musculacao`) e `treino_alongamento_menu.html`
+  (`?dominio=alongamento`) — o `menu` de cada domínio em
+  `js/dominios-biblioteca.js` é também o alvo do botão voltar desta
+  tela. O título da tela vem de `tituloBiblioteca` (ex.: "Biblioteca de
+  musculação", "Biblioteca de alongamento") — nomeado pelo domínio, não
+  por "exercícios": o domínio `musculacao` já engloba calistenia/
+  funcional/pliometria/etc (`classificacao.categoria`), e chamar só ele
+  de "biblioteca de exercícios" implicaria que alongamento (e dança/
+  luta/yoga no futuro) não são exercícios também. Note a diferença entre
+  `tituloBiblioteca` (nomeia o domínio) e `rotulo` (nomeia UM item do
+  domínio, sempre singular — "Novo exercício", "Excluir exercício
+  personalizado" — os dois divergem de propósito só em musculação, ver
+  comentário em `js/dominios-biblioteca.js`).
+
+Como a criação/edição acontece numa aba separada, a aba de origem
+(`treino_musculacao_novo.html`/`treino_alongamento_novo.html`) não teria como saber
+que a biblioteca mudou sem recarregar a página — o que perderia o treino
+em construção. Em vez disso, essas duas telas escutam o evento `focus`
+da janela: ao voltar o foco, chamam
+`TreinosStorage.recarregarBibliotecaPersonalizada()` (re-hidrata só essa
+loja a partir do IndexedDB — outra aba pode ter escrito nela) seguido de
+`invalidarCacheBiblioteca()` (`js/biblioteca-exercicios.js`, descarta só o
+merge em memória, nunca a oficial) e recarregam `carregarBiblioteca()`;
+se o picker estiver aberto na tela de busca, os resultados são
+re-renderizados na hora. `biblioteca.html` faz o mesmo ao ganhar foco,
+mais simples ainda por não ter estado de treino em construção pra
+preservar (recarrega tudo, resultado da busca incluído).
+
+Editar um item oficial cria um registro `origem: "edicao"` (override);
+editar um item já personalizado segue editando o mesmo registro. A tela
+de edição também tem "Excluir exercício/alongamento personalizado"
+(`TreinosStorage.removerExercicioPersonalizado`), só visível quando existe
+de fato um registro local pra aquele `[dominio, id]`.
+
+Exercício/alongamento personalizado sem imagem gerada é esperado —
+degrada como qualquer item oficial sem imagem ainda
+(`ligarImagemExercicio`, seção "Fluxo de dados" de `CLAUDE.md`). Campos
+fora do formulário de criação (biomecânicos/de relação avançados,
+específicos de cada domínio — `relacoes`, `restricoes`, `midia`,
+`qualidadeDados` em musculação; `anatomia`, `dosagem`, `relacoes`,
+`restricoes`, `guiaImagem` em alongamento) ficam vazios/neutros
+(`entradaBase()` de cada domínio em `js/dominios-biblioteca.js`) — fora
+de escopo da primeira versão.
+
+Exportação: um backup completo ("Baixar tudo", `TreinosStorage.montarBackup()`)
+inclui a loja inteira; o botão "Baixar plano" de `planos.html`
+(`TreinosStorage.montarExportacaoAvulsaDoPlano(id)`) baixa
+`{plano, bibliotecaPersonalizada}` — o plano cru mais só os registros
+personalizados que os `treinos[].exercicios[].exercicioId`/`.alternativas[].exercicioId`
+e `treinosAlongamento[].alongamentos[].alongamentoId` daquele plano de
+fato referenciam. Na importação (`TreinosStorage.importarPlano`, aceita
+tanto esse formato embrulhado quanto um plano cru de uma versão
+anterior), um registro só é adicionado se o par `[dominio, id]` ainda não
+existir localmente — nunca sobrescreve uma edição já feita no aparelho de
+quem está importando. Um backup completo restaurado, ao contrário,
+substitui a loja inteira (mesma semântica de `alunos`/`planos`: é o
+próprio dispositivo restaurando o que já era seu, não uma importação de
+terceiro).
+
+### Domínios futuros (não implementado)
+
+O desenho acima já é pensado pra crescer nestas direções, sem exigir
+reescrita do motor de merge/formulário quando chegar a hora:
+
+- **Domínios oficiais novos** (dança/balé, luta, yoga — cada um com
+  campos diferentes de musculação/alongamento, do mesmo jeito que
+  alongamento já difere de musculação hoje na biblioteca oficial): basta
+  uma entrada nova em `js/dominios-biblioteca.js` (rótulo, `colecaoPath`,
+  lista de campos) — zero mudança em `js/biblioteca-exercicios.js` ou
+  `js/paginas/exercicio-novo.js`.
+- **Domínio criado pelo próprio usuário**: exige mover o registro de
+  `js/dominios-biblioteca.js` (hoje um módulo estático) pra uma loja no
+  IndexedDB editável por uma tela de "criar domínio" — o formato dos
+  campos já é dado puro serializável (sem funções embutidas) justamente
+  pra sobreviver a essa migração sem o renderizador do formulário
+  precisar mudar.
+- **API de envio direto**: uma configuração futura (tela de
+  configurações) que, além de salvar localmente, envia a edição/criação
+  direto pra um endpoint do Nosso Treino — consumidor natural de
+  `TreinosStorage.listarBibliotecaPersonalizada()`, complementando (não
+  substituindo) o export manual.
+- **Consolidação do lado do time**: revisar as edições recebidas (via API
+  ou export manual) e incorporar as boas na biblioteca oficial do
+  próximo release — trabalho fora deste repositório (lado
+  Python/admin), fora de escopo aqui.
+- Treinos continuam só **referenciando** treinos de outro domínio como
+  complemento (`treino.cardio[]`/`treino.alongamento[]`, seção 12.3) — não
+  há fila de execução única misturando itens de domínios diferentes numa
+  mesma sequência, e não é um objetivo desta frente.

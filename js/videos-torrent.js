@@ -134,6 +134,9 @@ export const VideosTorrent = {
     Object.values(bibliotecaExercicios.bibliotecas.exercicios || {}).forEach((exercicio) => {
       if (exercicio.midia && exercicio.midia.videoMagnet) magnets.add(exercicio.midia.videoMagnet);
     });
+    Object.values(bibliotecaExercicios.bibliotecas.alongamentos || {}).forEach((alongamento) => {
+      if (alongamento.midia && alongamento.midia.videoMagnet) magnets.add(alongamento.midia.videoMagnet);
+    });
     Object.values((bibliotecaExercicios.bibliotecas.cardio || {}).modalidades || {}).forEach((modalidade) => {
       if (modalidade.midia && modalidade.midia.videoMagnet) magnets.add(modalidade.midia.videoMagnet);
     });

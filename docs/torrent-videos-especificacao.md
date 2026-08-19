@@ -106,7 +106,7 @@ site (mesma limitação já aceita hoje pro resto do armazenamento).
 
 ## 7. Estados de carregamento (UI)
 
-Cada vídeo (card de exercício em `treino_exercicios.html`, aquecimento,
+Cada vídeo (card de exercício em `treino_musculacao_exercicios.html`, aquecimento,
 tela de execução em `treino_execucao.html`) tem um estado observável:
 
 | Estado | Quando | UI |
@@ -128,7 +128,7 @@ exercícios ser buscada**. Nesse momento, todos os vídeos de **todos** os
 exercícios cadastrados já são disparados pra download de uma vez: cada
 entrada de `bibliotecas.exercicios[exercicioId].midia.videoMagnet` e de
 `bibliotecas.cardio.modalidades[modalidadeId].midia.videoMagnet` (se
-houver). Não é preciso abrir `treino_exercicios.html?treino=<id>` de
+houver). Não é preciso abrir `treino_musculacao_exercicios.html?treino=<id>` de
 nenhum treino em particular pra disparar o download dele — e, diferente
 do plano de treino, nem é preciso o aluno já ter importado nada: a
 biblioteca está sempre disponível.
@@ -144,7 +144,7 @@ biblioteca está sempre disponível.
   instantâneo), sem nenhuma requisição de rede — cobre o caso de a
   biblioteca ter mudado (novo exercício, vídeo novo) desde a última
   visita.
-- Cada card de exercício (em `treino_exercicios.html`, quando o aluno
+- Cada card de exercício (em `treino_musculacao_exercicios.html`, quando o aluno
   chega lá) já mostra o estado real (seção 7) — `pronto` se o
   pré-carregamento global já tiver terminado aquele vídeo específico,
   `baixando X%` se ainda estiver em andamento, sem esperar o aluno entrar
@@ -175,7 +175,7 @@ Enquanto `baixando`, o botão mostra o progresso em vez de "Ver vídeo →".
 
 Implementado em `js/video-player-modal.js`, função `ligarBotaoVideo(botaoEl,
 fonte, videoModal, deveAtualizar?)` — compartilhada por
-`treino_exercicios.html` (cards de exercício + aquecimento) e
+`treino_musculacao_exercicios.html` (cards de exercício + aquecimento) e
 `treino_execucao.html` (tela de execução guiada). `fonte` é
 `bibliotecas.exercicios[id].midia` (ou `.cardio.modalidades[id].midia`,
 ou `{videoUrl}` solto no caso de protocolo de aquecimento); `videoMagnet`

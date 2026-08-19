@@ -3,7 +3,7 @@
 // interpreta o significado de cada loja. Ver seção 2 de
 // docs/armazenamento-local-especificacao.md.
 export const NOME_BANCO = "nossotreino";
-export const VERSAO_BANCO = 1;
+export const VERSAO_BANCO = 2;
 
 function criarEsquemaInicial(banco) {
   banco.createObjectStore("alunos", { keyPath: "id" });
@@ -28,14 +28,23 @@ function criarEsquemaInicial(banco) {
   banco.createObjectStore("meta", { keyPath: "chave" });
 }
 
+// Biblioteca personalizada do usuário (exercícios novos ou edições locais
+// de exercícios oficiais — ver docs/especificacao-biblioteca-exercicios.md).
+// KeyPath composto porque exercícios e alongamentos podem repetir `id`
+// entre si (mesma regra do JSON oficial, ver js/imagem-exercicio.js).
+// Escopo global (não por aluno/plano) — mesmo nível de `preferencias`/`meta`.
+function criarLojaDeBibliotecaPersonalizada(banco) {
+  banco.createObjectStore("bibliotecaPersonalizada", { keyPath: ["dominio", "id"] });
+}
+
 // Tabela de migração estrutural do banco. Chave = versão de destino.
 // `onupgradeneeded` aplica em sequência de (oldVersion+1) até newVersion,
 // então um navegador parado numa versão antiga passa por todas as
 // intermediárias em ordem. Nunca editar uma entrada já publicada — só
-// acrescentar a próxima quando VERSAO_BANCO subir (ex.: uma loja `midias`
-// pro recurso futuro de imagens/vídeos próprios vira `MIGRACOES_BANCO[2]`).
+// acrescentar a próxima quando VERSAO_BANCO subir.
 const MIGRACOES_BANCO = {
-  1: criarEsquemaInicial
+  1: criarEsquemaInicial,
+  2: criarLojaDeBibliotecaPersonalizada
 };
 
 function promessaDaRequisicao(requisicao) {

@@ -35,7 +35,8 @@ const instantaneo = {
   planoDados: new Map(), // planoId -> dados (composição completa do plano)
   historico: new Map(), // `${planoId}|${tipo}` -> array de entradas
   execucoes: new Map(), // `${planoId}|${tipo}|${treinoId}` -> progresso
-  preferencias: new Map() // chave -> valor (planoAtivoId, apoio.*, avisoIaAceito.v1)
+  preferencias: new Map(), // chave -> valor (planoAtivoId, apoio.*, avisoIaAceito.v1)
+  bibliotecaPersonalizada: new Map() // `${dominio}|${id}` -> registro (ver seção "Biblioteca personalizada" abaixo)
 };
 
 let filaDeEscrita = Promise.resolve();
@@ -273,10 +274,11 @@ function migrarPlanoParaVersaoAtual(dados) {
 
 // --- Migração de formato: envelope de backup (versao) ---
 
-const VERSAO_BACKUP_ATUAL = 2;
+const VERSAO_BACKUP_ATUAL = 3;
 
 const MIGRACOES_BACKUP = {
-  1: migrarBackupDe1Para2
+  1: migrarBackupDe1Para2,
+  2: migrarBackupDe2Para3
 };
 
 // Formato 1: sem `alunos` (entidade Aluno ainda não existia) — deriva a
@@ -286,6 +288,13 @@ function migrarBackupDe1Para2(backup) {
   const planos = backup.planos || [];
   const alunos = backup.alunos || migrarAlunosApartirDePlanos(planos);
   return { ...backup, versao: 2, alunos, planos };
+}
+
+// Formato 2: sem `bibliotecaPersonalizada` (loja ainda não existia) —
+// backup antigo simplesmente não tinha nenhum exercício/alongamento
+// personalizado pra trazer.
+function migrarBackupDe2Para3(backup) {
+  return { ...backup, versao: 3, bibliotecaPersonalizada: backup.bibliotecaPersonalizada || [] };
 }
 
 function migrarBackupParaVersaoAtual(backupOriginal) {
@@ -309,13 +318,22 @@ async function hidratar() {
   const banco = await BancoIndexedDB.abrir();
   if (!banco) return;
 
-  const [alunos, planos, planoDadosRegistros, historicoRegistros, execucoesRegistros, preferenciasRegistros] = await Promise.all([
+  const [
+    alunos,
+    planos,
+    planoDadosRegistros,
+    historicoRegistros,
+    execucoesRegistros,
+    preferenciasRegistros,
+    bibliotecaPersonalizadaRegistros
+  ] = await Promise.all([
     BancoIndexedDB.lerTodos("alunos"),
     BancoIndexedDB.lerTodos("planos"),
     BancoIndexedDB.lerTodos("planoDados"),
     BancoIndexedDB.lerTodos("historico"),
     BancoIndexedDB.lerTodos("execucoes"),
-    BancoIndexedDB.lerTodos("preferencias")
+    BancoIndexedDB.lerTodos("preferencias"),
+    BancoIndexedDB.lerTodos("bibliotecaPersonalizada")
   ]);
 
   instantaneo.alunos = alunos;
@@ -335,6 +353,10 @@ async function hidratar() {
   });
 
   preferenciasRegistros.forEach((registro) => instantaneo.preferencias.set(registro.chave, registro.valor));
+
+  bibliotecaPersonalizadaRegistros.forEach((registro) => {
+    instantaneo.bibliotecaPersonalizada.set(`${registro.dominio}|${registro.id}`, registro);
+  });
 }
 
 export class TreinosStorage {
@@ -635,9 +657,16 @@ export class TreinosStorage {
   // Plano avulso recebido de fora — alunoId decidido por quem chama
   // (tela de confirmação de importação). Migra pra SCHEMA_VERSION_PLANO_ATUAL
   // antes de gravar: é o único jeito de um documento em formato antigo
-  // entrar no sistema (o outro é restaurarBackup, abaixo).
-  static importarPlano(dadosPlanoOriginal, alunoId) {
-    const dadosPlano = migrarPlanoParaVersaoAtual(dadosPlanoOriginal);
+  // entrar no sistema (o outro é restaurarBackup, abaixo). Aceita tanto um
+  // plano "cru" (arquivos exportados antes desta mudança, ou por quem
+  // ainda não atualizou) quanto o pacote de `montarExportacaoAvulsaDoPlano`
+  // (`{plano, bibliotecaPersonalizada}`) — nesse caso, cada personalizado
+  // só é gravado se o par `[dominio, id]` ainda não existir localmente,
+  // pra nunca sobrescrever uma edição já feita no aparelho de quem importa
+  // (ver seção 26 de docs/especificacao-biblioteca-exercicios.md).
+  static importarPlano(dadosOriginais, alunoId) {
+    const ehPacoteAvulso = Boolean(dadosOriginais && dadosOriginais.plano && Array.isArray(dadosOriginais.bibliotecaPersonalizada));
+    const dadosPlano = migrarPlanoParaVersaoAtual(ehPacoteAvulso ? dadosOriginais.plano : dadosOriginais);
     const planos = TreinosStorage.listarPlanos();
     const id = gerarIdUnico(alunoId, new Set(planos.map((p) => p.id)), "plano");
     const agora = new Date().toISOString();
@@ -651,6 +680,15 @@ export class TreinosStorage {
     planos.push(plano);
     enfileirarEscrita(() => BancoIndexedDB.gravar("planos", plano));
     TreinosStorage.salvarJSONDoPlano(id, "dados.v1", dadosPlano);
+
+    if (ehPacoteAvulso) {
+      dadosOriginais.bibliotecaPersonalizada.forEach((registro) => {
+        if (!instantaneo.bibliotecaPersonalizada.has(`${registro.dominio}|${registro.id}`)) {
+          TreinosStorage.salvarExercicioPersonalizado(registro);
+        }
+      });
+    }
+
     return id;
   }
 
@@ -666,8 +704,73 @@ export class TreinosStorage {
     return TreinosStorage.lerJSONDoPlano(id, "dados.v1", null);
   }
 
+  // "Baixar" avulso de um plano (planos.js) — inclui só os personalizados
+  // que o próprio plano referencia, pra quem recebe o arquivo conseguir
+  // ver os mesmos exercícios/alongamentos sem precisar de um backup
+  // completo. Ver seção 26 de docs/especificacao-biblioteca-exercicios.md.
+  static montarExportacaoAvulsaDoPlano(id) {
+    const dadosPlano = TreinosStorage.lerDadosDoPlano(id) || {};
+    const referenciados = new Set();
+    (dadosPlano.treinos || []).forEach((treino) => {
+      (treino.exercicios || []).forEach((item) => {
+        if (item.exercicioId) referenciados.add(`musculacao|${item.exercicioId}`);
+        (item.alternativas || []).forEach((alt) => {
+          if (alt.exercicioId) referenciados.add(`musculacao|${alt.exercicioId}`);
+        });
+      });
+    });
+    (dadosPlano.treinosAlongamento || []).forEach((treino) => {
+      (treino.alongamentos || []).forEach((item) => {
+        if (item.alongamentoId) referenciados.add(`alongamento|${item.alongamentoId}`);
+      });
+    });
+
+    const bibliotecaPersonalizada = TreinosStorage.listarBibliotecaPersonalizada().filter((registro) =>
+      referenciados.has(`${registro.dominio}|${registro.id}`)
+    );
+
+    return { plano: dadosPlano, bibliotecaPersonalizada };
+  }
+
   static montarExportacaoCompletaDoPlano(id) {
     return montarExportacaoCompletaDoPlano(id);
+  }
+
+  // --- Biblioteca personalizada (exercícios novos ou edições locais de
+  // exercícios oficiais — ver docs/especificacao-biblioteca-exercicios.md).
+  // Escopo global (não por aluno/plano), igual preferencias/meta. O merge
+  // com a biblioteca oficial acontece em js/biblioteca-exercicios.js, não
+  // aqui — esta classe só guarda/lista os registros brutos.
+
+  static listarBibliotecaPersonalizada() {
+    return [...instantaneo.bibliotecaPersonalizada.values()];
+  }
+
+  static salvarExercicioPersonalizado(registro) {
+    const chaveMapa = `${registro.dominio}|${registro.id}`;
+    const existente = instantaneo.bibliotecaPersonalizada.get(chaveMapa);
+    const agora = new Date().toISOString();
+    const completo = { ...registro, criadoEm: (existente && existente.criadoEm) || agora, atualizadoEm: agora };
+    instantaneo.bibliotecaPersonalizada.set(chaveMapa, completo);
+    enfileirarEscrita(() => BancoIndexedDB.gravar("bibliotecaPersonalizada", completo));
+  }
+
+  static removerExercicioPersonalizado(dominio, id) {
+    instantaneo.bibliotecaPersonalizada.delete(`${dominio}|${id}`);
+    enfileirarEscrita(() => BancoIndexedDB.remover("bibliotecaPersonalizada", [dominio, id]));
+  }
+
+  // Re-hidrata só esta loja a partir do IndexedDB — usada quando outra aba
+  // pode ter criado/editado/excluído um personalizado (ex.: "criar
+  // exercício novo" abre em aba própria, ver exercicio-novo.js) e esta
+  // aba precisa enxergar a mudança sem recarregar a página inteira (o que
+  // perderia um treino em construção). Ver invalidarCacheBiblioteca em
+  // biblioteca-exercicios.js, chamada junto.
+  static async recarregarBibliotecaPersonalizada() {
+    const banco = await BancoIndexedDB.abrir();
+    if (!banco) return;
+    const registros = await BancoIndexedDB.lerTodos("bibliotecaPersonalizada");
+    instantaneo.bibliotecaPersonalizada = new Map(registros.map((registro) => [`${registro.dominio}|${registro.id}`, registro]));
   }
 
   // --- Backup completo (todos os alunos e planos) ---
@@ -686,7 +789,8 @@ export class TreinosStorage {
       planoAtivoId: obterPlanoAtivoId(),
       alunos: TreinosStorage.listarAlunos(),
       planos,
-      dadosPorPlano
+      dadosPorPlano,
+      bibliotecaPersonalizada: TreinosStorage.listarBibliotecaPersonalizada()
     };
   }
 
@@ -709,6 +813,13 @@ export class TreinosStorage {
     enfileirarEscrita(async () => {
       await BancoIndexedDB.limparLoja("planos");
       await BancoIndexedDB.gravarVarios("planos", planos);
+    });
+
+    const bibliotecaPersonalizada = backup.bibliotecaPersonalizada || [];
+    instantaneo.bibliotecaPersonalizada = new Map(bibliotecaPersonalizada.map((registro) => [`${registro.dominio}|${registro.id}`, registro]));
+    enfileirarEscrita(async () => {
+      await BancoIndexedDB.limparLoja("bibliotecaPersonalizada");
+      await BancoIndexedDB.gravarVarios("bibliotecaPersonalizada", bibliotecaPersonalizada);
     });
 
     TreinosStorage.ativarPlano(backup.planoAtivoId || null);

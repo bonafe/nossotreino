@@ -1,5 +1,5 @@
 import { TreinosStorage } from "../storage.js";
-import { carregarBiblioteca } from "../biblioteca-exercicios.js";
+import { carregarBiblioteca, invalidarCacheBiblioteca } from "../biblioteca-exercicios.js";
 import { PrescricaoFormatadores } from "../prescricao-formatadores.js";
 import { LABEL_TIPO_ALONGAMENTO } from "../constantes.js";
 import { normalizar, gerarIdUnico } from "../identificadores.js";
@@ -12,7 +12,7 @@ const LABEL_METRICA = {
   tempo: "Tempo"
 };
 
-// Mesmo padrão de treino-novo.js (picker com busca/filtro + formulário de
+// Mesmo padrão de treino-musculacao-novo.js (picker com busca/filtro + formulário de
 // prescrição), trocando a fonte pra bibliotecas.alongamentos e sem
 // isometria/agrupamento (não se aplicam a alongamento).
 class TreinoAlongamentoNovoController {
@@ -45,6 +45,7 @@ class TreinoAlongamentoNovoController {
   #pickerBuscaInputEl = document.getElementById("pickerBuscaInput");
   #pickerLimparBtnEl = document.getElementById("pickerLimparBtn");
   #pickerResultadosEl = document.getElementById("pickerResultados");
+  #criarAlongamentoLinkEl = document.getElementById("criarAlongamentoLink");
 
   #filtroGrupoBtnEl = document.getElementById("filtroGrupoBtn");
   #filtroGrupoOpcoesEl = document.getElementById("filtroGrupoOpcoes");
@@ -86,7 +87,22 @@ class TreinoAlongamentoNovoController {
     this.#prescricaoModoInputEl.addEventListener("change", () => this.#atualizarVisibilidadeModo());
     this.#prescricaoConfirmarBtnEl.addEventListener("click", () => this.#confirmarPrescricao());
 
+    // "Criar alongamento novo" abre numa aba própria (ver #carregarDados)
+    // — ao voltar pra esta aba, reflete o que foi criado/editado/excluído
+    // lá sem recarregar a página (perderia o treino em construção).
+    window.addEventListener("focus", () => this.#atualizarBibliotecaEmFoco());
+
     this.#carregarDados();
+  }
+
+  async #atualizarBibliotecaEmFoco() {
+    if (!this.#bibliotecaExercicios) return;
+    await TreinosStorage.recarregarBibliotecaPersonalizada();
+    invalidarCacheBiblioteca();
+    this.#bibliotecaExercicios = await carregarBiblioteca();
+    // Não rechama #popularFiltros aqui: reconstruiria os checkboxes de
+    // filtro e perderia o que a pessoa já tinha marcado no picker aberto.
+    if (!this.#pickerOverlayEl.hidden && !this.#pickerBuscaEl.hidden) this.#filtrarResultados();
   }
 
   #mostrarErro(mensagem) {
@@ -113,6 +129,16 @@ class TreinoAlongamentoNovoController {
     }
 
     this.#popularFiltros();
+
+    // Abre em nova aba (target="_blank" no HTML) — criar um alongamento
+    // não pode navegar a própria aba, senão perde o treino em construção
+    // (nome/momento/alongamentos já adicionados, tudo em memória até
+    // "Salvar treino"). `voltar` carrega a URL atual pra quem sai de
+    // exercicio_novo.html por navegação (em vez de só fechar a aba) cair
+    // no lugar certo — mesmo padrão de treino-musculacao-novo.js.
+    const urlAtual = window.location.pathname.split("/").pop() + window.location.search;
+    this.#criarAlongamentoLinkEl.href = `exercicio_novo.html?dominio=alongamento&voltar=${encodeURIComponent(urlAtual)}`;
+
     this.#carregandoEl.hidden = true;
     this.#formEl.hidden = false;
   }

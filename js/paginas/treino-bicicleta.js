@@ -257,7 +257,7 @@ class TreinoBicicletaController {
     const origemTreinoId = params.get("origem");
 
     this.#voltarIconEl.href = origemTreinoId
-      ? `treino_exercicios.html?treino=${encodeURIComponent(origemTreinoId)}`
+      ? `treino_musculacao_exercicios.html?treino=${encodeURIComponent(origemTreinoId)}`
       : "treino_bicicleta_menu.html";
 
     if (!treinoCardioId) {

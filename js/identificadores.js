@@ -15,7 +15,7 @@ export function slugificar(texto) {
 }
 
 // Gera um id único dentro de `idsExistentes`, a partir do nome — usado
-// pelas telas de criação (treino_novo.html, treino_bicicleta_novo.html,
+// pelas telas de criação (treino_musculacao_novo.html, treino_bicicleta_novo.html,
 // treino_alongamento_novo.html) pra não colidir com um id já usado na
 // mesma coleção do plano.
 export function gerarIdUnico(nome, idsExistentes, base = "treino") {

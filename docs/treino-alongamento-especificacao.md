@@ -73,7 +73,7 @@ Fluxo independente do de exercícios/bicicleta — dá pra fazer uma sessão de
 alongamento avulsa sem passar por um treino de musculação. Mirror direto do
 fluxo de musculação (lista → execução → progresso, seção 6.2 de
 [treino-exercicios-especificacao.md](./treino-exercicios-especificacao.md)):
-o card "Alongamento complementar" de `treino_exercicios.html` linka pra
+o card "Alongamento complementar" de `treino_musculacao_exercicios.html` linka pra
 `treino_alongamento_exercicios.html`, usando
 `treino=<treinoAlongamentoId>&origem=<treinoMusculacaoId>`.
 
@@ -88,13 +88,13 @@ cartão por entrada de `dados.treinosAlongamento || []`: nome, `momento`
 bloqueia o uso avulso) e quantidade de alongamentos. Cada cartão linka
 para `treino_alongamento_exercicios.html?treino=<id>` (a lista de
 alongamentos do treino, seção 6 — mirror de
-`treino_exercicios_menu.html` linkando pra `treino_exercicios.html`, não
+`treino_musculacao_menu.html` linkando pra `treino_musculacao_exercicios.html`, não
 direto pro motor). Sem nenhuma entrada, mostra "Nenhum treino de
 alongamento cadastrado ainda."
 
 ### 4.1 Criar treino de alongamento (`treino_alongamento_novo.html`)
 
-Mesmo padrão de `treino_novo.html` (picker com busca/filtro + formulário de
+Mesmo padrão de `treino_musculacao_novo.html` (picker com busca/filtro + formulário de
 prescrição), trocando a fonte do picker para `bibliotecas.alongamentos`:
 
 - Filtros: grupo muscular (`gruposMusculares.{principais,secundarios,estabilizadores}`)
@@ -102,7 +102,7 @@ prescrição), trocando a fonte do picker para `bibliotecas.alongamentos`:
   `mobilidade-articular`) — sem filtro de equipamento/categoria (não fazem
   sentido aqui, a categoria já é sempre `alongamento`).
 - Formulário de prescrição: série + métrica (mesmo controle de
-  `treino_novo.html`, mas sem os campos de isometria/agrupamento —
+  `treino_musculacao_novo.html`, mas sem os campos de isometria/agrupamento —
   alongamento não usa técnica nem superset/circuito).
 - Botão "ⓘ" (`js/detalhes-modal.js`, domínio `"alongamento"` — ver seção
   2.1) ao lado do nome — em cada resultado da busca, no título da
@@ -113,7 +113,7 @@ prescrição), trocando a fonte do picker para `bibliotecas.alongamentos`:
   ganha seu próprio `#videoOverlay` (`criarVideoPlayerModal()`) só pra
   esse botão de vídeo.
 - Ao salvar, gera um `id` único (`js/identificadores.js`, mesmo helper de
-  `treino_novo.html`/`treino_bicicleta_novo.html`) e dá `push` em
+  `treino_musculacao_novo.html`/`treino_bicicleta_novo.html`) e dá `push` em
   `dados.treinosAlongamento`, depois volta para
   `treino_alongamento_menu.html`.
 - Anexar esse treino como complemento de um treino de musculação existente
@@ -204,8 +204,8 @@ Diferente de antes: sempre volta pra
 repassando `?origem=` quando presente — é essa tela (seção 6) que decide
 o próximo passo (voltar pro treino de musculação de origem ou pro menu de
 alongamento). Mirror exato de como `treino_execucao.html` sempre volta
-pra `treino_exercicios.html?treino=<id>` (nunca direto pro
-`treino_exercicios_menu.html`).
+pra `treino_musculacao_exercicios.html?treino=<id>` (nunca direto pro
+`treino_musculacao_menu.html`).
 
 ### 5.4 Pular direto para um alongamento (`?alongamento=`)
 
@@ -223,7 +223,7 @@ card de `treino_alongamento_exercicios.html` (seção 6).
 
 ### 6.1 Lista de alongamentos (`treino_alongamento_exercicios.html`)
 
-Mirror de `treino_exercicios.html` (seção 6.2 de
+Mirror de `treino_musculacao_exercicios.html` (seção 6.2 de
 [treino-exercicios-especificacao.md](./treino-exercicios-especificacao.md)),
 mas sem aquecimento/superset/circuito/cardio/alongamento complementar
 (nada disso existe num treino de alongamento, seção 8):
@@ -240,8 +240,8 @@ mas sem aquecimento/superset/circuito/cardio/alongamento complementar
   — entra já executando aquele item.
 - Botão "Iniciar treino →" no topo, virando "Continuar treino →" quando
   já existe `execucao.alongamento.<id>.v1` salvo — mesma checagem que
-  `treino_exercicios.html` já faz com `execucao.musculacao.<id>.v2`.
-- Botão de voltar: com `origem` → `treino_exercicios.html?treino=<origem>`;
+  `treino_musculacao_exercicios.html` já faz com `execucao.musculacao.<id>.v2`.
+- Botão de voltar: com `origem` → `treino_musculacao_exercicios.html?treino=<origem>`;
   sem `origem` → `treino_alongamento_menu.html`.
 
 ### 6.2 Progresso do alongamento (`treino_alongamento_progresso.html`)

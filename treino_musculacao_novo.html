@@ -6,12 +6,12 @@
   <title>Novo Treino</title>
   <link rel="stylesheet" href="css/base.css" />
   <link rel="stylesheet" href="css/componentes.css" />
-  <link rel="stylesheet" href="css/paginas/treino-novo.css" />
+  <link rel="stylesheet" href="css/paginas/treino-musculacao-novo.css" />
 </head>
 <body>
   <main>
     <header class="top">
-      <a id="voltarIcon" class="voltar-icon" href="treino_exercicios_menu.html" aria-label="Voltar">←</a>
+      <a id="voltarIcon" class="voltar-icon" href="treino_musculacao_menu.html" aria-label="Voltar">←</a>
       <div>
         <h1 id="titulo">Novo treino</h1>
       </div>
@@ -81,6 +81,7 @@
           </div>
 
           <button type="button" id="pickerLimparBtn" class="picker-limpar">Limpar filtros</button>
+          <a id="criarExercicioLink" href="exercicio_novo.html" class="picker-limpar" target="_blank" rel="noopener">+ Não achou? Criar exercício novo</a>
         </div>
         <div id="pickerResultados" class="picker-resultados"></div>
       </div>
@@ -188,6 +189,7 @@
       <div id="detalhesConteudo" class="detalhes-conteudo"></div>
       <div class="detalhes-imagem-wrap">
         <img id="detalhesImagem" class="detalhes-imagem" alt="" hidden />
+        <a id="detalhesEditarBtn" class="critica-badge editar-badge" href="#" target="_blank" rel="noopener">✏️ Editar</a>
         <button type="button" id="detalhesCriticaBtn" class="critica-badge" aria-label="Relatar">💬 Relatar</button>
       </div>
     </div>
@@ -205,6 +207,6 @@
     </div>
   </div>
 
-  <script type="module" src="js/paginas/treino-novo.js"></script>
+  <script type="module" src="js/paginas/treino-musculacao-novo.js"></script>
 </body>
 </html>

@@ -509,7 +509,7 @@ class TreinoExecucaoController {
   #mostrarErro(mensagem) {
     this.#carregandoEl.hidden = true;
     this.#erroEl.hidden = false;
-    this.#erroEl.innerHTML = `${mensagem} Volte ao <a href="treino_exercicios_menu.html">menu de treinos</a>.`;
+    this.#erroEl.innerHTML = `${mensagem} Volte ao <a href="treino_musculacao_menu.html">menu de treinos</a>.`;
     this.#tituloEl.textContent = "Execução do Treino";
   }
 
@@ -542,7 +542,7 @@ class TreinoExecucaoController {
       return;
     }
 
-    this.#voltarIconEl.href = `treino_exercicios.html?treino=${encodeURIComponent(treinoId)}`;
+    this.#voltarIconEl.href = `treino_musculacao_exercicios.html?treino=${encodeURIComponent(treinoId)}`;
 
     let dados;
     try {

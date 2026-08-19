@@ -1,6 +1,6 @@
 import { VideosTorrent } from "./videos-torrent.js";
 
-// Player embutido reutilizado por treino_exercicios.html e
+// Player embutido reutilizado por treino_musculacao_exercicios.html e
 // treino_execucao.html — cada página tem o mesmo bloco de markup
 // (#videoOverlay/#videoPlayer/#videoFechar, ver seção 10 de
 // docs/torrent-videos-especificacao.md), só o comportamento é compartilhado.

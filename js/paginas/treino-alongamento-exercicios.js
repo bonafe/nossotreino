@@ -5,7 +5,7 @@ import { criarVideoPlayerModal, ligarBotaoVideo } from "../video-player-modal.js
 import { criarImagemModal, ligarImagemExercicio } from "../imagem-exercicio.js";
 import { criarCriticaModal, ligarBotaoCritica } from "../critica-comunidade.js";
 
-// Mirror de treino-exercicios.js, mas pro schema mais simples do
+// Mirror de treino-musculacao-exercicios.js, mas pro schema mais simples do
 // alongamento (sem aquecimento/superset/circuito/alternativas/cardio —
 // fora de escopo, seção 8 de docs/treino-alongamento-especificacao.md).
 class TreinoAlongamentoExerciciosController {
@@ -153,7 +153,7 @@ class TreinoAlongamentoExerciciosController {
     this.#origemTreinoId = params.get("origem");
 
     document.getElementById("voltarLink").href = this.#origemTreinoId
-      ? `treino_exercicios.html?treino=${encodeURIComponent(this.#origemTreinoId)}`
+      ? `treino_musculacao_exercicios.html?treino=${encodeURIComponent(this.#origemTreinoId)}`
       : "treino_alongamento_menu.html";
 
     if (!treinoId) {

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Biblioteca</title>
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/componentes.css" />
+  <link rel="stylesheet" href="css/paginas/treino-musculacao-novo.css" />
+  <link rel="stylesheet" href="css/paginas/biblioteca.css" />
+</head>
+<body>
+  <main>
+    <header class="top">
+      <a id="voltarIcon" class="voltar-icon" href="treino_musculacao_menu.html" aria-label="Voltar">←</a>
+      <div>
+        <h1 id="titulo">📚 Biblioteca</h1>
+        <p class="subtitle" id="subtitulo">Oficiais e personalizados.</p>
+      </div>
+      <a id="criarLink" class="icon-btn" href="exercicio_novo.html" aria-label="Criar novo" target="_blank" rel="noopener">+</a>
+    </header>
+
+    <div id="carregando" class="estado">Carregando…</div>
+    <div id="erro" class="estado" hidden></div>
+
+    <div id="conteudo" hidden>
+      <div class="campo">
+        <input type="text" id="buscaInput" placeholder="Buscar por nome…" autocomplete="off" />
+      </div>
+      <div class="filtros-biblioteca">
+        <div id="filtrosDinamicos" class="filtros-biblioteca-grupos"></div>
+        <button type="button" id="limparFiltrosBtn" class="picker-limpar">Limpar filtros</button>
+      </div>
+      <div id="resultados" class="picker-resultados"></div>
+    </div>
+
+    <p class="rodape-apoio"><a href="index.html#apoio">❤️ Apoiar o Nosso Treino</a></p>
+  </main>
+
+  <div id="videoOverlay" class="overlay" hidden>
+    <div class="video-card">
+      <button id="videoFechar" class="video-fechar" type="button" aria-label="Fechar vídeo">✕</button>
+      <video id="videoPlayer" controls playsinline></video>
+    </div>
+  </div>
+
+  <div id="detalhesOverlay" class="overlay" hidden>
+    <div class="detalhes-card">
+      <button id="detalhesFechar" class="video-fechar" type="button" aria-label="Fechar detalhes">✕</button>
+      <h2 id="detalhesNome"></h2>
+      <button type="button" id="detalhesVideoBtn" class="video-botao" hidden disabled>Vídeo…</button>
+      <div id="detalhesConteudo" class="detalhes-conteudo"></div>
+      <div class="detalhes-imagem-wrap">
+        <img id="detalhesImagem" class="detalhes-imagem" alt="" hidden />
+        <a id="detalhesEditarBtn" class="critica-badge editar-badge" href="#" target="_blank" rel="noopener">✏️ Editar</a>
+        <button type="button" id="detalhesCriticaBtn" class="critica-badge" aria-label="Relatar">💬 Relatar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="criticaOverlay" class="overlay" hidden>
+    <div class="confirm-card">
+      <button type="button" id="criticaFechar" class="video-fechar" aria-label="Fechar">✕</button>
+      <p id="criticaTexto"></p>
+      <div class="confirm-botoes criticas">
+        <button type="button" id="criticaErro" class="secondary">🐞 Erro</button>
+        <button type="button" id="criticaSugestao" class="secondary">💡 Sugestão</button>
+        <button type="button" id="criticaOutro" class="secondary">💬 Outro</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/paginas/biblioteca.js"></script>
+</body>
+</html>

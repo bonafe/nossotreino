@@ -6,7 +6,7 @@
   <title>Novo Treino de Alongamento</title>
   <link rel="stylesheet" href="css/base.css" />
   <link rel="stylesheet" href="css/componentes.css" />
-  <link rel="stylesheet" href="css/paginas/treino-novo.css" />
+  <link rel="stylesheet" href="css/paginas/treino-musculacao-novo.css" />
 </head>
 <body>
   <main>
@@ -75,6 +75,7 @@
           </div>
 
           <button type="button" id="pickerLimparBtn" class="picker-limpar">Limpar filtros</button>
+          <a id="criarAlongamentoLink" href="exercicio_novo.html?dominio=alongamento" class="picker-limpar" target="_blank" rel="noopener">+ Não achou? Criar alongamento novo</a>
         </div>
         <div id="pickerResultados" class="picker-resultados"></div>
       </div>
@@ -141,6 +142,7 @@
       <div id="detalhesConteudo" class="detalhes-conteudo"></div>
       <div class="detalhes-imagem-wrap">
         <img id="detalhesImagem" class="detalhes-imagem" alt="" hidden />
+        <a id="detalhesEditarBtn" class="critica-badge editar-badge" href="#" target="_blank" rel="noopener">✏️ Editar</a>
         <button type="button" id="detalhesCriticaBtn" class="critica-badge" aria-label="Relatar">💬 Relatar</button>
       </div>
     </div>

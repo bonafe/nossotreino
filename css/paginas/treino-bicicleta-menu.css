@@ -16,6 +16,12 @@ p.subtitle {
   font-size: clamp(0.95rem, 3.5vw, 1.05rem);
 }
 
+.acoes-header {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
 #graficoBicicleta {
   width: 100%;
   height: auto;

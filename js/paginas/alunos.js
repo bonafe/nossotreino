@@ -8,6 +8,16 @@ import { semearContaDeExemplo } from "../treinos-exemplo.js";
 // backup) — ver seção 2.2 de especificacao-biblioteca-exercicios.md.
 const CAMPOS_OBRIGATORIOS_PLANO = ["schema", "metadata", "distribuicaoSemanal", "treinos"];
 
+// Um arquivo "Baixar" avulso (planos.js) vem embrulhado em
+// `{plano, bibliotecaPersonalizada}` (ver TreinosStorage.montarExportacaoAvulsaDoPlano)
+// pra poder trazer junto os personalizados que aquele plano referencia;
+// um arquivo de versões anteriores (ou já reaproveitado como template)
+// pode vir sem o embrulho, só o plano cru — os dois formatos precisam
+// continuar aceitos.
+function planoContidoEm(dados) {
+  return dados && dados.plano && Array.isArray(dados.bibliotecaPersonalizada) ? dados.plano : dados;
+}
+
 class AlunosController {
   #listaEl = document.getElementById("lista");
   #mensagemEl = document.getElementById("mensagem");
@@ -65,7 +75,8 @@ class AlunosController {
   }
 
   #validarPlano(dados) {
-    return dados && typeof dados === "object" && CAMPOS_OBRIGATORIOS_PLANO.every((campo) => campo in dados);
+    const plano = planoContidoEm(dados);
+    return plano && typeof plano === "object" && CAMPOS_OBRIGATORIOS_PLANO.every((campo) => campo in plano);
   }
 
   #aoEscolherArquivo(evento) {
@@ -112,7 +123,8 @@ class AlunosController {
   // o plano de um aluno e importar pra outro).
   #abrirConfirmacaoImportar(dados) {
     this.#dadosParaImportar = dados;
-    const nomeSugerido = ((dados.metadata && dados.metadata.aluno) || "").trim();
+    const metadata = planoContidoEm(dados).metadata;
+    const nomeSugerido = ((metadata && metadata.aluno) || "").trim();
     const alunos = TreinosStorage.listarAlunos();
     const existente = nomeSugerido && alunos.find((a) => a.nome.trim().toLowerCase() === nomeSugerido.toLowerCase());
 
@@ -149,7 +161,8 @@ class AlunosController {
     }
 
     const aluno = TreinosStorage.listarAlunos().find((a) => a.id === alunoId);
-    dados.metadata = { ...dados.metadata, aluno: (aluno && aluno.nome) || "" };
+    const plano = planoContidoEm(dados);
+    plano.metadata = { ...plano.metadata, aluno: (aluno && aluno.nome) || "" };
 
     const id = TreinosStorage.importarPlano(dados, alunoId);
     TreinosStorage.ativarPlano(id);

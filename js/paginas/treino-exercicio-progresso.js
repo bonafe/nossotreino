@@ -105,7 +105,7 @@ class TreinoExercicioProgressoController {
     document.getElementById("carregando").hidden = true;
     const erroEl = document.getElementById("erro");
     erroEl.hidden = false;
-    erroEl.innerHTML = `${mensagem} Volte ao <a href="treino_exercicios_menu.html">menu de treinos</a>.`;
+    erroEl.innerHTML = `${mensagem} Volte ao <a href="treino_musculacao_menu.html">menu de treinos</a>.`;
     document.getElementById("titulo").textContent = "Progresso do Exercício";
   }
 
@@ -115,8 +115,8 @@ class TreinoExercicioProgressoController {
     const treinoId = params.get("treino");
 
     document.getElementById("voltarLink").href = treinoId
-      ? `treino_exercicios.html?treino=${encodeURIComponent(treinoId)}`
-      : "treino_exercicios_menu.html";
+      ? `treino_musculacao_exercicios.html?treino=${encodeURIComponent(treinoId)}`
+      : "treino_musculacao_menu.html";
 
     if (!exercicioId) {
       this.#mostrarErro("Nenhum exercício selecionado.");
