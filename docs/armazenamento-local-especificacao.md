@@ -569,7 +569,21 @@ silencioso do `localStorage`, agora assíncrona.
   (ícone 📂) — não há aviso automático de que os dados ficaram
   desatualizados.
 
-## 7. Fora de escopo
+## 7. Exceção deliberada: `localStorage` para consentimento de analytics
+
+A justificativa da seção 1 ("Por que IndexedDB e não `localStorage`")
+vale para dado de domínio — aluno, plano, histórico: precisa de
+versionamento de esquema e (no futuro) de `Blob`. A escolha de
+consentimento para o Google Analytics (ver
+[analytics-especificacao.md](./analytics-especificacao.md)) não é dado
+de domínio, é preferência de navegador, e por isso é a única coisa no
+projeto guardada em `localStorage` puro (chave
+`nossoTreinoConsentimentoAnalytics`, `js/consentimento-analytics.js`) —
+deliberadamente fora de `TreinosStorage`/IndexedDB, pra não depender da
+hidratação assíncrona do banco (seção 5) nem do vocabulário da loja
+`preferencias`.
+
+## 8. Fora de escopo
 
 - Painel consolidado por exercício (volume, carga, recordes pessoais a
   partir de `historico.serieMusculacao.v1`) — a visualização por

@@ -2,6 +2,7 @@ import { gerarIdUnico } from "./identificadores.js";
 import { Formatadores } from "./formatadores.js";
 import { BancoIndexedDB } from "./armazenamento-indexeddb.js";
 import "./versao.js";
+import "./consentimento-analytics.js";
 
 // Mapa entre a chave relativa "histórica" (a mesma usada por toda página
 // desde a época do localStorage) e o `tipo` físico dentro da loja única
