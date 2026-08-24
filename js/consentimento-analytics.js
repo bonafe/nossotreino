@@ -4,13 +4,10 @@
 // docs/analytics-especificacao.md). Consentimento em localStorage puro (não
 // TreinosStorage/IndexedDB) porque é preferência de navegador, não dado de
 // domínio — não precisa de migração de esquema nem de esperar a hidratação
-// assíncrona do banco (ver seção 8 de docs/armazenamento-local-especificacao.md).
+// assíncrona do banco (ver seção 7 de docs/armazenamento-local-especificacao.md).
 
-// TODO: Measurement ID real ainda não configurado — criar uma propriedade
-// GA4 (analytics.google.com) e colar o ID (formato "G-XXXXXXX") aqui antes
-// de publicar. Enquanto for o placeholder abaixo, aceitar o banner não
-// carrega nenhum script de verdade (o `id` na URL do gtag.js seria inválido).
-const MEASUREMENT_ID = "G-TODO"; // TODO: configurar
+// Propriedade GA4 "Nosso Treino" (fluxo web nossotreino.com.br).
+const MEASUREMENT_ID = "G-BP092QVYP1";
 
 const CHAVE_CONSENTIMENTO = "nossoTreinoConsentimentoAnalytics";
 
@@ -32,8 +29,6 @@ function salvarConsentimento(valor) {
 }
 
 function carregarGoogleAnalytics() {
-  if (MEASUREMENT_ID.includes("TODO")) return;
-
   const script = document.createElement("script");
   script.async = true;
   script.src = `https://www.googletagmanager.com/gtag/js?id=${MEASUREMENT_ID}`;

@@ -65,12 +65,9 @@ requisição sai, até o clique em "Aceitar"**.
 
 ## 5. Configuração do Measurement ID
 
-`MEASUREMENT_ID` em `js/consentimento-analytics.js` é hoje um
-placeholder (`"G-TODO"`) — mesmo padrão do `NUMERO_WHATSAPP_CRITICA` em
-`js/critica-comunidade.js`. Enquanto o placeholder não for trocado pelo
-ID real de uma propriedade GA4 (`analytics.google.com`, formato
-`G-XXXXXXX`), o código detecta o placeholder e não carrega nenhum script
-mesmo que a pessoa clique em "Aceitar".
+`MEASUREMENT_ID` em `js/consentimento-analytics.js` aponta pra
+propriedade GA4 "Nosso Treino" (fluxo web `nossotreino.com.br`, código de
+fluxo `15489361107`, ID de métrica `G-BP092QVYP1`).
 
 ## 6. Service worker
 
