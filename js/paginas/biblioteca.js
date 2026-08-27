@@ -5,7 +5,7 @@ import { normalizar } from "../identificadores.js";
 import { criarDetalhesModal } from "../detalhes-modal.js";
 import { criarVideoPlayerModal } from "../video-player-modal.js";
 import { criarCriticaModal } from "../critica-comunidade.js";
-import { obterDominio, obterEm } from "../dominios-biblioteca.js";
+import { obterDominio, existeDominio, obterEm } from "../dominios-biblioteca.js";
 import { caminhoImagemExercicio } from "../imagem-exercicio.js";
 
 // Tela de navegação/gestão da biblioteca personalizada — complementa o
@@ -26,6 +26,8 @@ class BibliotecaController {
   #voltarIconEl = document.getElementById("voltarIcon");
   #tituloEl = document.getElementById("titulo");
   #subtituloEl = document.getElementById("subtitulo");
+  #mudarPaiLinkEl = document.getElementById("mudarPaiLink");
+  #mudarPaiTextoEl = document.getElementById("mudarPaiTexto");
   #criarLinkEl = document.getElementById("criarLink");
   #carregandoEl = document.getElementById("carregando");
   #erroEl = document.getElementById("erro");
@@ -38,11 +40,33 @@ class BibliotecaController {
   iniciar() {
     const params = new URLSearchParams(window.location.search);
     this.#dominioId = params.get("dominio") || "musculacao";
+    const voltarParam = params.get("voltar");
+    this.#configurarMudarPaiLink();
+
+    // Domínio sem biblioteca de verdade ainda (ex.: um tipo da árvore de
+    // atividade livre sem exercícios cadastrados, chegando por
+    // biblioteca_dominios.html) — mostra vazio em vez de cair no fallback
+    // de obterDominio() pra musculação, que renderizaria o conteúdo
+    // errado.
+    if (!existeDominio(this.#dominioId)) {
+      this.#tituloEl.textContent = `📚 ${params.get("nome") || this.#dominioId}`;
+      this.#subtituloEl.textContent = "Ainda sem exercícios cadastrados aqui.";
+      this.#voltarIconEl.href = voltarParam || "biblioteca_dominios.html";
+      this.#criarLinkEl.hidden = true;
+      this.#carregandoEl.hidden = true;
+      this.#conteudoEl.hidden = false;
+      this.#conteudoEl.querySelector(".campo").hidden = true;
+      this.#conteudoEl.querySelector(".filtros-biblioteca").hidden = true;
+      this.#resultadosEl.innerHTML =
+        '<div class="picker-vazio">Nenhum exercício cadastrado ainda aqui. No futuro você vai poder adicionar exercícios pra este domínio.</div>';
+      return;
+    }
+
     this.#dominio = obterDominio(this.#dominioId);
 
     this.#tituloEl.textContent = `📚 ${this.#dominio.tituloBiblioteca}`;
     this.#subtituloEl.textContent = "Oficiais e personalizados — toque num item pra ver detalhes.";
-    this.#voltarIconEl.href = this.#dominio.menu;
+    this.#voltarIconEl.href = voltarParam || this.#dominio.menu;
     this.#criarLinkEl.href = `exercicio_novo.html?dominio=${encodeURIComponent(this.#dominioId)}&voltar=${encodeURIComponent(
       `biblioteca.html?dominio=${this.#dominioId}`
     )}`;
@@ -57,6 +81,28 @@ class BibliotecaController {
     window.addEventListener("focus", () => this.#carregarDados());
 
     this.#carregarDados();
+  }
+
+  // Todo domínio mostrado aqui (com ou sem biblioteca de verdade em
+  // DOMINIOS) corresponde a um nó em tiposAtividade — musculação/
+  // alongamento são semeados junto com o banco, e qualquer outro só
+  // aparece em biblioteca.html porque biblioteca_dominios.html achou ele
+  // nessa árvore. "Mudar domínio pai" reaproveita o mesmo formulário/
+  // picker de criar tipo (atividade_livre_tipo_novo.html?editar=<id>),
+  // numa aba nova como todo link de edição desta tela.
+  #configurarMudarPaiLink() {
+    const tipo = TreinosStorage.obterTipoAtividade(this.#dominioId);
+    if (!tipo) {
+      this.#mudarPaiLinkEl.hidden = true;
+      return;
+    }
+
+    const voltarAqui = window.location.pathname + window.location.search;
+    this.#mudarPaiLinkEl.href = `atividade_livre_tipo_novo.html?editar=${encodeURIComponent(this.#dominioId)}&voltar=${encodeURIComponent(voltarAqui)}`;
+    this.#mudarPaiTextoEl.textContent = tipo.tipoAtividadePaiId
+      ? TreinosStorage.caminhoTipoAtividade(tipo.tipoAtividadePaiId).map((t) => t.nome).join(" › ")
+      : "— nenhum (raiz) —";
+    this.#mudarPaiLinkEl.hidden = false;
   }
 
   #mostrarErro(mensagem) {

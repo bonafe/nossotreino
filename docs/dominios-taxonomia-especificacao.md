@@ -85,6 +85,12 @@ Registradas como perguntas — nenhuma tem resposta escolhida ainda:
   de atividade cronometrada) convergirem num único modelo de
   domínio/subdomínio? Ou continuam propositalmente separados, porque um
   exige o peso de um formulário de cadastro de exercício e o outro não?
+  Uma primeira ponte, só de navegação (nenhum dado convergiu, nenhuma
+  pergunta acima foi respondida), já existe: `biblioteca_dominios.html`
+  deixa a árvore de `tiposAtividade` navegável e, quando um nó coincide
+  com um domínio real de `DOMINIOS`, manda pra `biblioteca.html`; um nó
+  sem domínio abre a biblioteca vazia, pronta pra ganhar itens se um dia
+  esses dois modelos convergirem de fato.
 
 ## 4. Não-escopo explícito
 

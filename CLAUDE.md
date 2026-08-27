@@ -81,6 +81,8 @@ Bicicleta, alongamento e musculação seguem o padrão "motor genérico recebe p
 
 Atividade livre (`atividade_livre_menu.html`) é um quarto pilar, mas não segue esse padrão de motor genérico: não tem execução cronometrada nem prescrição, e não exige nenhum treino pré-cadastrado — é lançamento manual direto no histórico (data, hora, duração) classificado numa árvore local de tipos de atividade (`TreinosStorage.listarTiposAtividade()`/`criarTipoAtividade()`, loja `tiposAtividade` do IndexedDB, device-local — não é `DOMINIOS` de `js/dominios-biblioteca.js`, que é a biblioteca de exercícios). Serve pra qualquer atividade com data e duração que não tenha (ou não precise de) uma prescrição estruturada — pilates, natação, dança, artes marciais, ou mesmo alongamento avulso. Ver `docs/atividade-livre-especificacao.md`.
 
+`biblioteca_dominios.html` (📚 em `sistema.html`) é o único ponto do código que lê as duas árvores juntas: navega a árvore de `tiposAtividade` e, quando um nó tem um domínio de verdade em `DOMINIOS` (hoje só `musculacao`/`alongamento`, cujos ids coincidem de propósito com as duas raízes semeadas em `tiposAtividade`), manda direto pra `biblioteca.html?dominio=<id>`; senão continua descendo (se tiver filhos) ou abre `biblioteca.html` vazia pra aquele tipo (se for folha, pronta pra ganhar itens no futuro). Ver seção "Convergência de `tiposAtividade` e `DOMINIOS`" em `docs/dominios-taxonomia-especificacao.md`.
+
 ### Fluxos de tela
 
 ```
@@ -99,8 +101,10 @@ index.html (institucional)
                         │                              │  └─> treino_musculacao_exercicios.html?treino=<id> → treino_execucao.html?treino=<id>
                         │                              │                                              └─> treino_exercicio_progresso.html?exercicio=<id>&treino=<id>
                         │                              └─> biblioteca.html?dominio=musculacao (📚, ver/criar/editar exercícios)
-                        └─> atividade_livre_menu.html → atividade_livre_novo.html
-                                                       └─> atividade_livre_tipo_novo.html (aba nova, criar tipo/subtipo)
+                        ├─> atividade_livre_menu.html → atividade_livre_novo.html
+                        │                             └─> atividade_livre_tipo_novo.html (aba nova, criar tipo/subtipo)
+                        └─> biblioteca_dominios.html (📚, navega a árvore de tiposAtividade;
+                                                       nó com domínio de verdade → biblioteca.html?dominio=<id>)
 ```
 
 `treino_musculacao_novo.html`, `treino_alongamento_novo.html` e `biblioteca.html` linkam pra `exercicio_novo.html?dominio=<id>[&id=<id>][&voltar=<url>]` (criar/editar exercício ou alongamento personalizado, ver seção 26 de `docs/especificacao-biblioteca-exercicios.md`) sempre **numa aba nova**, pra não perder um treino em construção só guardado em memória na aba de origem.

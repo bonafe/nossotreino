@@ -223,3 +223,12 @@ export function listarDominios() {
 export function obterDominio(id) {
   return DOMINIOS[id] || DOMINIOS.musculacao;
 }
+
+// Diferente de obterDominio (que sempre devolve algo, com fallback pra
+// musculação, pensado pra quem já sabe que o id é válido), esta função
+// existe pra quem precisa checar sem cair no fallback — usada por
+// biblioteca_dominios.html pra decidir se um tipo da árvore de atividade
+// livre tem uma biblioteca de verdade por trás ou não.
+export function existeDominio(id) {
+  return Object.prototype.hasOwnProperty.call(DOMINIOS, id);
+}

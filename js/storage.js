@@ -846,6 +846,23 @@ export class TreinosStorage {
     return id;
   }
 
+  // Move um tipo pra debaixo de outro pai (ou pra raiz, com paiId nulo) —
+  // usado por atividade_livre_tipo_novo.html em modo de edição
+  // (?editar=<id>), alcançado a partir do "✏️ Mudar domínio pai" de
+  // biblioteca.html. Recusa virar pai de si mesmo ou de um dos próprios
+  // descendentes (criaria um ciclo em caminhoTipoAtividade) — segunda
+  // trava além do filtro que a própria picker já aplica.
+  static alterarPaiTipoAtividade(id, novoPaiId) {
+    const tipo = TreinosStorage.obterTipoAtividade(id);
+    if (!tipo) return;
+    const paiNormalizado = novoPaiId || null;
+    if (paiNormalizado === id) return;
+    if (paiNormalizado && TreinosStorage.caminhoTipoAtividade(paiNormalizado).some((t) => t.id === id)) return;
+
+    tipo.tipoAtividadePaiId = paiNormalizado;
+    enfileirarEscrita(() => BancoIndexedDB.gravar("tiposAtividade", tipo));
+  }
+
   // Re-hidrata só esta loja — "criar tipo novo" abre em aba própria
   // (atividade-livre-tipo-novo.js), mesmo padrão de
   // recarregarBibliotecaPersonalizada.

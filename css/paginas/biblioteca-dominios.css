@@ -1,0 +1,32 @@
+main {
+  width: min(680px, 100%);
+  padding-top: 8px;
+}
+
+h1 {
+  margin: 0 0 4px;
+  font-size: clamp(1.4rem, 6vw, 2rem);
+  letter-spacing: -0.03em;
+  font-weight: 1000;
+}
+
+p.subtitle {
+  margin: 0;
+  color: #94a3b8;
+  font-size: clamp(0.95rem, 3.5vw, 1.05rem);
+}
+
+.picker-resultado-cabecalho {
+  align-items: center;
+}
+
+.picker-resultado-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  background: rgba(190, 242, 100, 0.18);
+  color: #bef264;
+  white-space: nowrap;
+}

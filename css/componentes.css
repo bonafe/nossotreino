@@ -18,6 +18,10 @@
   margin-left: auto;
 }
 
+.icon-btn[hidden] {
+  display: none;
+}
+
 .icon-btn:active {
   transform: translateY(1px) scale(0.99);
 }

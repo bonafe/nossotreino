@@ -126,10 +126,17 @@ pra segundos, resolve o nome do tipo escolhido e grava via
 ### 3.3 Criar tipo/subtipo (`atividade_livre_tipo_novo.html`)
 
 Abre sempre em aba nova (`?voltar=atividade_livre_novo.html`, mesmo
-parâmetro de `exercicio_novo.html`). Um campo de nome + um seletor de pai
+parâmetro de `exercicio_novo.html`) — usada tanto pelo link "+ Não achou?
+Criar tipo novo" de `atividade_livre_novo.html` quanto pelo "+" de
+`biblioteca_dominios.html` (ver seção 26 de
+`docs/especificacao-biblioteca-exercicios.md`), sem nenhuma variação de
+comportamento entre as duas origens. Um campo de nome + um seletor de pai
 (mesmo picker com busca por breadcrumb, mais a opção "— Nenhum (tipo
-raiz) —"). Ao salvar, `TreinosStorage.criarTipoAtividade(nome, paiId)`,
-limpa o formulário e mostra uma mensagem inline de sucesso — mas,
+raiz) —") — `?pai=<id>` na query string pré-seleciona esse seletor (usado
+por `biblioteca_dominios.html` pra já sugerir o nível que a pessoa estava
+navegando como pai do tipo novo; a pessoa ainda pode trocar pelo picker
+antes de criar). Ao salvar, `TreinosStorage.criarTipoAtividade(nome,
+paiId)`, limpa o formulário e mostra uma mensagem inline de sucesso — mas,
 diferente de `exercicio-novo.js` (que sempre navega pra `?voltar=` na
 sequência), aqui **não navega sozinho**: a tela permanece pronta pra criar
 mais um tipo (útil pra montar uma árvore de vários níveis de uma vez) e

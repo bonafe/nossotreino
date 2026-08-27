@@ -6,7 +6,9 @@ const ROTULO_RAIZ = "— Nenhum (tipo raiz) —";
 class AtividadeLivreTipoNovoController {
   #paiEscolhidoId = null;
   #voltarPara = "atividade_livre_novo.html";
+  #idEditando = null; // ?editar=<id> — muda de "criar tipo novo" pra "mudar domínio pai" de um tipo existente
 
+  #tituloEl = document.getElementById("titulo");
   #nomeInputEl = document.getElementById("nomeInput");
   #paiEscolhaBtnEl = document.getElementById("paiEscolhaBtn");
   #criarBtnEl = document.getElementById("criarBtn");
@@ -25,10 +27,28 @@ class AtividadeLivreTipoNovoController {
     this.#paiEscolhaBtnEl.addEventListener("click", () => this.#abrirPicker());
     this.#pickerFecharBtnEl.addEventListener("click", () => this.#fecharPicker());
     this.#pickerBuscaInputEl.addEventListener("input", () => this.#filtrarResultados());
-    this.#criarBtnEl.addEventListener("click", () => this.#criar());
+    this.#criarBtnEl.addEventListener("click", () => (this.#idEditando ? this.#salvar() : this.#criar()));
     this.#voltarBtnEl.addEventListener("click", () => {
       window.location.href = this.#voltarPara;
     });
+
+    const idEditando = params.get("editar");
+    const tipoEditando = idEditando && TreinosStorage.obterTipoAtividade(idEditando);
+    if (tipoEditando) {
+      this.#idEditando = idEditando;
+      this.#tituloEl.textContent = "Mudar domínio pai";
+      this.#nomeInputEl.value = tipoEditando.nome;
+      this.#nomeInputEl.disabled = true;
+      this.#criarBtnEl.textContent = "Salvar";
+      this.#escolherPai(tipoEditando.tipoAtividadePaiId);
+      return;
+    }
+
+    // ?pai=<id> pré-seleciona o pai (ex.: biblioteca_dominios.html manda
+    // pra cá já com o nível que a pessoa estava navegando) — só um atalho
+    // pro que o picker já faz, a pessoa ainda pode trocar antes de criar.
+    const paiInicial = params.get("pai");
+    if (paiInicial && TreinosStorage.obterTipoAtividade(paiInicial)) this.#escolherPai(paiInicial);
   }
 
   #abrirPicker() {
@@ -46,6 +66,10 @@ class AtividadeLivreTipoNovoController {
     const termo = normalizar(this.#pickerBuscaInputEl.value.trim());
     const tipos = TreinosStorage.listarTiposAtividade()
       .map((tipo) => ({ tipo, caminho: TreinosStorage.caminhoTipoAtividade(tipo.id) }))
+      // Editando: nunca oferece o próprio tipo nem um descendente dele como
+      // pai novo — viraria um ciclo na árvore (caminho de um descendente
+      // sempre passa pelo próprio #idEditando).
+      .filter(({ caminho }) => !this.#idEditando || !caminho.some((t) => t.id === this.#idEditando))
       .filter(({ caminho }) => !termo || normalizar(caminho.map((t) => t.nome).join(" ")).includes(termo))
       .sort((a, b) => a.caminho.map((t) => t.nome).join(" › ").localeCompare(b.caminho.map((t) => t.nome).join(" › ")));
 
@@ -103,6 +127,14 @@ class AtividadeLivreTipoNovoController {
     this.#nomeInputEl.value = "";
     this.#escolherPai(null);
     this.#mostrarMensagem(`✓ "${nome}" criado. Pode criar outro tipo ou voltar.`, "sucesso");
+    this.#voltarBtnEl.hidden = false;
+  }
+
+  async #salvar() {
+    TreinosStorage.alterarPaiTipoAtividade(this.#idEditando, this.#paiEscolhidoId);
+    await TreinosStorage.aguardarEscritas();
+
+    this.#mostrarMensagem("✓ Domínio pai atualizado.", "sucesso");
     this.#voltarBtnEl.hidden = false;
   }
 }
