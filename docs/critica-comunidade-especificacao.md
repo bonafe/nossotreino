@@ -115,10 +115,8 @@ Descreva aqui o que você notou ou sugere:
 
 ## 5. Número de WhatsApp
 
-Ainda não definido. `NUMERO_WHATSAPP_CRITICA` em `js/critica-comunidade.js`
-é um placeholder (`"5500000000000"`) marcado com `TODO` — configurar
-antes de publicar, formato E.164 sem `+`/espaços/traços (exigido por
-`wa.me`).
+`NUMERO_WHATSAPP_CRITICA` em `js/critica-comunidade.js` — formato E.164
+sem `+`/espaços/traços (exigido por `wa.me`).
 
 ## 6. Backend — esqueleto em `src/python/whatsapp/`
 

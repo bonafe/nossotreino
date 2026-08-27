@@ -6,10 +6,7 @@
 // caminhoImagemExercicio/ligarImagemExercicio em imagem-exercicio.js,
 // extensível a outros no futuro sem mudar este arquivo) ao WhatsApp.
 
-// TODO: número real do WhatsApp Business do Nosso Treino ainda não foi
-// configurado — trocar antes de publicar. Formato E.164 sem "+"/espaços
-// nem traços (exigido por wa.me), ex.: "5511999999999".
-export const NUMERO_WHATSAPP_CRITICA = "5500000000000"; // TODO: configurar
+export const NUMERO_WHATSAPP_CRITICA = "5514998847110";
 
 const DOMINIO_LABEL = { musculacao: "exercício", alongamento: "alongamento" };
 const CATEGORIA_LABEL = { erro: "Erro", sugestao: "Sugestão", outro: "Outro" };
