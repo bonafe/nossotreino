@@ -41,14 +41,7 @@ class AtividadeLivreTipoNovoController {
       this.#nomeInputEl.disabled = true;
       this.#criarBtnEl.textContent = "Salvar";
       this.#escolherPai(tipoEditando.tipoAtividadePaiId);
-      return;
     }
-
-    // ?pai=<id> pré-seleciona o pai (ex.: biblioteca_dominios.html manda
-    // pra cá já com o nível que a pessoa estava navegando) — só um atalho
-    // pro que o picker já faz, a pessoa ainda pode trocar antes de criar.
-    const paiInicial = params.get("pai");
-    if (paiInicial && TreinosStorage.obterTipoAtividade(paiInicial)) this.#escolherPai(paiInicial);
   }
 
   #abrirPicker() {

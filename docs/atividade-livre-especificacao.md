@@ -132,15 +132,25 @@ Criar tipo novo" de `atividade_livre_novo.html` quanto pelo "+" de
 `docs/especificacao-biblioteca-exercicios.md`), sem nenhuma variação de
 comportamento entre as duas origens. Um campo de nome + um seletor de pai
 (mesmo picker com busca por breadcrumb, mais a opção "— Nenhum (tipo
-raiz) —") — `?pai=<id>` na query string pré-seleciona esse seletor (usado
-por `biblioteca_dominios.html` pra já sugerir o nível que a pessoa estava
-navegando como pai do tipo novo; a pessoa ainda pode trocar pelo picker
-antes de criar). Ao salvar, `TreinosStorage.criarTipoAtividade(nome,
-paiId)`, limpa o formulário e mostra uma mensagem inline de sucesso — mas,
+raiz) —"). Ao salvar, `TreinosStorage.criarTipoAtividade(nome, paiId)`,
+limpa o formulário e mostra uma mensagem inline de sucesso — mas,
 diferente de `exercicio-novo.js` (que sempre navega pra `?voltar=` na
 sequência), aqui **não navega sozinho**: a tela permanece pronta pra criar
 mais um tipo (útil pra montar uma árvore de vários níveis de uma vez) e
 revela um botão "Voltar" que só então navega pra `?voltar=`.
+
+`?editar=<id>` troca o modo da tela inteira: em vez de criar, "Mudar
+domínio pai" de um tipo já existente (alcançado pelo link "✏️ Domínio
+pai" de `biblioteca.html`, ver seção 26 de
+`docs/especificacao-biblioteca-exercicios.md`). O campo de nome vem
+preenchido e desabilitado (só muda o pai, não renomeia), o seletor de pai
+vem pré-selecionado com o pai atual, e a picker de pai exclui o próprio
+tipo e todos os seus descendentes da lista — não teria como escolhê-los
+sem criar um ciclo em `caminhoTipoAtividade`. Ao salvar,
+`TreinosStorage.alterarPaiTipoAtividade(id, paiId)` (que repete a mesma
+trava contra ciclo do lado do storage) e revela o botão "Voltar" — aqui
+não tem sentido continuar editando outro tipo na mesma tela, então não
+limpa nem oferece continuar.
 
 ## 4. Formato do histórico (`historico.sessaoLivre.v1`)
 

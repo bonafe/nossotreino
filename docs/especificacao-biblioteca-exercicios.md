@@ -3343,7 +3343,16 @@ um treino em construção só guardado em memória até "Salvar treino"):
   busca/filtro e mostra um estado vazio ("Nenhum exercício cadastrado
   ainda aqui"), com o "+" de criar escondido (`exercicio_novo.html` só
   sabe montar formulário pros domínios que já existem em `DOMINIOS`); o
-  título vem então do `?nome=<nome>` da query string; quando o domínio
+  título vem então do `?nome=<nome>` da query string. Todo domínio
+  mostrado aqui (com ou sem entrada em `DOMINIOS`) corresponde a um nó em
+  `tiposAtividade` — um link "✏️ Domínio pai: `<nome do pai atual>`" sob
+  o subtítulo (sempre visível, já que `musculacao`/`alongamento` também
+  são nós, semeados junto com o banco) abre
+  `atividade_livre_tipo_novo.html?editar=<id>&voltar=<esta mesma URL>`
+  numa aba nova pra mudar o pai daquele tipo na árvore (ver seção 3.3 de
+  `docs/atividade-livre-especificacao.md`) — não afeta o conteúdo desta
+  tela, só a posição do domínio na árvore de `biblioteca_dominios.html`.
+  Quando o domínio
   existe, o título vem de `tituloBiblioteca` (ex.: "Biblioteca de
   musculação", "Biblioteca de alongamento") — nomeado pelo domínio, não
   por "exercícios": o domínio `musculacao` já engloba calistenia/
@@ -3354,24 +3363,24 @@ um treino em construção só guardado em memória até "Salvar treino"):
   domínio, sempre singular — "Novo exercício", "Excluir exercício
   personalizado" — os dois divergem de propósito só em musculação, ver
   comentário em `js/dominios-biblioteca.js`).
-- `biblioteca_dominios.html` (📚 em `sistema.html`) — navega a árvore de
-  `tiposAtividade` (ver `docs/atividade-livre-especificacao.md`) como se
-  fosse uma árvore de domínios: cada nível mostra os filhos do tipo atual
-  (raiz = tipos sem pai); clicar num nó que coincide com uma chave de
-  `DOMINIOS` manda direto pra `biblioteca.html?dominio=<id>` (badge "📖
-  biblioteca" sinaliza isso na lista); clicar num nó sem domínio desce
-  mais um nível se ele tiver filhos, ou abre `biblioteca.html` vazia
-  (`?dominio=<id>&nome=<nome>`) se for folha. `?pai=<id>` na query string
-  abre a árvore já naquele nível (usado pelo próprio `?voltar=` que este
-  controller passa pra `biblioteca.html`, pra voltar no mesmo lugar da
-  árvore em vez de sempre pra raiz). O "+" no cabeçalho reaproveita
+- `biblioteca_dominios.html` (📚 em `sistema.html`) — mostra a árvore
+  inteira de `tiposAtividade` (ver `docs/atividade-livre-especificacao.md`)
+  de uma vez, achatada numa lista só: percorre em pré-ordem a partir das
+  raízes (tipos sem pai, ordenados por nome), empilhando cada filho logo
+  depois do pai com um `margin-left` proporcional à profundidade — nada
+  de navegar nível por nível, o filho aparece identado dentro do pai
+  direto na mesma tela. Tocar em qualquer nó (raiz, folha, com ou sem
+  filhos) sempre abre a biblioteca dele: se o id coincide com uma chave
+  de `DOMINIOS`, manda direto pra `biblioteca.html?dominio=<id>` (badge
+  "📖 biblioteca" sinaliza isso na lista); senão abre a mesma tela vazia
+  (`?dominio=<id>&nome=<nome>`). O "+" no cabeçalho reaproveita
   `atividade_livre_tipo_novo.html` sem nenhuma variação de código (ver
-  seção 3.3 de `docs/atividade-livre-especificacao.md`) — abre numa aba
-  nova com `?pai=<id do nível atual>` (pré-seleciona o pai do tipo novo)
-  e `?voltar=<mesmo nível>`; ao voltar o foco pra esta aba,
+  seção 3.3 de `docs/atividade-livre-especificacao.md`), sempre sem pai
+  pré-selecionado (não existe mais um "nível atual" pra sugerir — a
+  pessoa escolhe pelo picker); ao voltar o foco pra esta aba,
   `TreinosStorage.recarregarTiposAtividade()` roda de novo (mesmo
-  mecanismo de `atividade-livre-novo.js`) pra refletir o tipo criado sem
-  recarregar a página.
+  mecanismo de `atividade-livre-novo.js`) e a árvore inteira é
+  re-renderizada, refletindo o tipo criado sem recarregar a página.
 
 Como a criação/edição acontece numa aba separada, a aba de origem
 (`treino_musculacao_novo.html`/`treino_alongamento_novo.html`) não teria como saber
