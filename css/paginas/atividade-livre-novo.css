@@ -17,3 +17,27 @@
   font-size: 0.78rem;
   margin-top: 2px;
 }
+
+#voltarBtn[hidden] {
+  display: none;
+}
+
+#voltarBtn {
+  appearance: none;
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 18px;
+  padding: 15px 12px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  touch-action: manipulation;
+  background: rgba(148, 163, 184, 0.14);
+  color: #e2e8f0;
+}
+
+#voltarBtn:active {
+  transform: translateY(1px) scale(0.99);
+}

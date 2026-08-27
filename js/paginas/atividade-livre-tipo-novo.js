@@ -5,11 +5,13 @@ const ROTULO_RAIZ = "— Nenhum (tipo raiz) —";
 
 class AtividadeLivreTipoNovoController {
   #paiEscolhidoId = null;
+  #voltarPara = "atividade_livre_novo.html";
 
   #nomeInputEl = document.getElementById("nomeInput");
   #paiEscolhaBtnEl = document.getElementById("paiEscolhaBtn");
   #criarBtnEl = document.getElementById("criarBtn");
   #mensagemEl = document.getElementById("mensagem");
+  #voltarBtnEl = document.getElementById("voltarBtn");
 
   #pickerOverlayEl = document.getElementById("pickerOverlay");
   #pickerFecharBtnEl = document.getElementById("pickerFecharBtn");
@@ -17,10 +19,16 @@ class AtividadeLivreTipoNovoController {
   #pickerResultadosEl = document.getElementById("pickerResultados");
 
   iniciar() {
+    const params = new URLSearchParams(window.location.search);
+    this.#voltarPara = params.get("voltar") || this.#voltarPara;
+
     this.#paiEscolhaBtnEl.addEventListener("click", () => this.#abrirPicker());
     this.#pickerFecharBtnEl.addEventListener("click", () => this.#fecharPicker());
     this.#pickerBuscaInputEl.addEventListener("input", () => this.#filtrarResultados());
     this.#criarBtnEl.addEventListener("click", () => this.#criar());
+    this.#voltarBtnEl.addEventListener("click", () => {
+      window.location.href = this.#voltarPara;
+    });
   }
 
   #abrirPicker() {
@@ -94,7 +102,8 @@ class AtividadeLivreTipoNovoController {
 
     this.#nomeInputEl.value = "";
     this.#escolherPai(null);
-    this.#mostrarMensagem("✓ Tipo criado — pode voltar pra aba anterior.", "sucesso");
+    this.#mostrarMensagem(`✓ "${nome}" criado. Pode criar outro tipo ou voltar.`, "sucesso");
+    this.#voltarBtnEl.hidden = false;
   }
 }
 

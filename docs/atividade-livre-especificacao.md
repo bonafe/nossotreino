@@ -105,8 +105,18 @@ Formulário direto (sem passo de "criar treino" antes):
   formulário em preenchimento). Ao voltar o foco pra esta aba,
   `TreinosStorage.recarregarTiposAtividade()` roda de novo (mirror exato
   de `treino-musculacao-novo.js`), refletindo o tipo criado sem recarregar
-  a página.
+  a página. Ao escolher o tipo, busca a atividade mais recente daquele
+  mesmo tipo no histórico agregado do aluno ativo
+  (`TreinosStorage.lerHistoricoAgregadoDoPlanoAtivo(chaves.historicoSessaoLivre)`,
+  mesma fonte de `atividade_livre_menu.js` — todos os ciclos, não só o
+  atual) e, se existir, sobrescreve **hora** e **duração** com os valores
+  daquela última sessão (chute melhor que "agora" pra atividade que
+  sempre acontece no mesmo horário/duração, ex.: pilates toda terça às
+  19h por 60min). A **data** nunca é sobrescrita — continua sempre hoje.
 - **Data**, **hora**, **duração (minutos)**, **observação** (opcional).
+  Data e hora começam preenchidas com o momento atual
+  (`#preencherAgora`); hora/duração são substituídas pela última sessão
+  do tipo assim que ele é escolhido, como descrito acima.
 
 Ao salvar: combina data+hora num `dataHora` ISO único, converte a duração
 pra segundos, resolve o nome do tipo escolhido e grava via
@@ -115,14 +125,15 @@ pra segundos, resolve o nome do tipo escolhido e grava via
 
 ### 3.3 Criar tipo/subtipo (`atividade_livre_tipo_novo.html`)
 
-Abre sempre em aba nova. Um campo de nome + um seletor de pai (mesmo
-picker com busca por breadcrumb, mais a opção "— Nenhum (tipo raiz) —").
-Ao salvar, `TreinosStorage.criarTipoAtividade(nome, paiId)` e mostra uma
-mensagem inline de sucesso — **não navega pra lugar nenhum**: diferente de
-`exercicio-novo.js` (que sempre volta pra `?voltar=`), aqui não há uma
-tela de destino fixa nem um treino em memória a perder, então a própria
-tela permanece pronta pra criar outro tipo ou pra a pessoa voltar pra aba
-anterior manualmente.
+Abre sempre em aba nova (`?voltar=atividade_livre_novo.html`, mesmo
+parâmetro de `exercicio_novo.html`). Um campo de nome + um seletor de pai
+(mesmo picker com busca por breadcrumb, mais a opção "— Nenhum (tipo
+raiz) —"). Ao salvar, `TreinosStorage.criarTipoAtividade(nome, paiId)`,
+limpa o formulário e mostra uma mensagem inline de sucesso — mas,
+diferente de `exercicio-novo.js` (que sempre navega pra `?voltar=` na
+sequência), aqui **não navega sozinho**: a tela permanece pronta pra criar
+mais um tipo (útil pra montar uma árvore de vários níveis de uma vez) e
+revela um botão "Voltar" que só então navega pra `?voltar=`.
 
 ## 4. Formato do histórico (`historico.sessaoLivre.v1`)
 

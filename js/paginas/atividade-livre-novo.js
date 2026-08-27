@@ -89,6 +89,26 @@ class AtividadeLivreNovoController {
     const caminho = TreinosStorage.caminhoTipoAtividade(tipo.id).map((t) => t.nome);
     this.#tipoEscolhaBtnEl.textContent = caminho.join(" › ");
     this.#fecharPicker();
+    this.#preencherComUltimaDoTipo(tipo.id);
+  }
+
+  // Repete hora e duração da última atividade registrada desse tipo (em
+  // qualquer ciclo do aluno ativo, mesmo agregado de atividade_livre_menu.js)
+  // — a data continua sendo hoje, só a hora/duração são um chute melhor que
+  // "agora" pra atividades que sempre acontecem no mesmo horário.
+  #preencherComUltimaDoTipo(tipoId) {
+    const historico = TreinosStorage.lerHistoricoAgregadoDoPlanoAtivo(TreinosStorage.chaves.historicoSessaoLivre);
+    const doTipo = historico
+      .filter((entrada) => entrada.tipoAtividadeId === tipoId)
+      .sort((a, b) => new Date(b.dataHora) - new Date(a.dataHora));
+
+    const ultima = doTipo[0];
+    if (!ultima) return;
+
+    const pad = (n) => String(n).padStart(2, "0");
+    const dataHora = new Date(ultima.dataHora);
+    this.#horaInputEl.value = `${pad(dataHora.getHours())}:${pad(dataHora.getMinutes())}`;
+    this.#duracaoInputEl.value = Math.round(ultima.duracaoSegundos / 60);
   }
 
   #mostrarMensagem(texto) {

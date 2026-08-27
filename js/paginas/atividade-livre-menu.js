@@ -33,7 +33,7 @@ class AtividadeLivreMenuController {
     div.innerHTML = `
       <div class="lancamento-cabecalho">
         <span class="lancamento-tipo">${breadcrumb || entrada.tipoAtividadeNome}</span>
-        <span class="lancamento-duracao">${Formatadores.duracaoExtensa(entrada.duracaoSegundos)}</span>
+        <span class="lancamento-duracao">${Formatadores.tempoCurto(entrada.duracaoSegundos)}</span>
       </div>
       <div class="lancamento-data">${Formatadores.dataHora(entrada.dataHora)}</div>
       ${entrada.observacao ? `<div class="lancamento-observacao">${entrada.observacao}</div>` : ""}
