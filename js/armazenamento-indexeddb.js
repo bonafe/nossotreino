@@ -3,7 +3,7 @@
 // interpreta o significado de cada loja. Ver seção 2 de
 // docs/armazenamento-local-especificacao.md.
 export const NOME_BANCO = "nossotreino";
-export const VERSAO_BANCO = 2;
+export const VERSAO_BANCO = 3;
 
 function criarEsquemaInicial(banco) {
   banco.createObjectStore("alunos", { keyPath: "id" });
@@ -37,6 +37,23 @@ function criarLojaDeBibliotecaPersonalizada(banco) {
   banco.createObjectStore("bibliotecaPersonalizada", { keyPath: ["dominio", "id"] });
 }
 
+// Árvore local (device-local, não versionada no git, não é dado de
+// aluno/plano) de tipos de atividade pra "atividade livre" (sessão com
+// data/duração lançada manualmente, sem treino pré-cadastrado — ver
+// docs/atividade-livre-especificacao.md). Profundidade arbitrária via
+// `tipoAtividadePaiId` (null = raiz). Semeada com as mesmas duas raízes
+// que já existem como domínio de biblioteca de exercícios (`musculacao`,
+// `alongamento` — ids coincidem por familiaridade de UX com
+// js/dominios-biblioteca.js, não por acoplamento: nenhum código lê um a
+// partir do outro).
+function criarLojaDeTiposAtividade(banco) {
+  const tipos = banco.createObjectStore("tiposAtividade", { keyPath: "id" });
+  tipos.createIndex("porPai", "tipoAtividadePaiId");
+  const agora = new Date().toISOString();
+  tipos.put({ id: "musculacao", nome: "Musculação", tipoAtividadePaiId: null, criadoEm: agora });
+  tipos.put({ id: "alongamento", nome: "Alongamento", tipoAtividadePaiId: null, criadoEm: agora });
+}
+
 // Tabela de migração estrutural do banco. Chave = versão de destino.
 // `onupgradeneeded` aplica em sequência de (oldVersion+1) até newVersion,
 // então um navegador parado numa versão antiga passa por todas as
@@ -44,7 +61,8 @@ function criarLojaDeBibliotecaPersonalizada(banco) {
 // acrescentar a próxima quando VERSAO_BANCO subir.
 const MIGRACOES_BANCO = {
   1: criarEsquemaInicial,
-  2: criarLojaDeBibliotecaPersonalizada
+  2: criarLojaDeBibliotecaPersonalizada,
+  3: criarLojaDeTiposAtividade
 };
 
 function promessaDaRequisicao(requisicao) {

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Registrar Atividade Livre</title>
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/componentes.css" />
+  <link rel="stylesheet" href="css/paginas/treino-musculacao-novo.css" />
+  <link rel="stylesheet" href="css/paginas/atividade-livre-novo.css" />
+</head>
+<body>
+  <main>
+    <header class="top">
+      <a class="voltar-icon" href="atividade_livre_menu.html" aria-label="Voltar">←</a>
+      <div>
+        <h1>Registrar atividade</h1>
+      </div>
+    </header>
+
+    <div class="campo">
+      <label>Tipo de atividade</label>
+      <button id="tipoEscolhaBtn" type="button" class="filtro-toggle">Escolher tipo…</button>
+    </div>
+
+    <div class="campo-linha">
+      <div class="campo">
+        <label for="dataInput">Data</label>
+        <input type="date" id="dataInput" />
+      </div>
+      <div class="campo">
+        <label for="horaInput">Hora</label>
+        <input type="time" id="horaInput" />
+      </div>
+    </div>
+
+    <div class="campo">
+      <label for="duracaoInput">Duração (minutos)</label>
+      <input type="number" id="duracaoInput" min="1" step="1" inputmode="numeric" />
+    </div>
+
+    <div class="campo">
+      <label for="observacaoInput">Observação <span class="opcional">(opcional)</span></label>
+      <textarea id="observacaoInput" rows="3"></textarea>
+    </div>
+
+    <button id="salvarBtn" class="primary" type="button">Registrar atividade</button>
+    <div id="mensagem" class="mensagem" hidden></div>
+  </main>
+
+  <div id="pickerOverlay" class="overlay" hidden>
+    <div class="picker-card">
+      <div class="picker-cabecalho">
+        <h2>Escolher tipo de atividade</h2>
+        <button id="pickerFecharBtn" class="picker-fechar" type="button">Fechar</button>
+      </div>
+      <div id="pickerBusca">
+        <div class="picker-filtros">
+          <input id="pickerBuscaInput" type="text" placeholder="Buscar tipo…" autocomplete="off" />
+          <a id="criarTipoLink" href="atividade_livre_tipo_novo.html" target="_blank" rel="noopener">+ Não achou? Criar tipo novo</a>
+        </div>
+        <div id="pickerResultados" class="picker-resultados"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/paginas/atividade-livre-novo.js"></script>
+</body>
+</html>

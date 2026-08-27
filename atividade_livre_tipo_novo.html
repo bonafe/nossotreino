@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Novo Tipo de Atividade</title>
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/componentes.css" />
+  <link rel="stylesheet" href="css/paginas/treino-musculacao-novo.css" />
+  <link rel="stylesheet" href="css/paginas/atividade-livre-novo.css" />
+</head>
+<body>
+  <main>
+    <header class="top">
+      <div>
+        <h1>Novo tipo de atividade</h1>
+      </div>
+    </header>
+
+    <div class="campo">
+      <label for="nomeInput">Nome do tipo/subtipo</label>
+      <input type="text" id="nomeInput" autocomplete="off" placeholder="Ex.: Salsa, Karatê, Pilates" />
+    </div>
+
+    <div class="campo">
+      <label>Dentro de qual tipo? <span class="opcional">(opcional)</span></label>
+      <button id="paiEscolhaBtn" type="button" class="filtro-toggle">— Nenhum (tipo raiz) —</button>
+    </div>
+
+    <button id="criarBtn" class="primary" type="button">Criar tipo</button>
+    <div id="mensagem" class="mensagem" hidden></div>
+  </main>
+
+  <div id="pickerOverlay" class="overlay" hidden>
+    <div class="picker-card">
+      <div class="picker-cabecalho">
+        <h2>Escolher tipo pai</h2>
+        <button id="pickerFecharBtn" class="picker-fechar" type="button">Fechar</button>
+      </div>
+      <div id="pickerBusca">
+        <div class="picker-filtros">
+          <input id="pickerBuscaInput" type="text" placeholder="Buscar tipo…" autocomplete="off" />
+        </div>
+        <div id="pickerResultados" class="picker-resultados"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/paginas/atividade-livre-tipo-novo.js"></script>
+</body>
+</html>

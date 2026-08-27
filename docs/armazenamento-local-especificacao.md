@@ -61,28 +61,33 @@ publicado — é responsabilidade do service worker, ver
 [treino_execucao.html](../treino_execucao.html),
 [treino_exercicio_progresso.html](../treino_exercicio_progresso.html),
 [treino_alongamento_menu.html](../treino_alongamento_menu.html),
-[treino_alongamento.html](../treino_alongamento.html) e
-[treino_alongamento_novo.html](../treino_alongamento_novo.html) (ver
+[treino_alongamento.html](../treino_alongamento.html),
+[treino_alongamento_novo.html](../treino_alongamento_novo.html),
+[atividade_livre_menu.html](../atividade_livre_menu.html),
+[atividade_livre_novo.html](../atividade_livre_novo.html) e
+[atividade_livre_tipo_novo.html](../atividade_livre_tipo_novo.html) (ver
 [treino-exercicios-especificacao.md](./treino-exercicios-especificacao.md),
-[treino-bicicleta-especificacao.md](./treino-bicicleta-especificacao.md) e
-[treino-alongamento-especificacao.md](./treino-alongamento-especificacao.md)),
+[treino-bicicleta-especificacao.md](./treino-bicicleta-especificacao.md),
+[treino-alongamento-especificacao.md](./treino-alongamento-especificacao.md) e
+[atividade-livre-especificacao.md](./atividade-livre-especificacao.md)),
 através de um script único e compartilhado:
 [`storage.js`](../storage.js).
 
 ## 2. Esquema do banco e política de versionamento
 
-Banco `nossotreino` (`js/armazenamento-indexeddb.js`), 8 object stores:
+Banco `nossotreino` (`js/armazenamento-indexeddb.js`), 9 object stores:
 
 | Loja | `keyPath` | Índices | Registro |
 |---|---|---|---|
 | `alunos` | `id` | — | `{id, nome, criadoEm, atualizadoEm}` |
 | `planos` | `id` | `porAluno`→`alunoId` | `{id, alunoId, professor, nome, criadoEm, atualizadoEm}` — `alunoId` referencia uma entrada de `alunos` |
 | `planoDados` | `planoId` | — | `{planoId, dados}` — documento opaco, a composição inteira do plano (treinos, cardio, alongamento, metadata — `metadata.aluno`/`metadata.professor` são cópias de exibição, ver seção 3.2); `dados.schemaVersion` é o eixo de versão do plano, seção 2.2 |
-| `historico` | `id` (autoIncrement) | `porPlano`→`planoId`, `porPlanoETipo`→`[planoId, tipo]` | `{id, planoId, tipo, ...entrada}` — um registro por série/sessão concluída; `tipo` é um de `sessaoBicicleta`/`serieMusculacao`/`sessaoMusculacao`/`serieAlongamento`/`sessaoAlongamento` |
+| `historico` | `id` (autoIncrement) | `porPlano`→`planoId`, `porPlanoETipo`→`[planoId, tipo]` | `{id, planoId, tipo, ...entrada}` — um registro por série/sessão concluída; `tipo` é um de `sessaoBicicleta`/`serieMusculacao`/`sessaoMusculacao`/`serieAlongamento`/`sessaoAlongamento`/`sessaoLivre` |
 | `execucoes` | `[planoId, tipo, treinoId]` | `porPlano`→`planoId`, `porPlanoETipo`→`[planoId, tipo]` | `{planoId, tipo, treinoId, progresso}` — estado de um treino em andamento (`tipo` é `musculacao`/`alongamento`), pra retomar após fechar a página — endereçado por `exercicioId` dentro de `progresso`, não por índice posicional |
 | `preferencias` | `chave` | — | `{chave, valor}` — inclui `planoAtivoId` (id do plano cujos dados escopados estão sendo lidos/escritos agora, ou `null`), e as preferências globais (`apoio.*`, `avisoIaAceito.v1`) que não dependem de plano nenhum |
 | `meta` | `chave` | — | bookkeeping interno do próprio motor de armazenamento, nunca dado de usuário |
 | `bibliotecaPersonalizada` | `[dominio, id]` | — | `{dominio, id, origem, baseadoEmVersao, entrada, criadoEm, atualizadoEm}` — exercícios/alongamentos novos ou editados localmente, escopo global (não por aluno/plano). Ver seção 26 de [especificacao-biblioteca-exercicios.md](./especificacao-biblioteca-exercicios.md) |
+| `tiposAtividade` | `id` | `porPai`→`tipoAtividadePaiId` | `{id, nome, tipoAtividadePaiId, criadoEm}` — árvore local (profundidade arbitrária) de tipos de atividade pra "atividade livre", escopo global (não por aluno/plano), semeada com duas raízes (`musculacao`, `alongamento`). Ver [atividade-livre-especificacao.md](./atividade-livre-especificacao.md) |
 
 Não existe um "aluno ativo" global: qual aluno está sendo visto é só a
 query string (`planos.html?aluno=<id>`) — nenhuma leitura/escrita de
@@ -188,6 +193,14 @@ nunca reescreve uma entrada antiga:
 6. Backup `versao` `2` → `3` — campo `bibliotecaPersonalizada` novo no
    envelope (`migrarBackupDe2Para3`); backup antigo simplesmente não tinha
    nenhum personalizado pra trazer, então migra pra `[]`.
+7. `VERSAO_BANCO` `2` → `3` — loja `tiposAtividade` nova, já semeada com
+   as duas raízes (`musculacao`, `alongamento`) dentro da própria
+   migração de upgrade — ver
+   [atividade-livre-especificacao.md](./atividade-livre-especificacao.md).
+8. Backup `versao` `3` → `4` — campo `tiposAtividade` novo no envelope
+   (`migrarBackupDe3Para4`); backup antigo não tinha a árvore ainda, então
+   migra semeando as mesmas duas raízes do `onupgradeneeded` (nunca `[]`,
+   pra não deixar a árvore vazia depois de restaurar um backup antigo).
 
 ## 3. Hierarquia aluno → plano → sistema
 
@@ -514,6 +527,14 @@ TreinosStorage.salvarJSONDoPlano(id, chave, valor)
 TreinosStorage.listarBibliotecaPersonalizada()
 TreinosStorage.salvarExercicioPersonalizado({dominio, id, origem, baseadoEmVersao, entrada})
 TreinosStorage.removerExercicioPersonalizado(dominio, id)
+
+// Tipos de atividade (árvore local pra "atividade livre" — ver
+// atividade-livre-especificacao.md)
+TreinosStorage.listarTiposAtividade()
+TreinosStorage.listarFilhosDeTipoAtividade(paiId)
+TreinosStorage.obterTipoAtividade(id)
+TreinosStorage.caminhoTipoAtividade(id)          // breadcrumb raiz → item
+TreinosStorage.criarTipoAtividade(nome, paiId)
 
 // Backup completo, todos os alunos e planos (alunos.html, seção 3.1)
 TreinosStorage.montarBackup()

@@ -12,7 +12,8 @@ const CHAVES_HISTORICO = {
   "historico.serieMusculacao.v1": "serieMusculacao",
   "historico.sessaoMusculacao.v1": "sessaoMusculacao",
   "historico.sessaoAlongamento.v1": "sessaoAlongamento",
-  "historico.serieAlongamento.v1": "serieAlongamento"
+  "historico.serieAlongamento.v1": "serieAlongamento",
+  "historico.sessaoLivre.v1": "sessaoLivre"
 };
 
 function analisarChaveExecucao(chaveRelativa) {
@@ -37,7 +38,8 @@ const instantaneo = {
   historico: new Map(), // `${planoId}|${tipo}` -> array de entradas
   execucoes: new Map(), // `${planoId}|${tipo}|${treinoId}` -> progresso
   preferencias: new Map(), // chave -> valor (planoAtivoId, apoio.*, avisoIaAceito.v1)
-  bibliotecaPersonalizada: new Map() // `${dominio}|${id}` -> registro (ver seção "Biblioteca personalizada" abaixo)
+  bibliotecaPersonalizada: new Map(), // `${dominio}|${id}` -> registro (ver seção "Biblioteca personalizada" abaixo)
+  tiposAtividade: [] // árvore local de tipos de atividade (ver seção "Tipos de atividade" abaixo)
 };
 
 let filaDeEscrita = Promise.resolve();
@@ -191,6 +193,7 @@ function montarExportacaoCompletaDoPlano(id) {
     historicoSessaoMusculacao: lerJSONDoPlano(id, "historico.sessaoMusculacao.v1", []),
     historicoSessaoAlongamento: lerJSONDoPlano(id, "historico.sessaoAlongamento.v1", []),
     historicoSerieAlongamento: lerJSONDoPlano(id, "historico.serieAlongamento.v1", []),
+    historicoSessaoLivre: lerJSONDoPlano(id, "historico.sessaoLivre.v1", []),
     execucoesEmAndamento
   };
 }
@@ -202,6 +205,7 @@ function restaurarExportacaoCompletaDoPlano(id, exportacao) {
   salvarJSONDoPlano(id, "historico.sessaoMusculacao.v1", exportacao.historicoSessaoMusculacao || []);
   salvarJSONDoPlano(id, "historico.sessaoAlongamento.v1", exportacao.historicoSessaoAlongamento || []);
   salvarJSONDoPlano(id, "historico.serieAlongamento.v1", exportacao.historicoSerieAlongamento || []);
+  salvarJSONDoPlano(id, "historico.sessaoLivre.v1", exportacao.historicoSessaoLivre || []);
   Object.entries(exportacao.execucoesEmAndamento || {}).forEach(([chave, valor]) => {
     salvarJSONDoPlano(id, chave, valor);
   });
@@ -275,11 +279,12 @@ function migrarPlanoParaVersaoAtual(dados) {
 
 // --- Migração de formato: envelope de backup (versao) ---
 
-const VERSAO_BACKUP_ATUAL = 3;
+const VERSAO_BACKUP_ATUAL = 4;
 
 const MIGRACOES_BACKUP = {
   1: migrarBackupDe1Para2,
-  2: migrarBackupDe2Para3
+  2: migrarBackupDe2Para3,
+  3: migrarBackupDe3Para4
 };
 
 // Formato 1: sem `alunos` (entidade Aluno ainda não existia) — deriva a
@@ -296,6 +301,23 @@ function migrarBackupDe1Para2(backup) {
 // personalizado pra trazer.
 function migrarBackupDe2Para3(backup) {
   return { ...backup, versao: 3, bibliotecaPersonalizada: backup.bibliotecaPersonalizada || [] };
+}
+
+// Formato 3: sem `tiposAtividade` (árvore de atividade livre ainda não
+// existia) — semeia com as mesmas duas raízes de
+// criarLojaDeTiposAtividade (armazenamento-indexeddb.js), nunca `[]`,
+// pra restaurar um backup antigo não deixar a árvore vazia.
+function migrarBackupDe3Para4(backup) {
+  if (backup.tiposAtividade) return { ...backup, versao: 4 };
+  const agora = new Date().toISOString();
+  return {
+    ...backup,
+    versao: 4,
+    tiposAtividade: [
+      { id: "musculacao", nome: "Musculação", tipoAtividadePaiId: null, criadoEm: agora },
+      { id: "alongamento", nome: "Alongamento", tipoAtividadePaiId: null, criadoEm: agora }
+    ]
+  };
 }
 
 function migrarBackupParaVersaoAtual(backupOriginal) {
@@ -326,7 +348,8 @@ async function hidratar() {
     historicoRegistros,
     execucoesRegistros,
     preferenciasRegistros,
-    bibliotecaPersonalizadaRegistros
+    bibliotecaPersonalizadaRegistros,
+    tiposAtividadeRegistros
   ] = await Promise.all([
     BancoIndexedDB.lerTodos("alunos"),
     BancoIndexedDB.lerTodos("planos"),
@@ -334,7 +357,8 @@ async function hidratar() {
     BancoIndexedDB.lerTodos("historico"),
     BancoIndexedDB.lerTodos("execucoes"),
     BancoIndexedDB.lerTodos("preferencias"),
-    BancoIndexedDB.lerTodos("bibliotecaPersonalizada")
+    BancoIndexedDB.lerTodos("bibliotecaPersonalizada"),
+    BancoIndexedDB.lerTodos("tiposAtividade")
   ]);
 
   instantaneo.alunos = alunos;
@@ -358,6 +382,8 @@ async function hidratar() {
   bibliotecaPersonalizadaRegistros.forEach((registro) => {
     instantaneo.bibliotecaPersonalizada.set(`${registro.dominio}|${registro.id}`, registro);
   });
+
+  instantaneo.tiposAtividade = tiposAtividadeRegistros;
 }
 
 export class TreinosStorage {
@@ -368,6 +394,7 @@ export class TreinosStorage {
     historicoSessaoMusculacao: "historico.sessaoMusculacao.v1",
     historicoSessaoAlongamento: "historico.sessaoAlongamento.v1",
     historicoSerieAlongamento: "historico.serieAlongamento.v1",
+    historicoSessaoLivre: "historico.sessaoLivre.v1",
     execucaoMusculacao: (treinoId) => `execucao.musculacao.${treinoId}.v2`,
     execucaoAlongamento: (treinoId) => `execucao.alongamento.${treinoId}.v1`,
     apoioUltimaExibicaoContador: "apoio.ultimaExibicaoContador.v1",
@@ -459,6 +486,10 @@ export class TreinosStorage {
     removerChave(TreinosStorage.chaves.historicoSessaoAlongamento);
     removerChave(TreinosStorage.chaves.historicoSerieAlongamento);
     listarChavesComPrefixo("execucao.alongamento.").forEach((chave) => removerChave(chave));
+  }
+
+  static resetarAtividadeLivre() {
+    removerChave(TreinosStorage.chaves.historicoSessaoLivre);
   }
 
   // --- Gestão de alunos (alunos.html) ---
@@ -774,6 +805,56 @@ export class TreinosStorage {
     instantaneo.bibliotecaPersonalizada = new Map(registros.map((registro) => [`${registro.dominio}|${registro.id}`, registro]));
   }
 
+  // --- Tipos de atividade (árvore local pra "atividade livre" — ver
+  // docs/atividade-livre-especificacao.md). Escopo global (não por
+  // aluno/plano), igual bibliotecaPersonalizada, mas com keyPath simples
+  // ("id"), então guardado como array, não Map. Independente de DOMINIOS
+  // (js/dominios-biblioteca.js) — mesmo que as duas raízes semeadas
+  // (musculacao/alongamento) coincidam de id por familiaridade de UX.
+
+  static listarTiposAtividade() {
+    return instantaneo.tiposAtividade;
+  }
+
+  static listarFilhosDeTipoAtividade(paiId) {
+    return TreinosStorage.listarTiposAtividade().filter((t) => (t.tipoAtividadePaiId || null) === (paiId || null));
+  }
+
+  static obterTipoAtividade(id) {
+    return TreinosStorage.listarTiposAtividade().find((t) => t.id === id) || null;
+  }
+
+  // Breadcrumb raiz → item, usado no picker de lançamento e na tela de
+  // criação de tipo pra diferenciar tipos de nomes parecidos em ramos
+  // diferentes da árvore.
+  static caminhoTipoAtividade(id) {
+    const caminho = [];
+    let atual = TreinosStorage.obterTipoAtividade(id);
+    while (atual) {
+      caminho.unshift(atual);
+      atual = atual.tipoAtividadePaiId ? TreinosStorage.obterTipoAtividade(atual.tipoAtividadePaiId) : null;
+    }
+    return caminho;
+  }
+
+  static criarTipoAtividade(nome, paiId) {
+    const tipos = TreinosStorage.listarTiposAtividade();
+    const id = gerarIdUnico(nome, new Set(tipos.map((t) => t.id)), "tipo-atividade");
+    const tipo = { id, nome, tipoAtividadePaiId: paiId || null, criadoEm: new Date().toISOString() };
+    tipos.push(tipo);
+    enfileirarEscrita(() => BancoIndexedDB.gravar("tiposAtividade", tipo));
+    return id;
+  }
+
+  // Re-hidrata só esta loja — "criar tipo novo" abre em aba própria
+  // (atividade-livre-tipo-novo.js), mesmo padrão de
+  // recarregarBibliotecaPersonalizada.
+  static async recarregarTiposAtividade() {
+    const banco = await BancoIndexedDB.abrir();
+    if (!banco) return;
+    instantaneo.tiposAtividade = await BancoIndexedDB.lerTodos("tiposAtividade");
+  }
+
   // --- Backup completo (todos os alunos e planos) ---
 
   static montarBackup() {
@@ -791,7 +872,8 @@ export class TreinosStorage {
       alunos: TreinosStorage.listarAlunos(),
       planos,
       dadosPorPlano,
-      bibliotecaPersonalizada: TreinosStorage.listarBibliotecaPersonalizada()
+      bibliotecaPersonalizada: TreinosStorage.listarBibliotecaPersonalizada(),
+      tiposAtividade: TreinosStorage.listarTiposAtividade()
     };
   }
 
@@ -821,6 +903,13 @@ export class TreinosStorage {
     enfileirarEscrita(async () => {
       await BancoIndexedDB.limparLoja("bibliotecaPersonalizada");
       await BancoIndexedDB.gravarVarios("bibliotecaPersonalizada", bibliotecaPersonalizada);
+    });
+
+    const tiposAtividade = backup.tiposAtividade || [];
+    instantaneo.tiposAtividade = tiposAtividade;
+    enfileirarEscrita(async () => {
+      await BancoIndexedDB.limparLoja("tiposAtividade");
+      await BancoIndexedDB.gravarVarios("tiposAtividade", tiposAtividade);
     });
 
     TreinosStorage.ativarPlano(backup.planoAtivoId || null);

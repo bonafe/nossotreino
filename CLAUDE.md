@@ -79,6 +79,8 @@ Toda leitura/escrita de dados de aluno/plano/histórico passa por `js/storage.js
 
 Bicicleta, alongamento e musculação seguem o padrão "motor genérico recebe parâmetros de um JSON": nenhum treino específico tem HTML/JS próprio. Novo treino de bike = nova entrada em `treinosCardio` no plano (referenciando uma modalidade já cadastrada na biblioteca); novo treino de alongamento = nova entrada em `treinosAlongamento` (referenciando alongamentos de `bibliotecas.alongamentos`); novo treino de musculação = nova entrada em `treinos`. As três telas de criação (`treino_bicicleta_novo.html`, `treino_alongamento_novo.html`, `treino_musculacao_novo.html`) escrevem nessas coleções pela interface, sem precisar editar o JSON à mão. Um treino de musculação pode referenciar treinos de cardio/alongamento existentes como complemento via `treino.cardio[]`/`treino.alongamento[]` (arrays de `{ treinoCardioId|treinoAlongamentoId, momento }`) — ver seção 12.3 de `docs/especificacao-biblioteca-exercicios.md`. Ver `docs/treino-bicicleta-especificacao.md`, `docs/treino-alongamento-especificacao.md` e `docs/treino-exercicios-especificacao.md` para o esquema completo (`metadata`, `orientacoesGerais`, `treinos`, lista plana de exercícios com `superset`/`circuito`).
 
+Atividade livre (`atividade_livre_menu.html`) é um quarto pilar, mas não segue esse padrão de motor genérico: não tem execução cronometrada nem prescrição, e não exige nenhum treino pré-cadastrado — é lançamento manual direto no histórico (data, hora, duração) classificado numa árvore local de tipos de atividade (`TreinosStorage.listarTiposAtividade()`/`criarTipoAtividade()`, loja `tiposAtividade` do IndexedDB, device-local — não é `DOMINIOS` de `js/dominios-biblioteca.js`, que é a biblioteca de exercícios). Serve pra qualquer atividade com data e duração que não tenha (ou não precise de) uma prescrição estruturada — pilates, natação, dança, artes marciais, ou mesmo alongamento avulso. Ver `docs/atividade-livre-especificacao.md`.
+
 ### Fluxos de tela
 
 ```
@@ -93,10 +95,12 @@ index.html (institucional)
                         │                                       └─> treino_alongamento.html?treino=<treinoAlongamentoId>[&alongamento=<id>][&origem=<id>]
                         │                                              └─> treino_alongamento_progresso.html?alongamento=<id>&treino=<treinoAlongamentoId>
                         │                                └─> biblioteca.html?dominio=alongamento (📚, ver/criar/editar alongamentos)
-                        └─> treino_musculacao_menu.html → treino_musculacao_novo.html
-                                                        │  └─> treino_musculacao_exercicios.html?treino=<id> → treino_execucao.html?treino=<id>
-                                                        │                                              └─> treino_exercicio_progresso.html?exercicio=<id>&treino=<id>
-                                                        └─> biblioteca.html?dominio=musculacao (📚, ver/criar/editar exercícios)
+                        ├─> treino_musculacao_menu.html → treino_musculacao_novo.html
+                        │                              │  └─> treino_musculacao_exercicios.html?treino=<id> → treino_execucao.html?treino=<id>
+                        │                              │                                              └─> treino_exercicio_progresso.html?exercicio=<id>&treino=<id>
+                        │                              └─> biblioteca.html?dominio=musculacao (📚, ver/criar/editar exercícios)
+                        └─> atividade_livre_menu.html → atividade_livre_novo.html
+                                                       └─> atividade_livre_tipo_novo.html (aba nova, criar tipo/subtipo)
 ```
 
 `treino_musculacao_novo.html`, `treino_alongamento_novo.html` e `biblioteca.html` linkam pra `exercicio_novo.html?dominio=<id>[&id=<id>][&voltar=<url>]` (criar/editar exercício ou alongamento personalizado, ver seção 26 de `docs/especificacao-biblioteca-exercicios.md`) sempre **numa aba nova**, pra não perder um treino em construção só guardado em memória na aba de origem.
