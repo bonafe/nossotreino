@@ -1,5 +1,5 @@
 import { gerarIdUnico } from "./identificadores.js";
-import { Formatadores } from "./formatadores.js";
+import { Formatadores, DIAS_SEMANA } from "./formatadores.js";
 import { BancoIndexedDB } from "./armazenamento-indexeddb.js";
 import "./versao.js";
 import "./consentimento-analytics.js";
@@ -249,7 +249,14 @@ function migrarAlunosApartirDePlanos(planos) {
 // versões) — nunca editar uma migração já publicada, só acrescentar a
 // próxima quando o formato mudar de novo. Ver seção 2 de
 // docs/armazenamento-local-especificacao.md.
-const SCHEMA_VERSION_PLANO_ATUAL = "1.3";
+const SCHEMA_VERSION_PLANO_ATUAL = "1.4";
+
+// Formato 1.3: sem `atividadesRecorrentes` (agenda/atividade recorrente
+// ainda não existia) — plano antigo simplesmente não tinha nenhuma regra
+// recorrente pra trazer, então migra pra `[]`.
+function migrarPlanoDe13Para14(dados) {
+  return { ...dados, schemaVersion: "1.4", atividadesRecorrentes: dados.atividadesRecorrentes || [] };
+}
 
 const MIGRACOES_PLANO = {
   // "1.2": migrarPlanoDe12Para13 — formato 1.2 (cardio/alongamento
@@ -258,6 +265,7 @@ const MIGRACOES_PLANO = {
   // se aparecer um arquivo nesse formato, escreva a função a partir desse
   // exemplar real (ver docs/especificacao-biblioteca-exercicios.md §16
   // pro shape antigo de referência) em vez de reconstruir de memória.
+  "1.3": migrarPlanoDe13Para14
 };
 
 // Aplica a cadeia de migrações até chegar em SCHEMA_VERSION_PLANO_ATUAL.
@@ -490,6 +498,11 @@ export class TreinosStorage {
 
   static resetarAtividadeLivre() {
     removerChave(TreinosStorage.chaves.historicoSessaoLivre);
+    const dados = lerJSON("dados.v1", null);
+    if (dados && dados.atividadesRecorrentes && dados.atividadesRecorrentes.length) {
+      dados.atividadesRecorrentes = [];
+      TreinosStorage.definirDadosTreinos(dados);
+    }
   }
 
   // --- Gestão de alunos (alunos.html) ---
@@ -602,7 +615,8 @@ export class TreinosStorage {
       orientacoesGerais: null,
       treinos: [],
       treinosCardio: [],
-      treinosAlongamento: []
+      treinosAlongamento: [],
+      atividadesRecorrentes: []
     });
     return id;
   }
@@ -870,6 +884,96 @@ export class TreinosStorage {
     const banco = await BancoIndexedDB.abrir();
     if (!banco) return;
     instantaneo.tiposAtividade = await BancoIndexedDB.lerTodos("tiposAtividade");
+  }
+
+  // --- Agenda (atividadesRecorrentes, dentro do plano ativo) ---
+  //
+  // Diferente de tiposAtividade (loja própria, device-local), regras
+  // recorrentes vivem dentro do mesmo documento opaco `dados.v1` do plano
+  // ativo (`atividadesRecorrentes`, ao lado de treinos/treinosCardio/
+  // treinosAlongamento) — duplicam junto quando a pessoa cria um novo
+  // ciclo, e isolam por aluno automaticamente. Ver
+  // docs/agenda-especificacao.md.
+
+  static listarAtividadesRecorrentes() {
+    const dados = lerJSON("dados.v1", null);
+    return (dados && dados.atividadesRecorrentes) || [];
+  }
+
+  // `horarios`: array de { dia, hora } — um horário por dia da semana
+  // marcado, não um só compartilhado (só a duração é obrigatoriamente
+  // igual pra todos os dias da mesma regra).
+  static criarAtividadeRecorrente({ tipoAtividadeId, horarios, duracaoSegundos, observacao }) {
+    const dados = lerJSON("dados.v1", null);
+    if (!dados) return null;
+    dados.atividadesRecorrentes = dados.atividadesRecorrentes || [];
+
+    const tipo = TreinosStorage.obterTipoAtividade(tipoAtividadeId);
+    const id = gerarIdUnico(
+      tipo ? tipo.nome : "atividade",
+      new Set(dados.atividadesRecorrentes.map((r) => r.id)),
+      "recorrente"
+    );
+    const regra = {
+      id,
+      tipoAtividadeId,
+      tipoAtividadeNome: tipo ? tipo.nome : "",
+      horarios,
+      duracaoSegundos,
+      observacao: observacao || null,
+      criadoEm: new Date().toISOString(),
+      confirmacoes: []
+    };
+    dados.atividadesRecorrentes.push(regra);
+    TreinosStorage.definirDadosTreinos(dados);
+    return id;
+  }
+
+  // Nunca apaga histórico já gravado (filosofia append-only) — só para de
+  // gerar novas pendências futuras na Agenda.
+  static excluirAtividadeRecorrente(id) {
+    const dados = lerJSON("dados.v1", null);
+    if (!dados) return;
+    dados.atividadesRecorrentes = (dados.atividadesRecorrentes || []).filter((r) => r.id !== id);
+    TreinosStorage.definirDadosTreinos(dados);
+  }
+
+  // Marca uma ocorrência (regraId + data local "AAAA-MM-DD") como "feito"
+  // ou "faltou". Idempotente: substitui qualquer confirmação anterior pra
+  // essa mesma data, permitindo corrigir um toque errado. "Feito" também
+  // grava uma entrada normal em historico.sessaoLivre — reaproveita 100%
+  // do código de leitura/gráfico já existente; "faltou" só fica registrado
+  // aqui, não teria sentido no histórico (duração zero). Uma vez "feito"
+  // não há caminho de fase 1 pra desfazer, já que o projeto não tem
+  // exclusão de item de histórico ainda.
+  static confirmarAtividadeRecorrente(regraId, data, status, duracaoSegundosOverride) {
+    const dados = lerJSON("dados.v1", null);
+    if (!dados) return;
+    const regra = (dados.atividadesRecorrentes || []).find((r) => r.id === regraId);
+    if (!regra) return;
+
+    regra.confirmacoes = (regra.confirmacoes || []).filter((c) => c.data !== data);
+    const duracao = duracaoSegundosOverride || regra.duracaoSegundos;
+    regra.confirmacoes.push(status === "feito" ? { data, status, duracaoSegundos: duracao } : { data, status });
+    TreinosStorage.definirDadosTreinos(dados);
+
+    if (status === "feito") {
+      // Construtor local (ano, mês, dia) em vez de parsear "AAAA-MM-DD"
+      // como ISO — parsear como ISO leria a data como UTC meia-noite, que
+      // vira o dia anterior em fusos negativos (ex.: Brasil) e resolveria
+      // o dia da semana errado.
+      const [ano, mes, dia] = data.split("-").map(Number);
+      const diaSemana = DIAS_SEMANA[new Date(ano, mes - 1, dia).getDay()];
+      const horario = regra.horarios.find((h) => h.dia === diaSemana);
+      const dataHora = new Date(`${data}T${horario ? horario.hora : "00:00"}`).toISOString();
+      TreinosStorage.adicionarAoHistorico(TreinosStorage.chaves.historicoSessaoLivre, {
+        tipoAtividadeId: regra.tipoAtividadeId,
+        tipoAtividadeNome: regra.tipoAtividadeNome,
+        dataHora,
+        duracaoSegundos: duracao,
+        observacao: regra.observacao
+      });
+    }
   }
 
   // --- Backup completo (todos os alunos e planos) ---

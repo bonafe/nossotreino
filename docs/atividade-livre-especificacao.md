@@ -77,8 +77,9 @@ Sem edição/exclusão de tipo no v1 — ver seção 5 "Fora de escopo".
 
 ```
 sistema.html
-   └─> atividade_livre_menu.html (histórico + gráfico) → atividade_livre_novo.html (lançar sessão)
-                                                        └─> atividade_livre_tipo_novo.html (aba nova, criar tipo/subtipo)
+   ├─> atividade_livre_menu.html (histórico + gráfico) → atividade_livre_novo.html (lançar sessão)
+   │                                                    └─> atividade_livre_tipo_novo.html (aba nova, criar tipo/subtipo)
+   └─> agenda.html (📅, janela rolante de dias — ver docs/agenda-especificacao.md)
 ```
 
 ### 3.1 Menu (`atividade_livre_menu.html`)
@@ -93,6 +94,24 @@ Não existe "card de treino" aqui — não há treino pré-cadastrado, cada
 lançamento é o item de primeira classe.
 
 ### 3.2 Lançar sessão (`atividade_livre_novo.html`)
+
+Alternador "Uma vez / Recorrente" no topo do formulário (`#modo`,
+`js/paginas/atividade-livre-novo.js`) — dois botões-aba
+(`aria-pressed`), decide o que acontece ao salvar (ver seção 4 abaixo pra
+"uma vez" e `docs/agenda-especificacao.md` seção 2 pro shape da regra
+recorrente). Tipo, duração e observação são compartilhados pelos dois
+modos sem nenhuma duplicação de campo. O que muda é como data e hora são
+capturadas:
+- **Uma vez**: `<input type="date">` + um único `<input type="time">`
+  compartilhado (`#campoUnica`/`#campoHoraUnica`).
+- **Recorrente**: em vez de data, uma lista de 7 linhas (uma por dia da
+  semana, rótulos de `DIAS_SEMANA`/`Formatadores.rotuloDia` em
+  `js/formatadores.js`) — marcar o checkbox de um dia revela um
+  `<input type="time">` **próprio daquele dia** (`#renderizarDiasSemana`).
+  Dias diferentes podem ter horários diferentes na mesma regra (ex.:
+  pilates terça de manhã, quinta à noite) — só a **duração** é
+  obrigatoriamente igual pra todos os dias marcados, é um campo único
+  fora da lista.
 
 Formulário direto (sem passo de "criar treino" antes):
 
@@ -113,15 +132,27 @@ Formulário direto (sem passo de "criar treino" antes):
   daquela última sessão (chute melhor que "agora" pra atividade que
   sempre acontece no mesmo horário/duração, ex.: pilates toda terça às
   19h por 60min). A **data** nunca é sobrescrita — continua sempre hoje.
-- **Data**, **hora**, **duração (minutos)**, **observação** (opcional).
-  Data e hora começam preenchidas com o momento atual
-  (`#preencherAgora`); hora/duração são substituídas pela última sessão
-  do tipo assim que ele é escolhido, como descrito acima.
+  Só roda no modo "uma vez" (recorrente não tem uma data única pra
+  âncorar a busca da "última sessão").
+- **Duração (minutos)** e **observação** (opcional) — compartilhados
+  pelos dois modos. Data/hora (uma vez) ou os horários por dia
+  (recorrente) começam preenchidos com o momento atual
+  (`#preencherAgora`); no modo "uma vez", hora/duração são substituídas
+  pela última sessão do tipo assim que ele é escolhido, como descrito
+  acima.
 
-Ao salvar: combina data+hora num `dataHora` ISO único, converte a duração
-pra segundos, resolve o nome do tipo escolhido e grava via
+**Modo "uma vez"**: ao salvar, combina data+hora num `dataHora` ISO
+único, converte a duração pra segundos, resolve o nome do tipo escolhido
+e grava via
 `TreinosStorage.adicionarAoHistorico(TreinosStorage.chaves.historicoSessaoLivre, entrada)`
-— ver seção 4 pro formato exato da entrada.
+— ver seção 4 pro formato exato da entrada. Redireciona pra
+`atividade_livre_menu.html`.
+
+**Modo "recorrente"**: exige ao menos um dia da semana marcado, cada um
+com sua própria hora preenchida; ao salvar, chama
+`TreinosStorage.criarAtividadeRecorrente({ tipoAtividadeId, horarios, duracaoSegundos, observacao })`
+e redireciona pra `agenda.html` — ver `docs/agenda-especificacao.md` pro
+formato da regra e o que a Agenda faz com ela.
 
 ### 3.3 Criar tipo/subtipo (`atividade_livre_tipo_novo.html`)
 

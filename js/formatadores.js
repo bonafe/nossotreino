@@ -1,5 +1,27 @@
 const MESES_ABREV = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
 
+// Mesmos 7 ids usados em distribuicaoSemanal/atividadesRecorrentes do
+// plano — índice 0 casa com Date#getDay() (0 = domingo).
+export const DIAS_SEMANA = [
+  "domingo",
+  "segunda-feira",
+  "terca-feira",
+  "quarta-feira",
+  "quinta-feira",
+  "sexta-feira",
+  "sabado"
+];
+
+const ROTULOS_DIA_CURTO = {
+  domingo: "Dom",
+  "segunda-feira": "Seg",
+  "terca-feira": "Ter",
+  "quarta-feira": "Qua",
+  "quinta-feira": "Qui",
+  "sexta-feira": "Sex",
+  sabado: "Sáb"
+};
+
 export class Formatadores {
   static relogio(segundos) {
     const m = Math.floor(segundos / 60).toString().padStart(2, "0");
@@ -61,5 +83,9 @@ export class Formatadores {
 
   static dataHora(iso) {
     return `${Formatadores.dataExtenso(iso)} ${Formatadores.hora(iso)}`;
+  }
+
+  static rotuloDia(diaId) {
+    return ROTULOS_DIA_CURTO[diaId] || diaId;
   }
 }

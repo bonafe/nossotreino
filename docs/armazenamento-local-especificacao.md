@@ -81,7 +81,7 @@ Banco `nossotreino` (`js/armazenamento-indexeddb.js`), 9 object stores:
 |---|---|---|---|
 | `alunos` | `id` | — | `{id, nome, criadoEm, atualizadoEm}` |
 | `planos` | `id` | `porAluno`→`alunoId` | `{id, alunoId, professor, nome, criadoEm, atualizadoEm}` — `alunoId` referencia uma entrada de `alunos` |
-| `planoDados` | `planoId` | — | `{planoId, dados}` — documento opaco, a composição inteira do plano (treinos, cardio, alongamento, metadata — `metadata.aluno`/`metadata.professor` são cópias de exibição, ver seção 3.2); `dados.schemaVersion` é o eixo de versão do plano, seção 2.2 |
+| `planoDados` | `planoId` | — | `{planoId, dados}` — documento opaco, a composição inteira do plano (treinos, cardio, alongamento, `atividadesRecorrentes`, metadata — `metadata.aluno`/`metadata.professor` são cópias de exibição, ver seção 3.2); `dados.schemaVersion` é o eixo de versão do plano, seção 2.2 |
 | `historico` | `id` (autoIncrement) | `porPlano`→`planoId`, `porPlanoETipo`→`[planoId, tipo]` | `{id, planoId, tipo, ...entrada}` — um registro por série/sessão concluída; `tipo` é um de `sessaoBicicleta`/`serieMusculacao`/`sessaoMusculacao`/`serieAlongamento`/`sessaoAlongamento`/`sessaoLivre` |
 | `execucoes` | `[planoId, tipo, treinoId]` | `porPlano`→`planoId`, `porPlanoETipo`→`[planoId, tipo]` | `{planoId, tipo, treinoId, progresso}` — estado de um treino em andamento (`tipo` é `musculacao`/`alongamento`), pra retomar após fechar a página — endereçado por `exercicioId` dentro de `progresso`, não por índice posicional |
 | `preferencias` | `chave` | — | `{chave, valor}` — inclui `planoAtivoId` (id do plano cujos dados escopados estão sendo lidos/escritos agora, ou `null`), e as preferências globais (`apoio.*`, `avisoIaAceito.v1`) que não dependem de plano nenhum |
@@ -116,7 +116,7 @@ independentes, cada um com sua própria tabela de despacho:
 | Eixo | Onde vive | Tipo | Tabela de despacho | Quando roda |
 |---|---|---|---|---|
 | Esquema do banco | `VERSAO_BANCO` em `armazenamento-indexeddb.js` | inteiro | `MIGRACOES_BANCO` | `onupgradeneeded`, ao abrir o banco numa versão nova |
-| Plano | `dados.schemaVersion` (dentro de `planoDados`) | string (`"1.3"`) | `MIGRACOES_PLANO` em `storage.js` | ao importar um plano avulso (`importarPlano`) e ao restaurar um backup (`restaurarBackup`) |
+| Plano | `dados.schemaVersion` (dentro de `planoDados`) | string (`"1.4"`) | `MIGRACOES_PLANO` em `storage.js` | ao importar um plano avulso (`importarPlano`) e ao restaurar um backup (`restaurarBackup`) |
 | Backup | `versao` (envelope do arquivo baixado) | inteiro | `MIGRACOES_BACKUP` em `storage.js` | ao restaurar um backup (`restaurarBackup`) |
 
 Cada tabela mapeia "versão de origem → função que migra pra próxima
@@ -201,6 +201,10 @@ nunca reescreve uma entrada antiga:
    (`migrarBackupDe3Para4`); backup antigo não tinha a árvore ainda, então
    migra semeando as mesmas duas raízes do `onupgradeneeded` (nunca `[]`,
    pra não deixar a árvore vazia depois de restaurar um backup antigo).
+9. Plano `schemaVersion` `1.3` → `1.4` (`migrarPlanoDe13Para14`) — campo
+   `atividadesRecorrentes` novo (regras recorrentes da Agenda); plano
+   antigo não tinha nenhuma regra pra trazer, migra pra `[]` — ver
+   [agenda-especificacao.md](./agenda-especificacao.md).
 
 ## 3. Hierarquia aluno → plano → sistema
 
@@ -369,8 +373,9 @@ ações:
 professor, início/fim do ciclo — sem campo de aluno, fixo pela URL)
 chama `TreinosStorage.criarPlano({alunoId, professor, inicio, fim, nome})`:
 gera um id único, adiciona ao índice, ativa e grava um esqueleto vazio
-(`treinos`, `treinosCardio`, `treinosAlongamento` vazios,
-`distribuicaoSemanal` com todos os dias sem treino, `orientacoesGerais: null` —
+(`treinos`, `treinosCardio`, `treinosAlongamento`, `atividadesRecorrentes`
+vazios, `distribuicaoSemanal` com todos os dias sem treino,
+`orientacoesGerais: null` —
 código já trata essa ausência graciosamente, ver seção 6 de
 [treino-exercicios-especificacao.md](./treino-exercicios-especificacao.md))
 e redireciona pra `sistema.html`. De lá, o professor usa os mesmos botões

@@ -37,7 +37,7 @@ const TEXTOS_CONFIRMACAO = {
   "reset-alongamento":
     "Isso vai apagar todo o histórico de alongamento, além do progresso de treinos em andamento. Não dá pra desfazer. Continuar?",
   "reset-atividade-livre":
-    "Isso vai apagar todo o histórico de atividade livre. Não dá pra desfazer. Continuar?"
+    "Isso vai apagar todo o histórico de atividade livre e as atividades recorrentes cadastradas na Agenda. Não dá pra desfazer. Continuar?"
 };
 
 class ConfiguracoesController {

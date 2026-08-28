@@ -1,16 +1,7 @@
 import { TreinosStorage } from "../storage.js";
 import { LABEL_TIPO } from "../constantes.js";
 import { GraficoBarrasHistorico } from "../grafico-barras.js";
-
-const DIAS_SEMANA = [
-  "domingo",
-  "segunda-feira",
-  "terca-feira",
-  "quarta-feira",
-  "quinta-feira",
-  "sexta-feira",
-  "sabado"
-];
+import { DIAS_SEMANA } from "../formatadores.js";
 
 class TreinoExerciciosMenuController {
   #listaEl = document.getElementById("lista");

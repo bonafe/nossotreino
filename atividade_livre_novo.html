@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Registrar Atividade Livre</title>
+  <title>Registrar Atividade</title>
   <link rel="stylesheet" href="css/base.css" />
   <link rel="stylesheet" href="css/componentes.css" />
   <link rel="stylesheet" href="css/paginas/treino-musculacao-novo.css" />
@@ -18,25 +18,36 @@
       </div>
     </header>
 
+    <div class="modo-toggle">
+      <button id="modoUnicaBtn" type="button" class="modo-opcao" aria-pressed="true">Uma vez</button>
+      <button id="modoRecorrenteBtn" type="button" class="modo-opcao" aria-pressed="false">Recorrente</button>
+    </div>
+
     <div class="campo">
       <label>Tipo de atividade</label>
       <button id="tipoEscolhaBtn" type="button" class="filtro-toggle">Escolher tipo…</button>
     </div>
 
+    <div class="campo" id="campoUnica">
+      <label for="dataInput">Data</label>
+      <input type="date" id="dataInput" />
+    </div>
+
+    <div class="campo" id="campoRecorrente" hidden>
+      <label>Dias da semana e horário</label>
+      <p class="campo-ajuda">Cada dia pode ter um horário diferente — só a duração vale pra todos.</p>
+      <div id="diasSemanaGrupo" class="dias-semana-lista"></div>
+    </div>
+
     <div class="campo-linha">
-      <div class="campo">
-        <label for="dataInput">Data</label>
-        <input type="date" id="dataInput" />
-      </div>
-      <div class="campo">
+      <div class="campo" id="campoHoraUnica">
         <label for="horaInput">Hora</label>
         <input type="time" id="horaInput" />
       </div>
-    </div>
-
-    <div class="campo">
-      <label for="duracaoInput">Duração (minutos)</label>
-      <input type="number" id="duracaoInput" min="1" step="1" inputmode="numeric" />
+      <div class="campo">
+        <label for="duracaoInput">Duração (minutos)</label>
+        <input type="number" id="duracaoInput" min="1" step="1" inputmode="numeric" />
+      </div>
     </div>
 
     <div class="campo">

@@ -1,8 +1,17 @@
 import { TreinosStorage } from "../storage.js";
 import { normalizar } from "../identificadores.js";
+import { DIAS_SEMANA, Formatadores } from "../formatadores.js";
 
 class AtividadeLivreNovoController {
   #tipoEscolhidoId = null;
+  #modo = "unica"; // "unica" | "recorrente"
+
+  #modoUnicaBtnEl = document.getElementById("modoUnicaBtn");
+  #modoRecorrenteBtnEl = document.getElementById("modoRecorrenteBtn");
+  #campoUnicaEl = document.getElementById("campoUnica");
+  #campoRecorrenteEl = document.getElementById("campoRecorrente");
+  #campoHoraUnicaEl = document.getElementById("campoHoraUnica");
+  #diasSemanaGrupoEl = document.getElementById("diasSemanaGrupo");
 
   #tipoEscolhaBtnEl = document.getElementById("tipoEscolhaBtn");
   #dataInputEl = document.getElementById("dataInput");
@@ -19,6 +28,10 @@ class AtividadeLivreNovoController {
 
   iniciar() {
     this.#preencherAgora();
+    this.#renderizarDiasSemana();
+
+    this.#modoUnicaBtnEl.addEventListener("click", () => this.#alternarModo("unica"));
+    this.#modoRecorrenteBtnEl.addEventListener("click", () => this.#alternarModo("recorrente"));
 
     this.#tipoEscolhaBtnEl.addEventListener("click", () => this.#abrirPicker());
     this.#pickerFecharBtnEl.addEventListener("click", () => this.#fecharPicker());
@@ -30,6 +43,48 @@ class AtividadeLivreNovoController {
     // formulário em preenchimento). Mesmo padrão de
     // treino-musculacao-novo.js.
     window.addEventListener("focus", () => this.#atualizarTiposEmFoco());
+  }
+
+  #alternarModo(modo) {
+    this.#modo = modo;
+    this.#modoUnicaBtnEl.setAttribute("aria-pressed", String(modo === "unica"));
+    this.#modoRecorrenteBtnEl.setAttribute("aria-pressed", String(modo === "recorrente"));
+    this.#campoUnicaEl.hidden = modo !== "unica";
+    this.#campoHoraUnicaEl.hidden = modo !== "unica";
+    this.#campoRecorrenteEl.hidden = modo !== "recorrente";
+    this.#salvarBtnEl.textContent = modo === "unica" ? "Registrar atividade" : "Criar atividade recorrente";
+  }
+
+  // Cada dia da semana marcado ganha seu próprio campo de hora — dias
+  // diferentes podem acontecer em horários diferentes, só a duração
+  // (campo compartilhado, fora desta lista) é igual pra todos.
+  #renderizarDiasSemana() {
+    this.#diasSemanaGrupoEl.innerHTML = DIAS_SEMANA.map(
+      (dia) => `
+        <div class="dia-semana-linha">
+          <label class="dia-semana-check">
+            <input type="checkbox" class="dia-semana-input" value="${dia}" />
+            <span>${Formatadores.rotuloDia(dia)}</span>
+          </label>
+          <input type="time" class="dia-semana-hora" data-dia="${dia}" hidden />
+        </div>
+      `
+    ).join("");
+
+    this.#diasSemanaGrupoEl.querySelectorAll(".dia-semana-input").forEach((checkbox) => {
+      checkbox.addEventListener("change", () => {
+        const horaEl = checkbox.closest(".dia-semana-linha").querySelector(".dia-semana-hora");
+        horaEl.hidden = !checkbox.checked;
+        if (checkbox.checked && !horaEl.value) horaEl.value = this.#horaInputEl.value || "19:00";
+      });
+    });
+  }
+
+  #horariosSelecionados() {
+    return Array.from(this.#diasSemanaGrupoEl.querySelectorAll(".dia-semana-input:checked")).map((checkbox) => {
+      const horaEl = checkbox.closest(".dia-semana-linha").querySelector(".dia-semana-hora");
+      return { dia: checkbox.value, hora: horaEl.value };
+    });
   }
 
   #preencherAgora() {
@@ -89,13 +144,15 @@ class AtividadeLivreNovoController {
     const caminho = TreinosStorage.caminhoTipoAtividade(tipo.id).map((t) => t.nome);
     this.#tipoEscolhaBtnEl.textContent = caminho.join(" › ");
     this.#fecharPicker();
-    this.#preencherComUltimaDoTipo(tipo.id);
+    if (this.#modo === "unica") this.#preencherComUltimaDoTipo(tipo.id);
   }
 
   // Repete hora e duração da última atividade registrada desse tipo (em
   // qualquer ciclo do aluno ativo, mesmo agregado de atividade_livre_menu.js)
   // — a data continua sendo hoje, só a hora/duração são um chute melhor que
-  // "agora" pra atividades que sempre acontecem no mesmo horário.
+  // "agora" pra atividades que sempre acontecem no mesmo horário. Só faz
+  // sentido no modo "uma vez" (recorrente não tem uma data única pra
+  // âncorar a busca da "última sessão").
   #preencherComUltimaDoTipo(tipoId) {
     const historico = TreinosStorage.lerHistoricoAgregadoDoPlanoAtivo(TreinosStorage.chaves.historicoSessaoLivre);
     const doTipo = historico
@@ -122,13 +179,26 @@ class AtividadeLivreNovoController {
       this.#mostrarMensagem("Escolha o tipo de atividade.");
       return;
     }
-    if (!this.#dataInputEl.value || !this.#horaInputEl.value) {
-      this.#mostrarMensagem("Preencha a data e a hora.");
-      return;
-    }
     const duracaoMinutos = Number(this.#duracaoInputEl.value);
     if (!duracaoMinutos || duracaoMinutos <= 0) {
       this.#mostrarMensagem("Informe uma duração maior que zero.");
+      return;
+    }
+
+    if (this.#modo === "unica") {
+      await this.#salvarUnica(duracaoMinutos);
+    } else {
+      await this.#salvarRecorrente(duracaoMinutos);
+    }
+  }
+
+  async #salvarUnica(duracaoMinutos) {
+    if (!this.#dataInputEl.value) {
+      this.#mostrarMensagem("Preencha a data.");
+      return;
+    }
+    if (!this.#horaInputEl.value) {
+      this.#mostrarMensagem("Preencha a hora.");
       return;
     }
 
@@ -145,6 +215,28 @@ class AtividadeLivreNovoController {
 
     await TreinosStorage.aguardarEscritas();
     window.location.href = "atividade_livre_menu.html";
+  }
+
+  async #salvarRecorrente(duracaoMinutos) {
+    const horarios = this.#horariosSelecionados();
+    if (!horarios.length) {
+      this.#mostrarMensagem("Marque pelo menos um dia da semana.");
+      return;
+    }
+    if (horarios.some((h) => !h.hora)) {
+      this.#mostrarMensagem("Preencha a hora de cada dia marcado.");
+      return;
+    }
+
+    TreinosStorage.criarAtividadeRecorrente({
+      tipoAtividadeId: this.#tipoEscolhidoId,
+      horarios,
+      duracaoSegundos: Math.round(duracaoMinutos * 60),
+      observacao: this.#observacaoInputEl.value.trim() || null
+    });
+
+    await TreinosStorage.aguardarEscritas();
+    window.location.href = "agenda.html";
   }
 }
 

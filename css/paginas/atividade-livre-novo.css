@@ -1,3 +1,99 @@
+.modo-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.modo-opcao {
+  appearance: none;
+  flex: 1;
+  cursor: pointer;
+  background: rgba(148, 163, 184, 0.1);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 14px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #cbd5e1;
+}
+
+.modo-opcao[aria-pressed="true"] {
+  background: rgba(190, 242, 100, 0.16);
+  border-color: rgba(190, 242, 100, 0.45);
+  color: #bef264;
+}
+
+.modo-opcao:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.campo-ajuda {
+  margin: -4px 0 8px;
+  color: #94a3b8;
+  font-size: 0.78rem;
+}
+
+.dias-semana-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dia-semana-linha {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dia-semana-check {
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.dia-semana-check input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+}
+
+.dia-semana-check span {
+  display: block;
+  width: 52px;
+  text-align: center;
+  padding: 10px 6px;
+  border-radius: 12px;
+  background: rgba(148, 163, 184, 0.1);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #cbd5e1;
+}
+
+.dia-semana-check input:checked + span {
+  background: rgba(190, 242, 100, 0.16);
+  border-color: rgba(190, 242, 100, 0.45);
+  color: #bef264;
+}
+
+.dia-semana-hora[hidden] {
+  display: none;
+}
+
+.dia-semana-hora {
+  flex: 1;
+  min-width: 0;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 12px;
+  padding: 9px 10px;
+  color: #e2e8f0;
+  font-size: 0.9rem;
+}
+
 #criarTipoLink {
   display: block;
   text-align: center;

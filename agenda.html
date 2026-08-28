@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Agenda</title>
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/componentes.css" />
+  <link rel="stylesheet" href="css/paginas/agenda.css" />
+</head>
+<body>
+  <main>
+    <header class="top">
+      <a class="voltar-icon" href="sistema.html" aria-label="Voltar">←</a>
+      <div>
+        <h1>📅 Agenda</h1>
+        <p class="subtitle">O que está previsto e o que já aconteceu, dia a dia.</p>
+      </div>
+      <a class="icon-btn" href="atividade_livre_novo.html" aria-label="Nova atividade recorrente">+</a>
+    </header>
+
+    <div class="agenda-navegacao">
+      <button type="button" id="anterioresBtn" class="agenda-nav-btn">◀ Anteriores</button>
+      <button type="button" id="hojeBtn" class="agenda-nav-btn">Hoje</button>
+      <button type="button" id="proximosBtn" class="agenda-nav-btn">Próximos ▶</button>
+    </div>
+
+    <div id="dias" class="agenda-dias"></div>
+  </main>
+
+  <script type="module" src="js/paginas/agenda.js"></script>
+</body>
+</html>
