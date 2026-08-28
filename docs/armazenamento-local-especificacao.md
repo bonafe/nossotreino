@@ -87,7 +87,7 @@ Banco `nossotreino` (`js/armazenamento-indexeddb.js`), 9 object stores:
 | `preferencias` | `chave` | — | `{chave, valor}` — inclui `planoAtivoId` (id do plano cujos dados escopados estão sendo lidos/escritos agora, ou `null`), e as preferências globais (`apoio.*`, `avisoIaAceito.v1`) que não dependem de plano nenhum |
 | `meta` | `chave` | — | bookkeeping interno do próprio motor de armazenamento, nunca dado de usuário |
 | `bibliotecaPersonalizada` | `[dominio, id]` | — | `{dominio, id, origem, baseadoEmVersao, entrada, criadoEm, atualizadoEm}` — exercícios/alongamentos novos ou editados localmente, escopo global (não por aluno/plano). Ver seção 26 de [especificacao-biblioteca-exercicios.md](./especificacao-biblioteca-exercicios.md) |
-| `tiposAtividade` | `id` | `porPai`→`tipoAtividadePaiId` | `{id, nome, tipoAtividadePaiId, criadoEm}` — árvore local (profundidade arbitrária) de tipos de atividade pra "atividade livre", escopo global (não por aluno/plano), semeada com duas raízes (`musculacao`, `alongamento`). Ver [atividade-livre-especificacao.md](./atividade-livre-especificacao.md) |
+| `tiposAtividade` | `id` | `porPai`→`tipoAtividadePaiId` (vestigial — nenhum registro pós-migração tem esse campo, ver item 10 abaixo) | `{id, nome, categoriaIds, criadoEm}` — coleção local (multi-categoria, cada item pode ter 0+ vínculos) de tipos de atividade pra "atividade livre", escopo global (não por aluno/plano), semeada com duas raízes (`musculacao`, `alongamento`). Ver [atividade-livre-especificacao.md](./atividade-livre-especificacao.md) |
 
 Não existe um "aluno ativo" global: qual aluno está sendo visto é só a
 query string (`planos.html?aluno=<id>`) — nenhuma leitura/escrita de
@@ -205,6 +205,16 @@ nunca reescreve uma entrada antiga:
    `atividadesRecorrentes` novo (regras recorrentes da Agenda); plano
    antigo não tinha nenhuma regra pra trazer, migra pra `[]` — ver
    [agenda-especificacao.md](./agenda-especificacao.md).
+10. Migração preguiçosa de `tiposAtividade` (`tipoAtividadePaiId` → `categoriaIds`,
+    `migrarTipoAtividadeParaCategoriaIds` em `js/storage.js`) — não é bump
+    de `VERSAO_BANCO` (é conversão de valor de um campo, não de esquema
+    estrutural da loja); roda na hidratação e em `recarregarTiposAtividade()`,
+    regravando em segundo plano só os registros que ainda estavam no
+    formato antigo. Ver seção 2 de
+    [atividade-livre-especificacao.md](./atividade-livre-especificacao.md).
+11. Backup `versao` `4` → `5` (`migrarBackupDe4Para5`) — mesma conversão
+    `tipoAtividadePaiId` → `categoriaIds`, aplicada ao array `tiposAtividade`
+    do envelope de backup.
 
 ## 3. Hierarquia aluno → plano → sistema
 
@@ -533,13 +543,14 @@ TreinosStorage.listarBibliotecaPersonalizada()
 TreinosStorage.salvarExercicioPersonalizado({dominio, id, origem, baseadoEmVersao, entrada})
 TreinosStorage.removerExercicioPersonalizado(dominio, id)
 
-// Tipos de atividade (árvore local pra "atividade livre" — ver
-// atividade-livre-especificacao.md)
+// Tipos de atividade (coleção local multi-categoria pra "atividade livre"
+// — ver atividade-livre-especificacao.md)
 TreinosStorage.listarTiposAtividade()
-TreinosStorage.listarFilhosDeTipoAtividade(paiId)
+TreinosStorage.listarPorCategoria(categoriaId)        // filhos de uma categoria (null = raízes)
 TreinosStorage.obterTipoAtividade(id)
-TreinosStorage.caminhoTipoAtividade(id)          // breadcrumb raiz → item
-TreinosStorage.criarTipoAtividade(nome, paiId)
+TreinosStorage.caminhosTipoAtividade(id)              // todos os caminhos raiz → item, mais curto primeiro
+TreinosStorage.criarTipoAtividade(nome, categoriaIds) // categoriaIds: string[]
+TreinosStorage.alterarCategoriasTipoAtividade(id, categoriaIds)
 
 // Backup completo, todos os alunos e planos (alunos.html, seção 3.1)
 TreinosStorage.montarBackup()

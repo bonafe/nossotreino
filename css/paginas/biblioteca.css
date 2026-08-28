@@ -1,8 +1,8 @@
-.mudar-pai-link[hidden] {
+.categorias-link[hidden] {
   display: none;
 }
 
-.mudar-pai-link {
+.categorias-link {
   display: inline-block;
   margin-top: 6px;
   color: #7dd3fc;
@@ -11,7 +11,7 @@
   text-decoration: none;
 }
 
-.mudar-pai-link:active {
+.categorias-link:active {
   opacity: 0.7;
 }
 

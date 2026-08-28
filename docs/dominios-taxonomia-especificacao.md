@@ -87,10 +87,25 @@ Registradas como perguntas — nenhuma tem resposta escolhida ainda:
   exige o peso de um formulário de cadastro de exercício e o outro não?
   Uma primeira ponte, só de navegação (nenhum dado convergiu, nenhuma
   pergunta acima foi respondida), já existe: `biblioteca_dominios.html`
-  deixa a árvore de `tiposAtividade` navegável e, quando um nó coincide
+  deixa a coleção de `tiposAtividade` navegável e, quando um nó coincide
   com um domínio real de `DOMINIOS`, manda pra `biblioteca.html`; um nó
   sem domínio abre a biblioteca vazia, pronta pra ganhar itens se um dia
   esses dois modelos convergirem de fato.
+
+  `tiposAtividade` deixou de ser uma árvore de pai único e passou a ser
+  multi-categoria — cada item pode carregar `categoriaIds` (0+ vínculos)
+  em vez de um `tipoAtividadePaiId` único, motivado por casos reais como
+  Judô pertencer simultaneamente a "Artes marciais japonesas" e
+  "Grappling", ou Capoeira a "Artes marciais" e "Dança" (ver seção 2 de
+  [atividade-livre-especificacao.md](./atividade-livre-especificacao.md)).
+  Isso é relevante pra esta pergunta de convergência porque, se um dia os
+  dois modelos se juntarem, `DOMINIOS` (hoje flat, sem qualquer noção de
+  hierarquia ou categoria múltipla) teria a mesma pergunta de multi-tag
+  pela frente — o formato que vencer precisaria suportar os dois casos.
+  A travessia de `biblioteca_dominios.html` também mudou: como um item
+  pode ter mais de uma categoria, ele agora pode aparecer sob mais de um
+  ramo da lista achatada (uma vez por categoria a que pertence), em vez de
+  ter um lugar único garantido na árvore.
 
 ## 4. Não-escopo explícito
 

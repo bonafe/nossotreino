@@ -37,15 +37,22 @@ function criarLojaDeBibliotecaPersonalizada(banco) {
   banco.createObjectStore("bibliotecaPersonalizada", { keyPath: ["dominio", "id"] });
 }
 
-// Árvore local (device-local, não versionada no git, não é dado de
+// Coleção local (device-local, não versionada no git, não é dado de
 // aluno/plano) de tipos de atividade pra "atividade livre" (sessão com
 // data/duração lançada manualmente, sem treino pré-cadastrado — ver
-// docs/atividade-livre-especificacao.md). Profundidade arbitrária via
-// `tipoAtividadePaiId` (null = raiz). Semeada com as mesmas duas raízes
-// que já existem como domínio de biblioteca de exercícios (`musculacao`,
-// `alongamento` — ids coincidem por familiaridade de UX com
-// js/dominios-biblioteca.js, não por acoplamento: nenhum código lê um a
-// partir do outro).
+// docs/atividade-livre-especificacao.md). Semeada com as mesmas duas
+// raízes que já existem como domínio de biblioteca de exercícios
+// (`musculacao`, `alongamento` — ids coincidem por familiaridade de UX
+// com js/dominios-biblioteca.js, não por acoplamento: nenhum código lê um
+// a partir do outro).
+//
+// Migração já publicada (VERSAO_BANCO 3) — nunca editar o shape gravado
+// aqui (`tipoAtividadePaiId`). `js/storage.js` normaliza pra
+// `categoriaIds` (array, multi-categoria) na hidratação seguinte, então o
+// shape antigo nunca é observado por código nenhum — ver
+// migrarTipoAtividadeParaCategoriaIds em storage.js. O índice `porPai`
+// abaixo já era código morto antes disso (nenhuma leitura o usa) e
+// continua só como vestígio histórico.
 function criarLojaDeTiposAtividade(banco) {
   const tipos = banco.createObjectStore("tiposAtividade", { keyPath: "id" });
   tipos.createIndex("porPai", "tipoAtividadePaiId");

@@ -113,9 +113,14 @@ class AtividadeLivreNovoController {
   #filtrarResultados() {
     const termo = normalizar(this.#pickerBuscaInputEl.value.trim());
     const tipos = TreinosStorage.listarTiposAtividade()
-      .map((tipo) => ({ tipo, caminho: TreinosStorage.caminhoTipoAtividade(tipo.id) }))
-      .filter(({ caminho }) => !termo || normalizar(caminho.map((t) => t.nome).join(" ")).includes(termo))
-      .sort((a, b) => a.caminho.map((t) => t.nome).join(" › ").localeCompare(b.caminho.map((t) => t.nome).join(" › ")));
+      .map((tipo) => ({ tipo, caminhos: TreinosStorage.caminhosTipoAtividade(tipo.id) }))
+      // Busca contra TODOS os caminhos do item, não só o canônico — achar
+      // Judô buscando "grappling" precisa funcionar mesmo que o caminho
+      // exibido seja o de "artes marciais japonesas".
+      .filter(({ caminhos }) => !termo || caminhos.some((c) => normalizar(c.map((t) => t.nome).join(" ")).includes(termo)))
+      .sort((a, b) =>
+        a.caminhos[0].map((t) => t.nome).join(" › ").localeCompare(b.caminhos[0].map((t) => t.nome).join(" › "))
+      );
 
     this.#pickerResultadosEl.innerHTML = "";
     if (!tipos.length) {
@@ -123,13 +128,15 @@ class AtividadeLivreNovoController {
       return;
     }
 
-    tipos.forEach(({ tipo, caminho }) => {
+    tipos.forEach(({ tipo, caminhos }) => {
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "picker-resultado-item";
-      const nomes = caminho.map((t) => t.nome);
+      const nomes = caminhos[0].map((t) => t.nome);
       const nomeProprio = nomes[nomes.length - 1];
-      const ancestrais = nomes.slice(0, -1).join(" › ");
+      const outros =
+        caminhos.length > 1 ? `+${caminhos.length - 1} outro${caminhos.length > 2 ? "s" : ""} caminho${caminhos.length > 2 ? "s" : ""}` : "";
+      const ancestrais = [nomes.slice(0, -1).join(" › "), outros].filter(Boolean).join(" · ");
       btn.innerHTML = `
         <div class="picker-resultado-nome">${nomeProprio}</div>
         ${ancestrais ? `<div class="picker-resultado-caminho">${ancestrais}</div>` : ""}
@@ -141,7 +148,7 @@ class AtividadeLivreNovoController {
 
   #escolherTipo(tipo) {
     this.#tipoEscolhidoId = tipo.id;
-    const caminho = TreinosStorage.caminhoTipoAtividade(tipo.id).map((t) => t.nome);
+    const caminho = TreinosStorage.caminhosTipoAtividade(tipo.id)[0].map((t) => t.nome);
     this.#tipoEscolhaBtnEl.textContent = caminho.join(" › ");
     this.#fecharPicker();
     if (this.#modo === "unica") this.#preencherComUltimaDoTipo(tipo.id);

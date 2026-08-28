@@ -114,6 +114,37 @@
   margin-top: 2px;
 }
 
+.chips-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(190, 242, 100, 0.16);
+  border: 1px solid rgba(190, 242, 100, 0.45);
+  border-radius: 999px;
+  padding: 6px 6px 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #bef264;
+}
+
+.chip-remover {
+  appearance: none;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
 #voltarBtn[hidden] {
   display: none;
 }

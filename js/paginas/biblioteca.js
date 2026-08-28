@@ -26,8 +26,8 @@ class BibliotecaController {
   #voltarIconEl = document.getElementById("voltarIcon");
   #tituloEl = document.getElementById("titulo");
   #subtituloEl = document.getElementById("subtitulo");
-  #mudarPaiLinkEl = document.getElementById("mudarPaiLink");
-  #mudarPaiTextoEl = document.getElementById("mudarPaiTexto");
+  #categoriasLinkEl = document.getElementById("categoriasLink");
+  #categoriasTextoEl = document.getElementById("categoriasTexto");
   #criarLinkEl = document.getElementById("criarLink");
   #carregandoEl = document.getElementById("carregando");
   #erroEl = document.getElementById("erro");
@@ -41,7 +41,7 @@ class BibliotecaController {
     const params = new URLSearchParams(window.location.search);
     this.#dominioId = params.get("dominio") || "musculacao";
     const voltarParam = params.get("voltar");
-    this.#configurarMudarPaiLink();
+    this.#configurarCategoriasLink();
 
     // Domínio sem biblioteca de verdade ainda (ex.: um tipo da árvore de
     // atividade livre sem exercícios cadastrados, chegando por
@@ -87,22 +87,24 @@ class BibliotecaController {
   // DOMINIOS) corresponde a um nó em tiposAtividade — musculação/
   // alongamento são semeados junto com o banco, e qualquer outro só
   // aparece em biblioteca.html porque biblioteca_dominios.html achou ele
-  // nessa árvore. "Mudar domínio pai" reaproveita o mesmo formulário/
-  // picker de criar tipo (atividade_livre_tipo_novo.html?editar=<id>),
-  // numa aba nova como todo link de edição desta tela.
-  #configurarMudarPaiLink() {
+  // nessa coleção. "Categorias" reaproveita o mesmo formulário/picker de
+  // criar tipo (atividade_livre_tipo_novo.html?editar=<id>), numa aba nova
+  // como todo link de edição desta tela.
+  #configurarCategoriasLink() {
     const tipo = TreinosStorage.obterTipoAtividade(this.#dominioId);
     if (!tipo) {
-      this.#mudarPaiLinkEl.hidden = true;
+      this.#categoriasLinkEl.hidden = true;
       return;
     }
 
     const voltarAqui = window.location.pathname + window.location.search;
-    this.#mudarPaiLinkEl.href = `atividade_livre_tipo_novo.html?editar=${encodeURIComponent(this.#dominioId)}&voltar=${encodeURIComponent(voltarAqui)}`;
-    this.#mudarPaiTextoEl.textContent = tipo.tipoAtividadePaiId
-      ? TreinosStorage.caminhoTipoAtividade(tipo.tipoAtividadePaiId).map((t) => t.nome).join(" › ")
-      : "— nenhum (raiz) —";
-    this.#mudarPaiLinkEl.hidden = false;
+    this.#categoriasLinkEl.href = `atividade_livre_tipo_novo.html?editar=${encodeURIComponent(this.#dominioId)}&voltar=${encodeURIComponent(voltarAqui)}`;
+    const nomes = (tipo.categoriaIds || []).map((cid) => {
+      const caminho = TreinosStorage.caminhosTipoAtividade(cid)[0] || [];
+      return caminho.map((t) => t.nome).join(" › ");
+    });
+    this.#categoriasTextoEl.textContent = nomes.length ? nomes.join(", ") : "— nenhuma (raiz) —";
+    this.#categoriasLinkEl.hidden = false;
   }
 
   #mostrarErro(mensagem) {

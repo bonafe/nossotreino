@@ -1,16 +1,15 @@
 import { TreinosStorage } from "../storage.js";
 import { normalizar } from "../identificadores.js";
 
-const ROTULO_RAIZ = "— Nenhum (tipo raiz) —";
-
 class AtividadeLivreTipoNovoController {
-  #paiEscolhidoId = null;
+  #categoriasEscolhidasIds = [];
   #voltarPara = "atividade_livre_novo.html";
-  #idEditando = null; // ?editar=<id> — muda de "criar tipo novo" pra "mudar domínio pai" de um tipo existente
+  #idEditando = null; // ?editar=<id> — muda de "criar tipo novo" pra "editar categorias" de um tipo existente
 
   #tituloEl = document.getElementById("titulo");
   #nomeInputEl = document.getElementById("nomeInput");
-  #paiEscolhaBtnEl = document.getElementById("paiEscolhaBtn");
+  #categoriasEscolhaBtnEl = document.getElementById("categoriasEscolhaBtn");
+  #categoriasSelecionadasEl = document.getElementById("categoriasSelecionadas");
   #criarBtnEl = document.getElementById("criarBtn");
   #mensagemEl = document.getElementById("mensagem");
   #voltarBtnEl = document.getElementById("voltarBtn");
@@ -24,7 +23,7 @@ class AtividadeLivreTipoNovoController {
     const params = new URLSearchParams(window.location.search);
     this.#voltarPara = params.get("voltar") || this.#voltarPara;
 
-    this.#paiEscolhaBtnEl.addEventListener("click", () => this.#abrirPicker());
+    this.#categoriasEscolhaBtnEl.addEventListener("click", () => this.#abrirPicker());
     this.#pickerFecharBtnEl.addEventListener("click", () => this.#fecharPicker());
     this.#pickerBuscaInputEl.addEventListener("input", () => this.#filtrarResultados());
     this.#criarBtnEl.addEventListener("click", () => (this.#idEditando ? this.#salvar() : this.#criar()));
@@ -36,11 +35,12 @@ class AtividadeLivreTipoNovoController {
     const tipoEditando = idEditando && TreinosStorage.obterTipoAtividade(idEditando);
     if (tipoEditando) {
       this.#idEditando = idEditando;
-      this.#tituloEl.textContent = "Mudar domínio pai";
+      this.#tituloEl.textContent = "Editar categorias";
       this.#nomeInputEl.value = tipoEditando.nome;
       this.#nomeInputEl.disabled = true;
       this.#criarBtnEl.textContent = "Salvar";
-      this.#escolherPai(tipoEditando.tipoAtividadePaiId);
+      this.#categoriasEscolhidasIds = [...(tipoEditando.categoriaIds || [])];
+      this.#renderizarChips();
     }
   }
 
@@ -58,47 +58,75 @@ class AtividadeLivreTipoNovoController {
   #filtrarResultados() {
     const termo = normalizar(this.#pickerBuscaInputEl.value.trim());
     const tipos = TreinosStorage.listarTiposAtividade()
-      .map((tipo) => ({ tipo, caminho: TreinosStorage.caminhoTipoAtividade(tipo.id) }))
+      .map((tipo) => ({ tipo, caminhos: TreinosStorage.caminhosTipoAtividade(tipo.id) }))
       // Editando: nunca oferece o próprio tipo nem um descendente dele como
-      // pai novo — viraria um ciclo na árvore (caminho de um descendente
+      // categoria nova — viraria um ciclo (algum caminho de um descendente
       // sempre passa pelo próprio #idEditando).
-      .filter(({ caminho }) => !this.#idEditando || !caminho.some((t) => t.id === this.#idEditando))
-      .filter(({ caminho }) => !termo || normalizar(caminho.map((t) => t.nome).join(" ")).includes(termo))
-      .sort((a, b) => a.caminho.map((t) => t.nome).join(" › ").localeCompare(b.caminho.map((t) => t.nome).join(" › ")));
+      .filter(({ caminhos }) => !this.#idEditando || !caminhos.some((c) => c.some((t) => t.id === this.#idEditando)))
+      .filter(({ caminhos }) => !termo || caminhos.some((c) => normalizar(c.map((t) => t.nome).join(" ")).includes(termo)))
+      .sort((a, b) =>
+        a.caminhos[0].map((t) => t.nome).join(" › ").localeCompare(b.caminhos[0].map((t) => t.nome).join(" › "))
+      );
 
     this.#pickerResultadosEl.innerHTML = "";
 
-    if (!termo) {
-      const btnRaiz = document.createElement("button");
-      btnRaiz.type = "button";
-      btnRaiz.className = "picker-resultado-item";
-      btnRaiz.innerHTML = `<div class="picker-resultado-nome">${ROTULO_RAIZ}</div>`;
-      btnRaiz.addEventListener("click", () => this.#escolherPai(null));
-      this.#pickerResultadosEl.appendChild(btnRaiz);
+    if (!tipos.length) {
+      this.#pickerResultadosEl.innerHTML = '<div class="picker-vazio">Nenhum tipo encontrado.</div>';
+      return;
     }
 
-    tipos.forEach(({ tipo, caminho }) => {
+    tipos.forEach(({ tipo, caminhos }) => {
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "picker-resultado-item";
-      const nomes = caminho.map((t) => t.nome);
+      btn.setAttribute("aria-pressed", String(this.#categoriasEscolhidasIds.includes(tipo.id)));
+      const nomes = caminhos[0].map((t) => t.nome);
       const nomeProprio = nomes[nomes.length - 1];
       const ancestrais = nomes.slice(0, -1).join(" › ");
       btn.innerHTML = `
         <div class="picker-resultado-nome">${nomeProprio}</div>
         ${ancestrais ? `<div class="picker-resultado-caminho">${ancestrais}</div>` : ""}
       `;
-      btn.addEventListener("click", () => this.#escolherPai(tipo.id));
+      btn.addEventListener("click", () => this.#alternarCategoria(tipo.id, btn));
       this.#pickerResultadosEl.appendChild(btn);
     });
   }
 
-  #escolherPai(paiId) {
-    this.#paiEscolhidoId = paiId;
-    this.#paiEscolhaBtnEl.textContent = paiId
-      ? TreinosStorage.caminhoTipoAtividade(paiId).map((t) => t.nome).join(" › ")
-      : ROTULO_RAIZ;
-    this.#fecharPicker();
+  #alternarCategoria(id, btn) {
+    const indice = this.#categoriasEscolhidasIds.indexOf(id);
+    if (indice === -1) this.#categoriasEscolhidasIds.push(id);
+    else this.#categoriasEscolhidasIds.splice(indice, 1);
+    btn.setAttribute("aria-pressed", String(indice === -1));
+    this.#renderizarChips();
+  }
+
+  #removerCategoria(id) {
+    const indice = this.#categoriasEscolhidasIds.indexOf(id);
+    if (indice === -1) return;
+    this.#categoriasEscolhidasIds.splice(indice, 1);
+    this.#renderizarChips();
+    if (!this.#pickerOverlayEl.hidden) this.#filtrarResultados();
+  }
+
+  #renderizarChips() {
+    this.#categoriasSelecionadasEl.innerHTML = "";
+    this.#categoriasEscolhidasIds.forEach((id) => {
+      const caminho = TreinosStorage.caminhosTipoAtividade(id)[0] || [];
+      const breadcrumb = caminho.map((t) => t.nome).join(" › ") || id;
+
+      const chip = document.createElement("span");
+      chip.className = "chip";
+      chip.innerHTML = `<span>${breadcrumb}</span>`;
+      const removerBtn = document.createElement("button");
+      removerBtn.type = "button";
+      removerBtn.className = "chip-remover";
+      removerBtn.setAttribute("aria-label", `Remover categoria ${breadcrumb}`);
+      removerBtn.textContent = "×";
+      removerBtn.addEventListener("click", () => this.#removerCategoria(id));
+      chip.appendChild(removerBtn);
+
+      this.#categoriasSelecionadasEl.appendChild(chip);
+    });
   }
 
   #mostrarMensagem(texto, classe) {
@@ -114,20 +142,21 @@ class AtividadeLivreTipoNovoController {
       return;
     }
 
-    TreinosStorage.criarTipoAtividade(nome, this.#paiEscolhidoId);
+    TreinosStorage.criarTipoAtividade(nome, this.#categoriasEscolhidasIds);
     await TreinosStorage.aguardarEscritas();
 
     this.#nomeInputEl.value = "";
-    this.#escolherPai(null);
+    this.#categoriasEscolhidasIds = [];
+    this.#renderizarChips();
     this.#mostrarMensagem(`✓ "${nome}" criado. Pode criar outro tipo ou voltar.`, "sucesso");
     this.#voltarBtnEl.hidden = false;
   }
 
   async #salvar() {
-    TreinosStorage.alterarPaiTipoAtividade(this.#idEditando, this.#paiEscolhidoId);
+    TreinosStorage.alterarCategoriasTipoAtividade(this.#idEditando, this.#categoriasEscolhidasIds);
     await TreinosStorage.aguardarEscritas();
 
-    this.#mostrarMensagem("✓ Domínio pai atualizado.", "sucesso");
+    this.#mostrarMensagem("✓ Categorias atualizadas.", "sucesso");
     this.#voltarBtnEl.hidden = false;
   }
 }

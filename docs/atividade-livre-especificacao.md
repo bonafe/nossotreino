@@ -17,7 +17,7 @@ natação num clube) e também o de repetir uma sessão de um domínio que já
 existe (ex.: "fiz 15 minutos de alongamento avulso, sem abrir o treino
 cadastrado").
 
-## 2. Árvore de tipos de atividade (`tiposAtividade`)
+## 2. Tipos de atividade (`tiposAtividade`)
 
 Loja própria no IndexedDB (`js/armazenamento-indexeddb.js`), **device-local**
 (escopo global, não por aluno/plano — mesmo nível de `bibliotecaPersonalizada`)
@@ -26,24 +26,38 @@ registro:
 
 ```json
 {
-  "id": "salsa",
-  "nome": "Salsa",
-  "tipoAtividadePaiId": "danca-de-salao",
+  "id": "judo",
+  "nome": "Judô",
+  "categoriaIds": ["artes-marciais-japonesas", "grappling"],
   "criadoEm": "2026-08-26T14:00:00.000Z"
 }
 ```
 
-`tipoAtividadePaiId: null` marca um tipo raiz. Profundidade arbitrária —
-`dança` → `dança de salão` → `salsa` é uma árvore de 3 níveis. A loja vem
-semeada, dentro da própria migração de upgrade do banco
-(`criarLojaDeTiposAtividade`), com duas raízes:
+`categoriaIds` é um array self-referencial (aponta pra outros ids desta
+mesma coleção) — um item pode pertencer a **mais de uma categoria ao mesmo
+tempo** (ex.: Judô é ao mesmo tempo "Artes marciais japonesas" e
+"Grappling"; Capoeira poderia ser "Artes marciais" e "Dança"). `categoriaIds:
+[]` marca um tipo raiz. Continua valendo o exemplo simples de um único
+vínculo — `dança` → `dança de salão` → `salsa` é `salsa` com
+`categoriaIds: ["danca-de-salao"]`. Como categorias também podem ter mais
+de uma categoria-pai, é um **grafo**, não uma árvore estrita — toda leitura
+que percorre a coleção (`TreinosStorage.caminhosTipoAtividade`, a
+travessia de `biblioteca_dominios.html`) é defensiva contra ciclo por
+construção. A loja vem semeada, dentro da própria migração de upgrade do
+banco (`criarLojaDeTiposAtividade`), com duas raízes:
 
 ```json
 [
-  { "id": "musculacao", "nome": "Musculação", "tipoAtividadePaiId": null },
-  { "id": "alongamento", "nome": "Alongamento", "tipoAtividadePaiId": null }
+  { "id": "musculacao", "nome": "Musculação", "categoriaIds": [] },
+  { "id": "alongamento", "nome": "Alongamento", "categoriaIds": [] }
 ]
 ```
+
+Formato anterior (pai único, `tipoAtividadePaiId: string|null`) migrado
+preguiçosamente pra `categoriaIds` na hidratação (`migrarTipoAtividadeParaCategoriaIds`
+em `js/storage.js`) e no envelope de backup (`migrarBackupDe4Para5`) — ver
+seção 2 de [armazenamento-local-especificacao.md](./armazenamento-local-especificacao.md)
+pro histórico completo de migrações.
 
 ### Por que não reusar `DOMINIOS` (`js/dominios-biblioteca.js`)
 
@@ -51,7 +65,7 @@ semeada, dentro da própria migração de upgrade do banco
 carrega um `campos` (schema de formulário completo: nome, vídeo, grupo
 muscular, equipamento...) usado por `exercicio_novo.html`/`biblioteca.html`
 para cadastrar um item de exercício. É pesado demais pro que "tipo de
-atividade" precisa: só um nome e uma posição na árvore. Os dois conceitos
+atividade" precisa: só um nome e 0+ categorias. Os dois conceitos
 são independentes — os ids das duas raízes semeadas (`musculacao`,
 `alongamento`) coincidem com os de `DOMINIOS` só por familiaridade de UX
 (quem já reconhece esses nomes no menu de biblioteca reconhece de novo
@@ -63,12 +77,13 @@ conceitos podem convergir — ver
 ### API (`TreinosStorage`, `js/storage.js`)
 
 ```js
-TreinosStorage.listarTiposAtividade()               // todos os nós
-TreinosStorage.listarFilhosDeTipoAtividade(paiId)
+TreinosStorage.listarTiposAtividade()                // todos os nós
+TreinosStorage.listarPorCategoria(categoriaId)        // filhos de uma categoria (null = raízes)
 TreinosStorage.obterTipoAtividade(id)
-TreinosStorage.caminhoTipoAtividade(id)              // [raiz, ..., item] — breadcrumb
-TreinosStorage.criarTipoAtividade(nome, paiId)
-TreinosStorage.recarregarTiposAtividade()            // re-hidrata após aba de criação
+TreinosStorage.caminhosTipoAtividade(id)              // [[raiz, ..., item], ...] — todos os caminhos, mais curto primeiro
+TreinosStorage.criarTipoAtividade(nome, categoriaIds) // categoriaIds: string[], default []
+TreinosStorage.alterarCategoriasTipoAtividade(id, categoriaIds) // substitui a lista inteira, filtra ciclo
+TreinosStorage.recarregarTiposAtividade()             // re-hidrata após aba de criação
 ```
 
 Sem edição/exclusão de tipo no v1 — ver seção 5 "Fora de escopo".
@@ -88,8 +103,8 @@ Mesmo padrão visual dos outros menus (`treino_bicicleta_menu.html`):
 cabeçalho com voltar + botão "+" pra `atividade_livre_novo.html`, gráfico
 de barras de tempo total (`GraficoBarrasHistorico`, todos os tipos
 agregados juntos, sem filtro por tipo no v1) e, abaixo, a lista de
-lançamentos — cada um mostrando o breadcrumb do tipo
-(`TreinosStorage.caminhoTipoAtividade`), duração, data/hora e observação.
+lançamentos — cada um mostrando o breadcrumb canônico do tipo
+(`TreinosStorage.caminhosTipoAtividade(id)[0]`), duração, data/hora e observação.
 Não existe "card de treino" aqui — não há treino pré-cadastrado, cada
 lançamento é o item de primeira classe.
 
@@ -115,9 +130,13 @@ capturadas:
 
 Formulário direto (sem passo de "criar treino" antes):
 
-- **Tipo de atividade** — picker com busca por texto sobre
-  `TreinosStorage.listarTiposAtividade()`, mostrando o breadcrumb completo
-  pra diferenciar tipos de nomes parecidos em ramos diferentes da árvore.
+- **Tipo de atividade** — picker de seleção única com busca por texto
+  sobre `TreinosStorage.listarTiposAtividade()`, mostrando o breadcrumb
+  canônico (`caminhosTipoAtividade(id)[0]`, o mais curto) pra diferenciar
+  tipos de nomes parecidos; a busca textual verifica **todos** os caminhos
+  do item (assim buscar "grappling" acha Judô mesmo que o breadcrumb
+  exibido seja o de "artes marciais japonesas"), e um item com mais de um
+  caminho ganha um sufixo "+N outro(s) caminho(s)" na linha de ancestrais.
   Link "+ Não achou? Criar tipo novo" abre `atividade_livre_tipo_novo.html`
   numa aba nova (`target="_blank"`, mesmo padrão de
   `treino_musculacao_novo.html`/`exercicio_novo.html` — não perder o
@@ -161,27 +180,33 @@ parâmetro de `exercicio_novo.html`) — usada tanto pelo link "+ Não achou?
 Criar tipo novo" de `atividade_livre_novo.html` quanto pelo "+" de
 `biblioteca_dominios.html` (ver seção 26 de
 `docs/especificacao-biblioteca-exercicios.md`), sem nenhuma variação de
-comportamento entre as duas origens. Um campo de nome + um seletor de pai
-(mesmo picker com busca por breadcrumb, mais a opção "— Nenhum (tipo
-raiz) —"). Ao salvar, `TreinosStorage.criarTipoAtividade(nome, paiId)`,
-limpa o formulário e mostra uma mensagem inline de sucesso — mas,
-diferente de `exercicio-novo.js` (que sempre navega pra `?voltar=` na
+comportamento entre as duas origens. Um campo de nome + uma lista de
+chips de categorias escolhidas, com um botão "+ Adicionar categoria…" que
+abre o mesmo picker com busca por breadcrumb — clicar num resultado
+alterna a seleção (`aria-pressed`) e **não fecha o overlay**, permitindo
+marcar várias categorias em sequência; cada chip tem um "×" pra remover.
+Zero chips = tipo raiz (substitui a antiga opção fixa "— Nenhum (tipo
+raiz) —", agora implícita). Ao salvar,
+`TreinosStorage.criarTipoAtividade(nome, categoriaIds)`, limpa o
+formulário (incluindo os chips) e mostra uma mensagem inline de sucesso —
+mas, diferente de `exercicio-novo.js` (que sempre navega pra `?voltar=` na
 sequência), aqui **não navega sozinho**: a tela permanece pronta pra criar
-mais um tipo (útil pra montar uma árvore de vários níveis de uma vez) e
-revela um botão "Voltar" que só então navega pra `?voltar=`.
+mais um tipo (útil pra montar vários vínculos de uma vez) e revela um
+botão "Voltar" que só então navega pra `?voltar=`.
 
-`?editar=<id>` troca o modo da tela inteira: em vez de criar, "Mudar
-domínio pai" de um tipo já existente (alcançado pelo link "✏️ Domínio
-pai" de `biblioteca.html`, ver seção 26 de
+`?editar=<id>` troca o modo da tela inteira: em vez de criar, "Editar
+categorias" de um tipo já existente (alcançado pelo link "✏️ Categorias"
+de `biblioteca.html`, ver seção 26 de
 `docs/especificacao-biblioteca-exercicios.md`). O campo de nome vem
-preenchido e desabilitado (só muda o pai, não renomeia), o seletor de pai
-vem pré-selecionado com o pai atual, e a picker de pai exclui o próprio
-tipo e todos os seus descendentes da lista — não teria como escolhê-los
-sem criar um ciclo em `caminhoTipoAtividade`. Ao salvar,
-`TreinosStorage.alterarPaiTipoAtividade(id, paiId)` (que repete a mesma
-trava contra ciclo do lado do storage) e revela o botão "Voltar" — aqui
-não tem sentido continuar editando outro tipo na mesma tela, então não
-limpa nem oferece continuar.
+preenchido e desabilitado (só mudam as categorias, não o nome), os chips
+vêm pré-preenchidos com as categorias atuais, e o picker exclui o próprio
+tipo e qualquer candidata cujo **algum** caminho passe por ele — não teria
+como escolhê-los sem criar um ciclo em `caminhosTipoAtividade`. Ao salvar,
+`TreinosStorage.alterarCategoriasTipoAtividade(id, categoriaIds)` (que
+recebe a lista completa nova e filtra silenciosamente qualquer candidata
+que ainda assim fechasse ciclo, como defesa em profundidade) e revela o
+botão "Voltar" — aqui não tem sentido continuar editando outro tipo na
+mesma tela, então não limpa nem oferece continuar.
 
 ## 4. Formato do histórico (`historico.sessaoLivre.v1`)
 
@@ -199,8 +224,8 @@ limpa nem oferece continuar.
 princípio de `alongamentoNome` em `historico.sessaoAlongamento.v1`) —
 sobrevive mesmo que o tipo venha a ser renomeado no futuro (hoje não há
 tela de renomear, mas o padrão já protege o histórico contra isso). O
-menu prefere o breadcrumb ao vivo (`caminhoTipoAtividade`) quando o tipo
-ainda existe, e cai pro nome congelado como alternativa.
+menu prefere o breadcrumb canônico ao vivo (`caminhosTipoAtividade(id)[0]`)
+quando o tipo ainda existe, e cai pro nome congelado como alternativa.
 
 `dataHora`/`duracaoSegundos` (em vez de campos separados de data, hora e
 minutos) porque é exatamente o shape que `GraficoBarrasHistorico`
@@ -217,10 +242,10 @@ atual.
 
 ## 5. Fora de escopo
 
-- **Edição/exclusão de um tipo já criado** (renomear, mover na árvore,
-  apagar) — só criação no v1. Excluir um tipo com filhos ou histórico
-  apontando pra ele exige antes decidir o que fazer com essas referências;
-  fica pra quando o uso real mostrar necessidade.
+- **Edição/exclusão de um tipo já criado** (renomear, apagar) — só criação
+  e edição de categorias no v1. Excluir um tipo com dependentes ou
+  histórico apontando pra ele exige antes decidir o que fazer com essas
+  referências; fica pra quando o uso real mostrar necessidade.
 - **Exclusão de um lançamento individual** — só reset total via
   engrenagem (`TreinosStorage.resetarAtividadeLivre()`), mesmo nível de
   granularidade que bicicleta/alongamento já têm hoje (nenhum dos dois
@@ -228,7 +253,7 @@ atual.
   [armazenamento-local-especificacao.md](./armazenamento-local-especificacao.md)).
 - **Filtro por tipo/subdomínio no gráfico do menu** — soma tudo junto no
   v1, mesma simplicidade dos outros dois menus.
-- **Sincronização/consolidação da árvore com outros navegadores ou com uma
-  comunidade** — a árvore é 100% local por enquanto. Visão de longo prazo
+- **Sincronização/consolidação da coleção com outros navegadores ou com
+  uma comunidade** — é 100% local por enquanto. Visão de longo prazo
   registrada em
   [dominios-taxonomia-especificacao.md](./dominios-taxonomia-especificacao.md).

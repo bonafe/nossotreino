@@ -287,12 +287,13 @@ function migrarPlanoParaVersaoAtual(dados) {
 
 // --- Migração de formato: envelope de backup (versao) ---
 
-const VERSAO_BACKUP_ATUAL = 4;
+const VERSAO_BACKUP_ATUAL = 5;
 
 const MIGRACOES_BACKUP = {
   1: migrarBackupDe1Para2,
   2: migrarBackupDe2Para3,
-  3: migrarBackupDe3Para4
+  3: migrarBackupDe3Para4,
+  4: migrarBackupDe4Para5
 };
 
 // Formato 1: sem `alunos` (entidade Aluno ainda não existia) — deriva a
@@ -328,6 +329,14 @@ function migrarBackupDe3Para4(backup) {
   };
 }
 
+// Formato 4: `tiposAtividade` ainda no formato de pai único
+// (`tipoAtividadePaiId`) — converte cada nó pra `categoriaIds` (array
+// multi-categoria), mesma função usada na migração preguiçosa do dado
+// local (ver hidratar() e migrarTipoAtividadeParaCategoriaIds).
+function migrarBackupDe4Para5(backup) {
+  return { ...backup, versao: 5, tiposAtividade: migrarTiposAtividadeParaCategoriaIds(backup.tiposAtividade || []) };
+}
+
 function migrarBackupParaVersaoAtual(backupOriginal) {
   let atual = { ...backupOriginal, versao: backupOriginal.versao || 1 };
   let seguranca = 0;
@@ -338,6 +347,24 @@ function migrarBackupParaVersaoAtual(backupOriginal) {
     seguranca += 1;
   }
   return atual;
+}
+
+// Migração de formato: tiposAtividade — `tipoAtividadePaiId` (pai único,
+// string ou null) → `categoriaIds` (array de 0+ ids, mesma coleção
+// self-referencial — ver seção 2 de docs/atividade-livre-especificacao.md).
+// Idempotente por referência: um registro que já tenha `categoriaIds`
+// (array, mesmo vazio) volta inalterado (mesma referência, não uma cópia)
+// — usado pelos chamadores pra saber quais registros precisam ser
+// regravados. Nunca lança: `tipoAtividadePaiId` ausente/undefined também
+// vira `[]`, não só `null` explícito.
+function migrarTipoAtividadeParaCategoriaIds(tipo) {
+  if (Array.isArray(tipo.categoriaIds)) return tipo;
+  const { tipoAtividadePaiId, ...resto } = tipo;
+  return { ...resto, categoriaIds: tipoAtividadePaiId ? [tipoAtividadePaiId] : [] };
+}
+
+function migrarTiposAtividadeParaCategoriaIds(lista) {
+  return lista.map(migrarTipoAtividadeParaCategoriaIds);
 }
 
 // Preenche o instantâneo a partir do IndexedDB, uma vez por carregamento de
@@ -391,7 +418,18 @@ async function hidratar() {
     instantaneo.bibliotecaPersonalizada.set(`${registro.dominio}|${registro.id}`, registro);
   });
 
-  instantaneo.tiposAtividade = tiposAtividadeRegistros;
+  const tiposAtividadeMigrados = migrarTiposAtividadeParaCategoriaIds(tiposAtividadeRegistros);
+  instantaneo.tiposAtividade = tiposAtividadeMigrados;
+  // Preguiçosa: só regrava em segundo plano os registros que de fato
+  // mudaram de shape (comparação por referência) — próximos boots não
+  // regravam nada. Silenciosa/segura-na-falha: enfileirarEscrita já
+  // engole erro de gravação, a leitura em memória desta sessão já está
+  // correta independente do resultado da escrita.
+  tiposAtividadeMigrados.forEach((tipo, indice) => {
+    if (tipo !== tiposAtividadeRegistros[indice]) {
+      enfileirarEscrita(() => BancoIndexedDB.gravar("tiposAtividade", tipo));
+    }
+  });
 }
 
 export class TreinosStorage {
@@ -819,71 +857,134 @@ export class TreinosStorage {
     instantaneo.bibliotecaPersonalizada = new Map(registros.map((registro) => [`${registro.dominio}|${registro.id}`, registro]));
   }
 
-  // --- Tipos de atividade (árvore local pra "atividade livre" — ver
+  // --- Tipos de atividade (coleção local pra "atividade livre" — ver
   // docs/atividade-livre-especificacao.md). Escopo global (não por
   // aluno/plano), igual bibliotecaPersonalizada, mas com keyPath simples
   // ("id"), então guardado como array, não Map. Independente de DOMINIOS
   // (js/dominios-biblioteca.js) — mesmo que as duas raízes semeadas
   // (musculacao/alongamento) coincidam de id por familiaridade de UX.
+  //
+  // Cada item carrega `categoriaIds` (0+ ids, apontando pra outros itens
+  // desta mesma coleção) em vez de um pai único — um item pode pertencer a
+  // mais de uma categoria ao mesmo tempo (ex.: Judô é ao mesmo tempo
+  // "Artes marciais japonesas" e "Grappling"). `categoriaIds: []` marca
+  // raiz. Como categorias também podem ter múltiplas categorias-pai, é um
+  // grafo (não uma árvore estrita) — toda travessia abaixo é defensiva
+  // contra ciclo por construção, corta o ramo em vez de travar.
 
   static listarTiposAtividade() {
     return instantaneo.tiposAtividade;
   }
 
-  static listarFilhosDeTipoAtividade(paiId) {
-    return TreinosStorage.listarTiposAtividade().filter((t) => (t.tipoAtividadePaiId || null) === (paiId || null));
+  // Substitui listarFilhosDeTipoAtividade(paiId). categoriaId nulo lista
+  // as raízes (categoriaIds vazio).
+  static listarPorCategoria(categoriaId) {
+    const alvo = categoriaId || null;
+    return TreinosStorage.listarTiposAtividade().filter((t) =>
+      alvo ? (t.categoriaIds || []).includes(alvo) : (t.categoriaIds || []).length === 0
+    );
   }
 
   static obterTipoAtividade(id) {
     return TreinosStorage.listarTiposAtividade().find((t) => t.id === id) || null;
   }
 
-  // Breadcrumb raiz → item, usado no picker de lançamento e na tela de
-  // criação de tipo pra diferenciar tipos de nomes parecidos em ramos
-  // diferentes da árvore.
-  static caminhoTipoAtividade(id) {
-    const caminho = [];
-    let atual = TreinosStorage.obterTipoAtividade(id);
-    while (atual) {
-      caminho.unshift(atual);
-      atual = atual.tipoAtividadePaiId ? TreinosStorage.obterTipoAtividade(atual.tipoAtividadePaiId) : null;
-    }
-    return caminho;
+  static #LIMITE_CAMINHOS_TIPO_ATIVIDADE = 50; // trava contra explosão combinatória em grafos degenerados
+
+  // Substitui caminhoTipoAtividade(id) — devolve TODOS os caminhos
+  // raiz→item possíveis (cada um [raiz, ..., item]), ordenados do mais
+  // curto pro mais longo (quem só quer UM caminho canônico usa [0]).
+  // Usado no picker de lançamento e na tela de criação de tipo pra
+  // diferenciar tipos de nomes parecidos em ramos diferentes.
+  //
+  // Defensivo contra ciclo: `visitados` é por RAMO da busca (um Set novo
+  // por chamada recursiva, não compartilhado entre irmãos) — permite o
+  // mesmo nó aparecer em dois caminhos diferentes (correto: é uma
+  // categoria compartilhada), só corta quando o PRÓPRIO ramo repete um nó
+  // (ciclo de verdade). Nunca trava, nunca devolve [] pra um item
+  // existente: se todo caminho colidir com um ciclo, cai no fallback
+  // [[item]].
+  static caminhosTipoAtividade(id) {
+    const item = TreinosStorage.obterTipoAtividade(id);
+    if (!item) return [];
+
+    const caminhos = [];
+    const subir = (no, resto, visitados) => {
+      if (caminhos.length >= TreinosStorage.#LIMITE_CAMINHOS_TIPO_ATIVIDADE) return;
+      if (visitados.has(no.id)) return; // ciclo neste ramo — corta, não trava
+      const proximosVisitados = new Set(visitados).add(no.id);
+      const categorias = (no.categoriaIds || [])
+        .map((cid) => TreinosStorage.obterTipoAtividade(cid))
+        .filter(Boolean);
+
+      if (!categorias.length) {
+        caminhos.push([no, ...resto]);
+        return;
+      }
+      categorias.forEach((pai) => subir(pai, [no, ...resto], proximosVisitados));
+    };
+
+    subir(item, [], new Set());
+    caminhos.sort((a, b) => a.length - b.length);
+    return caminhos.length ? caminhos : [[item]];
   }
 
-  static criarTipoAtividade(nome, paiId) {
+  // Substitui criarTipoAtividade(nome, paiId). Sem checagem de ciclo aqui
+  // — desnecessária: um nó novo só pode referenciar categoriaIds já
+  // existentes (o próprio id dele ainda não existe pra ninguém apontar de
+  // volta), então nunca fecha um ciclo na criação.
+  static criarTipoAtividade(nome, categoriaIds = []) {
     const tipos = TreinosStorage.listarTiposAtividade();
     const id = gerarIdUnico(nome, new Set(tipos.map((t) => t.id)), "tipo-atividade");
-    const tipo = { id, nome, tipoAtividadePaiId: paiId || null, criadoEm: new Date().toISOString() };
+    const categoriasValidas = [...new Set(categoriaIds || [])].filter((cid) => TreinosStorage.obterTipoAtividade(cid));
+    const tipo = { id, nome, categoriaIds: categoriasValidas, criadoEm: new Date().toISOString() };
     tipos.push(tipo);
     enfileirarEscrita(() => BancoIndexedDB.gravar("tiposAtividade", tipo));
     return id;
   }
 
-  // Move um tipo pra debaixo de outro pai (ou pra raiz, com paiId nulo) —
-  // usado por atividade_livre_tipo_novo.html em modo de edição
-  // (?editar=<id>), alcançado a partir do "✏️ Mudar domínio pai" de
-  // biblioteca.html. Recusa virar pai de si mesmo ou de um dos próprios
-  // descendentes (criaria um ciclo em caminhoTipoAtividade) — segunda
-  // trava além do filtro que a própria picker já aplica.
-  static alterarPaiTipoAtividade(id, novoPaiId) {
+  // Substitui alterarPaiTipoAtividade(id, novoPaiId) — usada por
+  // atividade_livre_tipo_novo.html em modo de edição (?editar=<id>),
+  // alcançado a partir do "✏️ Categorias" de biblioteca.html. Recebe a
+  // lista NOVA completa de categorias (não um diff, mesmo padrão
+  // "substitui tudo" do resto do projeto). Filtra (não rejeita tudo)
+  // candidatas que fechariam ciclo — uma candidata é inválida se `id`
+  // aparecer em QUALQUER caminho ancestral dela (reusa
+  // caminhosTipoAtividade, já defensivo contra ciclo residual) — cobre
+  // tanto "mover" quanto duas edições separadas que se referenciariam
+  // mutuamente (a segunda edição, que fecharia o ciclo, é a que perde a
+  // categoria problemática; a tela já filtra isso do picker antes, então
+  // esse filtro aqui é defesa em profundidade).
+  static alterarCategoriasTipoAtividade(id, categoriaIds) {
     const tipo = TreinosStorage.obterTipoAtividade(id);
     if (!tipo) return;
-    const paiNormalizado = novoPaiId || null;
-    if (paiNormalizado === id) return;
-    if (paiNormalizado && TreinosStorage.caminhoTipoAtividade(paiNormalizado).some((t) => t.id === id)) return;
 
-    tipo.tipoAtividadePaiId = paiNormalizado;
+    const candidatas = [...new Set(categoriaIds || [])].filter(
+      (cid) => cid && cid !== id && TreinosStorage.obterTipoAtividade(cid)
+    );
+    const semCiclo = candidatas.filter(
+      (cid) => !TreinosStorage.caminhosTipoAtividade(cid).some((caminho) => caminho.some((t) => t.id === id))
+    );
+
+    tipo.categoriaIds = semCiclo;
     enfileirarEscrita(() => BancoIndexedDB.gravar("tiposAtividade", tipo));
   }
 
   // Re-hidrata só esta loja — "criar tipo novo" abre em aba própria
   // (atividade-livre-tipo-novo.js), mesmo padrão de
-  // recarregarBibliotecaPersonalizada.
+  // recarregarBibliotecaPersonalizada. Passa pela mesma migração
+  // preguiçosa de hidratar().
   static async recarregarTiposAtividade() {
     const banco = await BancoIndexedDB.abrir();
     if (!banco) return;
-    instantaneo.tiposAtividade = await BancoIndexedDB.lerTodos("tiposAtividade");
+    const registros = await BancoIndexedDB.lerTodos("tiposAtividade");
+    const migrados = migrarTiposAtividadeParaCategoriaIds(registros);
+    instantaneo.tiposAtividade = migrados;
+    migrados.forEach((tipo, indice) => {
+      if (tipo !== registros[indice]) {
+        enfileirarEscrita(() => BancoIndexedDB.gravar("tiposAtividade", tipo));
+      }
+    });
   }
 
   // --- Agenda (atividadesRecorrentes, dentro do plano ativo) ---

@@ -23,8 +23,9 @@
     </div>
 
     <div class="campo">
-      <label>Dentro de qual tipo? <span class="opcional">(opcional)</span></label>
-      <button id="paiEscolhaBtn" type="button" class="filtro-toggle">— Nenhum (tipo raiz) —</button>
+      <label>Categorias <span class="opcional">(opcional, 0 ou mais)</span></label>
+      <div id="categoriasSelecionadas" class="chips-lista"></div>
+      <button id="categoriasEscolhaBtn" type="button" class="filtro-toggle">+ Adicionar categoria…</button>
     </div>
 
     <button id="criarBtn" class="primary" type="button">Criar tipo</button>
@@ -35,7 +36,7 @@
   <div id="pickerOverlay" class="overlay" hidden>
     <div class="picker-card">
       <div class="picker-cabecalho">
-        <h2>Escolher tipo pai</h2>
+        <h2>Escolher categorias</h2>
         <button id="pickerFecharBtn" class="picker-fechar" type="button">Fechar</button>
       </div>
       <div id="pickerBusca">

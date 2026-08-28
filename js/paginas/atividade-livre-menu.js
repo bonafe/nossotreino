@@ -24,7 +24,7 @@ class AtividadeLivreMenuController {
   }
 
   #cartaoLancamento(entrada) {
-    const breadcrumb = TreinosStorage.caminhoTipoAtividade(entrada.tipoAtividadeId)
+    const breadcrumb = (TreinosStorage.caminhosTipoAtividade(entrada.tipoAtividadeId)[0] || [])
       .map((t) => t.nome)
       .join(" › ");
 

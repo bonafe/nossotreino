@@ -406,6 +406,15 @@ button.danger:active {
   transform: translateY(1px) scale(0.995);
 }
 
+.picker-resultado-item[aria-pressed="true"] {
+  background: rgba(190, 242, 100, 0.16);
+  border-color: rgba(190, 242, 100, 0.45);
+}
+
+.picker-resultado-item[aria-pressed="true"] .picker-resultado-nome {
+  color: #bef264;
+}
+
 .picker-resultado-cabecalho {
   display: flex;
   align-items: center;
