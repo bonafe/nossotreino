@@ -28,6 +28,18 @@
       <button id="tipoEscolhaBtn" type="button" class="filtro-toggle">Escolher tipo…</button>
     </div>
 
+    <div class="campo" id="cronometroBloco">
+      <button id="iniciarBtn" class="primary" type="button">▶️ Iniciar agora</button>
+      <div id="cronometroCard" class="cronometro-card" hidden>
+        <div class="cronometro-rotulo">Em andamento desde <span id="cronometroInicioEl"></span></div>
+        <div class="cronometro-valor" id="cronometroValorEl">00:00</div>
+        <div class="confirm-botoes">
+          <button id="cancelarBtn" class="danger" type="button">Cancelar</button>
+          <button id="terminarBtn" class="primary" type="button">Terminar</button>
+        </div>
+      </div>
+    </div>
+
     <div class="campo" id="campoUnica">
       <label for="dataInput">Data</label>
       <input type="date" id="dataInput" />

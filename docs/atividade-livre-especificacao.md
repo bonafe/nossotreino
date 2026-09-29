@@ -167,6 +167,62 @@ e grava via
 — ver seção 4 pro formato exato da entrada. Redireciona pra
 `atividade_livre_menu.html`.
 
+#### 3.2.1 Início/fim cronometrados (alternativa a digitar data/hora/duração)
+
+Só no modo "uma vez" (uma regra recorrente não tem um "agora" pra
+âncorar a contagem — o bloco some da tela em modo "Recorrente"). Em vez
+de preencher data, hora e duração à mão, um botão "▶️ Iniciar agora":
+
+1. Grava o momento exato (`new Date().toISOString()`) mais o tipo já
+   escolhido (se houver) em `execucao.atividadeLivre.v1`
+   (`TreinosStorage.chaves.execucaoAtividadeLivre`) — chave de execução
+   em andamento, mesma família de `execucao.musculacao.<id>.v2`/
+   `execucao.alongamento.<id>.v1` (ver seção 2 de
+   [armazenamento-local-especificacao.md](./armazenamento-local-especificacao.md)),
+   só que sem `treinoId` de verdade: como só pode existir uma contagem
+   por vez, o `treinoId` físico é a constante `"unica"`.
+2. Preenche os campos de data e hora com esse mesmo momento e os trava
+   (`disabled`) — eles deixam de ser editáveis à mão enquanto a contagem
+   roda, já que representam o início real.
+3. Mostra um cronômetro (`Formatadores.relogio`, atualizado a cada
+   segundo) calculado sempre a partir da diferença entre `Date.now()` e o
+   início gravado — nunca um contador em memória por si só. É esse
+   detalhe que permite fechar a aba/aplicativo e reabrir depois (mesmo
+   horas depois) com o tempo decorrido certo: `atividade-livre-novo.js`
+   lê `execucao.atividadeLivre.v1` ao carregar a tela
+   (`#retomarSessaoEmAndamento`) e, se houver uma sessão, já reaparece no
+   estado "rodando" com os campos travados e o cronômetro no valor
+   correto, sem precisar de nenhum recurso além do que `storage.js` já
+   hidrata no carregamento da página.
+4. Troca o tipo de atividade enquanto a contagem roda apenas atualiza o
+   tipo gravado na sessão em andamento (`#persistirSessaoEmAndamento`) —
+   não reaproveita o chute de "última sessão do tipo" (seção 3.2 acima),
+   que só faz sentido pro lançamento manual sem cronômetro.
+5. Dois botões ficam visíveis enquanto a contagem roda:
+   - **Terminar** — calcula os segundos decorridos, preenche o campo de
+     duração (minutos arredondados, mínimo 1) e volta a tela ao estado
+     normal (campos de data/hora destravados, botão "Iniciar" de volta)
+     — mas **não salva sozinho**: a pessoa ainda confirma com "Registrar
+     atividade", podendo revisar/corrigir os campos antes.
+   - **Cancelar** — descarta a contagem (remove
+     `execucao.atividadeLivre.v1`) sem preencher nada, e repõe data/hora
+     pro momento atual (`#preencherAgora`), como se a tela tivesse acabado
+     de abrir.
+
+   Os dois removem a chave de execução em andamento — assim como o
+   próprio "Registrar atividade", que também limpa a sessão se a pessoa
+   salvar direto sem passar por "Terminar" (evita deixar uma contagem
+   fantasma pra reaparecer na próxima visita).
+
+`TreinosStorage.resetarAtividadeLivre()` (reset da engrenagem) também
+limpa `execucao.atividadeLivre.v1`, e ela entra em
+`montarExportacaoCompletaDoPlano`/backup completo junto com as outras
+`execucao.*` do plano — nenhuma chave nova de esquema, é só mais um valor
+de `tipo` na loja `execucoes` já existente, não exige bump de
+`VERSAO_BANCO` (mesmo precedente de `historico.sessaoLivre.v1`, que
+também só acrescentou um valor de `tipo` na loja `historico` já
+existente).
+
 **Modo "recorrente"**: exige ao menos um dia da semana marcado, cada um
 com sua própria hora preenchida; ao salvar, chama
 `TreinosStorage.criarAtividadeRecorrente({ tipoAtividadeId, horarios, duracaoSegundos, observacao })`

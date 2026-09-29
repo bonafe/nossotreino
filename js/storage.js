@@ -23,8 +23,20 @@ function analisarChaveExecucao(chaveRelativa) {
   combinacao = chaveRelativa.match(/^execucao\.alongamento\.(.+)\.v1$/);
   if (combinacao) return { tipo: "alongamento", treinoId: combinacao[1] };
 
+  // Sessão de atividade livre "uma vez" com início/fim cronometrados
+  // (ver atividade-livre-novo.js) — só uma pode estar em andamento por
+  // plano ao mesmo tempo, então o treinoId é uma constante fixa em vez de
+  // um id de treino de verdade.
+  if (chaveRelativa === "execucao.atividadeLivre.v1") return { tipo: "atividadeLivre", treinoId: "unica" };
+
   return null;
 }
+
+const PREFIXOS_CHAVE_EXECUCAO = {
+  musculacao: (treinoId) => `execucao.musculacao.${treinoId}.v2`,
+  alongamento: (treinoId) => `execucao.alongamento.${treinoId}.v1`,
+  atividadeLivre: () => "execucao.atividadeLivre.v1"
+};
 
 // Espelho em memória do banco, montado uma vez por carregamento de página
 // (ver hidratar()). Leituras são síncronas sobre este objeto; escritas
@@ -145,7 +157,9 @@ function listarChavesDoPlano(planoId, prefixo) {
   instantaneo.execucoes.forEach((valor, chaveMapa) => {
     const [pid, tipo, treinoId] = chaveMapa.split("|");
     if (pid !== planoId) return;
-    const chaveRelativa = tipo === "musculacao" ? `execucao.musculacao.${treinoId}.v2` : `execucao.alongamento.${treinoId}.v1`;
+    const montarChave = PREFIXOS_CHAVE_EXECUCAO[tipo];
+    if (!montarChave) return;
+    const chaveRelativa = montarChave(treinoId);
     if (chaveRelativa.startsWith(prefixo)) chaves.push(chaveRelativa);
   });
   return chaves;
@@ -183,6 +197,9 @@ function montarExportacaoCompletaDoPlano(id) {
     execucoesEmAndamento[chave] = lerJSONDoPlano(id, chave, null);
   });
   listarChavesDoPlano(id, "execucao.alongamento.").forEach((chave) => {
+    execucoesEmAndamento[chave] = lerJSONDoPlano(id, chave, null);
+  });
+  listarChavesDoPlano(id, "execucao.atividadeLivre.").forEach((chave) => {
     execucoesEmAndamento[chave] = lerJSONDoPlano(id, chave, null);
   });
 
@@ -443,6 +460,7 @@ export class TreinosStorage {
     historicoSessaoLivre: "historico.sessaoLivre.v1",
     execucaoMusculacao: (treinoId) => `execucao.musculacao.${treinoId}.v2`,
     execucaoAlongamento: (treinoId) => `execucao.alongamento.${treinoId}.v1`,
+    execucaoAtividadeLivre: "execucao.atividadeLivre.v1",
     apoioUltimaExibicaoContador: "apoio.ultimaExibicaoContador.v1",
     apoioUltimaExibicaoData: "apoio.ultimaExibicaoData.v1",
     apoioDispensadoPermanentemente: "apoio.dispensadoPermanentemente.v1",
@@ -536,6 +554,7 @@ export class TreinosStorage {
 
   static resetarAtividadeLivre() {
     removerChave(TreinosStorage.chaves.historicoSessaoLivre);
+    removerChave(TreinosStorage.chaves.execucaoAtividadeLivre);
     const dados = lerJSON("dados.v1", null);
     if (dados && dados.atividadesRecorrentes && dados.atividadesRecorrentes.length) {
       dados.atividadesRecorrentes = [];

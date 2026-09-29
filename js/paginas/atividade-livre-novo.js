@@ -5,6 +5,8 @@ import { DIAS_SEMANA, Formatadores } from "../formatadores.js";
 class AtividadeLivreNovoController {
   #tipoEscolhidoId = null;
   #modo = "unica"; // "unica" | "recorrente"
+  #sessaoInicio = null; // Date|null — início da contagem em andamento (persistido)
+  #cronometroIntervalId = null;
 
   #modoUnicaBtnEl = document.getElementById("modoUnicaBtn");
   #modoRecorrenteBtnEl = document.getElementById("modoRecorrenteBtn");
@@ -12,6 +14,14 @@ class AtividadeLivreNovoController {
   #campoRecorrenteEl = document.getElementById("campoRecorrente");
   #campoHoraUnicaEl = document.getElementById("campoHoraUnica");
   #diasSemanaGrupoEl = document.getElementById("diasSemanaGrupo");
+
+  #cronometroBlocoEl = document.getElementById("cronometroBloco");
+  #iniciarBtnEl = document.getElementById("iniciarBtn");
+  #cronometroCardEl = document.getElementById("cronometroCard");
+  #cronometroInicioEl = document.getElementById("cronometroInicioEl");
+  #cronometroValorEl = document.getElementById("cronometroValorEl");
+  #terminarBtnEl = document.getElementById("terminarBtn");
+  #cancelarBtnEl = document.getElementById("cancelarBtn");
 
   #tipoEscolhaBtnEl = document.getElementById("tipoEscolhaBtn");
   #dataInputEl = document.getElementById("dataInput");
@@ -38,11 +48,17 @@ class AtividadeLivreNovoController {
     this.#pickerBuscaInputEl.addEventListener("input", () => this.#filtrarResultados());
     this.#salvarBtnEl.addEventListener("click", () => this.#salvar());
 
+    this.#iniciarBtnEl.addEventListener("click", () => this.#iniciarCronometro());
+    this.#terminarBtnEl.addEventListener("click", () => this.#terminarCronometro());
+    this.#cancelarBtnEl.addEventListener("click", () => this.#cancelarCronometro());
+
     // "Criar tipo novo" abre numa aba própria — ao voltar pra esta aba,
     // reflete o tipo criado lá sem recarregar a página (perderia o
     // formulário em preenchimento). Mesmo padrão de
     // treino-musculacao-novo.js.
     window.addEventListener("focus", () => this.#atualizarTiposEmFoco());
+
+    this.#retomarSessaoEmAndamento();
   }
 
   #alternarModo(modo) {
@@ -52,6 +68,9 @@ class AtividadeLivreNovoController {
     this.#campoUnicaEl.hidden = modo !== "unica";
     this.#campoHoraUnicaEl.hidden = modo !== "unica";
     this.#campoRecorrenteEl.hidden = modo !== "recorrente";
+    // Início/fim cronometrados só fazem sentido pra um lançamento pontual —
+    // uma regra recorrente não tem "agora" pra âncorar a contagem.
+    this.#cronometroBlocoEl.hidden = modo !== "unica";
     this.#salvarBtnEl.textContent = modo === "unica" ? "Registrar atividade" : "Criar atividade recorrente";
   }
 
@@ -151,7 +170,15 @@ class AtividadeLivreNovoController {
     const caminho = TreinosStorage.caminhosTipoAtividade(tipo.id)[0].map((t) => t.nome);
     this.#tipoEscolhaBtnEl.textContent = caminho.join(" › ");
     this.#fecharPicker();
-    if (this.#modo === "unica") this.#preencherComUltimaDoTipo(tipo.id);
+    if (this.#modo !== "unica") return;
+    // Com a contagem em andamento, a data/hora já são as do início real —
+    // só atualiza o tipo gravado na sessão, não sobrescreve com a última
+    // sessão do tipo (isso é só pro lançamento manual, sem cronômetro).
+    if (this.#sessaoInicio) {
+      this.#persistirSessaoEmAndamento();
+    } else {
+      this.#preencherComUltimaDoTipo(tipo.id);
+    }
   }
 
   // Repete hora e duração da última atividade registrada desse tipo (em
@@ -173,6 +200,93 @@ class AtividadeLivreNovoController {
     const dataHora = new Date(ultima.dataHora);
     this.#horaInputEl.value = `${pad(dataHora.getHours())}:${pad(dataHora.getMinutes())}`;
     this.#duracaoInputEl.value = Math.round(ultima.duracaoSegundos / 60);
+  }
+
+  // Retoma uma contagem que ficou em andamento ao fechar/reabrir o app —
+  // TreinosStorage.lerJSON já leu o instantâneo hidratado do IndexedDB, e
+  // como o início é um timestamp absoluto (não um contador em memória), o
+  // tempo decorrido é recalculado certo mesmo depois de horas fechado.
+  #retomarSessaoEmAndamento() {
+    const sessao = TreinosStorage.lerJSON(TreinosStorage.chaves.execucaoAtividadeLivre, null);
+    if (!sessao) return;
+
+    this.#alternarModo("unica");
+    if (sessao.tipoAtividadeId) {
+      this.#tipoEscolhidoId = sessao.tipoAtividadeId;
+      const tipo = TreinosStorage.obterTipoAtividade(sessao.tipoAtividadeId);
+      const caminho = tipo ? TreinosStorage.caminhosTipoAtividade(tipo.id)[0].map((t) => t.nome) : [sessao.tipoAtividadeNome];
+      this.#tipoEscolhaBtnEl.textContent = caminho.join(" › ");
+    }
+    this.#ligarEstadoRodando(new Date(sessao.inicio));
+  }
+
+  #persistirSessaoEmAndamento() {
+    if (!this.#sessaoInicio) return;
+    const tipo = this.#tipoEscolhidoId ? TreinosStorage.obterTipoAtividade(this.#tipoEscolhidoId) : null;
+    TreinosStorage.salvarJSON(TreinosStorage.chaves.execucaoAtividadeLivre, {
+      tipoAtividadeId: this.#tipoEscolhidoId,
+      tipoAtividadeNome: tipo ? tipo.nome : "",
+      inicio: this.#sessaoInicio.toISOString()
+    });
+  }
+
+  #iniciarCronometro() {
+    this.#ligarEstadoRodando(new Date());
+    this.#persistirSessaoEmAndamento();
+  }
+
+  // Estado visual "rodando" — usado tanto ao clicar "Iniciar" quanto ao
+  // retomar uma sessão persistida.
+  #ligarEstadoRodando(inicio) {
+    this.#sessaoInicio = inicio;
+    const pad = (n) => String(n).padStart(2, "0");
+    this.#dataInputEl.value = `${inicio.getFullYear()}-${pad(inicio.getMonth() + 1)}-${pad(inicio.getDate())}`;
+    this.#horaInputEl.value = `${pad(inicio.getHours())}:${pad(inicio.getMinutes())}`;
+    this.#dataInputEl.disabled = true;
+    this.#horaInputEl.disabled = true;
+    this.#modoRecorrenteBtnEl.disabled = true;
+    this.#cronometroInicioEl.textContent = `${pad(inicio.getHours())}:${pad(inicio.getMinutes())}`;
+    this.#iniciarBtnEl.hidden = true;
+    this.#cronometroCardEl.hidden = false;
+
+    this.#pararIntervaloCronometro();
+    this.#atualizarCronometroTela();
+    this.#cronometroIntervalId = setInterval(() => this.#atualizarCronometroTela(), 1000);
+  }
+
+  #atualizarCronometroTela() {
+    const segundos = Math.max(0, Math.round((Date.now() - this.#sessaoInicio.getTime()) / 1000));
+    this.#cronometroValorEl.textContent = Formatadores.relogio(segundos);
+  }
+
+  #pararIntervaloCronometro() {
+    if (this.#cronometroIntervalId) {
+      clearInterval(this.#cronometroIntervalId);
+      this.#cronometroIntervalId = null;
+    }
+  }
+
+  #terminarCronometro() {
+    const segundos = Math.round((Date.now() - this.#sessaoInicio.getTime()) / 1000);
+    this.#duracaoInputEl.value = Math.max(1, Math.round(segundos / 60));
+    this.#desligarEstadoRodando();
+  }
+
+  #cancelarCronometro() {
+    this.#desligarEstadoRodando();
+    this.#preencherAgora();
+  }
+
+  #desligarEstadoRodando() {
+    this.#pararIntervaloCronometro();
+    this.#sessaoInicio = null;
+    TreinosStorage.removerChave(TreinosStorage.chaves.execucaoAtividadeLivre);
+
+    this.#dataInputEl.disabled = false;
+    this.#horaInputEl.disabled = false;
+    this.#modoRecorrenteBtnEl.disabled = false;
+    this.#cronometroCardEl.hidden = true;
+    this.#iniciarBtnEl.hidden = false;
   }
 
   #mostrarMensagem(texto) {
@@ -219,6 +333,10 @@ class AtividadeLivreNovoController {
       duracaoSegundos: Math.round(duracaoMinutos * 60),
       observacao: this.#observacaoInputEl.value.trim() || null
     });
+    // Cobre registrar direto enquanto o cronômetro ainda está rodando (sem
+    // passar por "Terminar" antes) — sem isso a sessão em andamento ficaria
+    // órfã no IndexedDB, e reabrir a tela retomaria uma contagem fantasma.
+    if (this.#sessaoInicio) this.#desligarEstadoRodando();
 
     await TreinosStorage.aguardarEscritas();
     window.location.href = "atividade_livre_menu.html";
