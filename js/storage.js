@@ -1,6 +1,7 @@
 import { gerarIdUnico } from "./identificadores.js";
 import { Formatadores, DIAS_SEMANA } from "./formatadores.js";
 import { BancoIndexedDB } from "./armazenamento-indexeddb.js";
+import { blobParaBase64, base64ParaBlob } from "./imagem-corporal.js";
 import "./versao.js";
 import "./consentimento-analytics.js";
 
@@ -51,7 +52,8 @@ const instantaneo = {
   execucoes: new Map(), // `${planoId}|${tipo}|${treinoId}` -> progresso
   preferencias: new Map(), // chave -> valor (planoAtivoId, apoio.*, avisoIaAceito.v1)
   bibliotecaPersonalizada: new Map(), // `${dominio}|${id}` -> registro (ver seção "Biblioteca personalizada" abaixo)
-  tiposAtividade: [] // árvore local de tipos de atividade (ver seção "Tipos de atividade" abaixo)
+  tiposAtividade: [], // árvore local de tipos de atividade (ver seção "Tipos de atividade" abaixo)
+  avaliacoesCorporais: new Map() // id -> documento da avaliação, sem blobs (ver seção "Avaliações corporais" abaixo)
 };
 
 let filaDeEscrita = Promise.resolve();
@@ -304,13 +306,14 @@ function migrarPlanoParaVersaoAtual(dados) {
 
 // --- Migração de formato: envelope de backup (versao) ---
 
-const VERSAO_BACKUP_ATUAL = 5;
+const VERSAO_BACKUP_ATUAL = 6;
 
 const MIGRACOES_BACKUP = {
   1: migrarBackupDe1Para2,
   2: migrarBackupDe2Para3,
   3: migrarBackupDe3Para4,
-  4: migrarBackupDe4Para5
+  4: migrarBackupDe4Para5,
+  5: migrarBackupDe5Para6
 };
 
 // Formato 1: sem `alunos` (entidade Aluno ainda não existia) — deriva a
@@ -352,6 +355,12 @@ function migrarBackupDe3Para4(backup) {
 // local (ver hidratar() e migrarTipoAtividadeParaCategoriaIds).
 function migrarBackupDe4Para5(backup) {
   return { ...backup, versao: 5, tiposAtividade: migrarTiposAtividadeParaCategoriaIds(backup.tiposAtividade || []) };
+}
+
+// Formato 5: sem `avaliacoesCorporais` (medidas/fotos ainda não existiam)
+// — backup antigo simplesmente não tinha nenhuma avaliação pra trazer.
+function migrarBackupDe5Para6(backup) {
+  return { ...backup, versao: 6, avaliacoesCorporais: backup.avaliacoesCorporais || [] };
 }
 
 function migrarBackupParaVersaoAtual(backupOriginal) {
@@ -401,7 +410,8 @@ async function hidratar() {
     execucoesRegistros,
     preferenciasRegistros,
     bibliotecaPersonalizadaRegistros,
-    tiposAtividadeRegistros
+    tiposAtividadeRegistros,
+    avaliacoesCorporaisRegistros
   ] = await Promise.all([
     BancoIndexedDB.lerTodos("alunos"),
     BancoIndexedDB.lerTodos("planos"),
@@ -410,7 +420,8 @@ async function hidratar() {
     BancoIndexedDB.lerTodos("execucoes"),
     BancoIndexedDB.lerTodos("preferencias"),
     BancoIndexedDB.lerTodos("bibliotecaPersonalizada"),
-    BancoIndexedDB.lerTodos("tiposAtividade")
+    BancoIndexedDB.lerTodos("tiposAtividade"),
+    BancoIndexedDB.lerTodos("avaliacoesCorporais")
   ]);
 
   instantaneo.alunos = alunos;
@@ -434,6 +445,8 @@ async function hidratar() {
   bibliotecaPersonalizadaRegistros.forEach((registro) => {
     instantaneo.bibliotecaPersonalizada.set(`${registro.dominio}|${registro.id}`, registro);
   });
+
+  avaliacoesCorporaisRegistros.forEach((registro) => instantaneo.avaliacoesCorporais.set(registro.id, registro));
 
   const tiposAtividadeMigrados = migrarTiposAtividadeParaCategoriaIds(tiposAtividadeRegistros);
   instantaneo.tiposAtividade = tiposAtividadeMigrados;
@@ -591,8 +604,16 @@ export class TreinosStorage {
   // histórico, progresso em andamento — reusa `excluirPlano` pra cada um).
   static excluirAluno(id) {
     TreinosStorage.listarPlanosDoAluno(id).forEach((plano) => TreinosStorage.excluirPlano(plano.id));
+    TreinosStorage.listarAvaliacoesDoAluno(id).forEach((avaliacao) => TreinosStorage.excluirAvaliacao(avaliacao.id));
     instantaneo.alunos = TreinosStorage.listarAlunos().filter((a) => a.id !== id);
     enfileirarEscrita(() => BancoIndexedDB.remover("alunos", id));
+  }
+
+  // Aluno do plano ativo ({alunoId, nome}) ou null — atalho das telas de
+  // medidas/fotos, que pertencem ao aluno (não ao plano).
+  static obterAlunoDoPlanoAtivo() {
+    const planoAtivoId = obterPlanoAtivoId();
+    return planoAtivoId ? TreinosStorage.obterAlunoDoPlano(planoAtivoId) : null;
   }
 
   static listarPlanosDoAluno(alunoId) {
@@ -1096,6 +1117,100 @@ export class TreinosStorage {
     }
   }
 
+  // --- Avaliações corporais (peso, medidas, fotos — ver
+  // docs/medidas-fotos-especificacao.md). Escopo global por aluno. O
+  // instantâneo guarda só os documentos (leves); o Blob de cada foto vive na
+  // loja `fotosCorporais` e é lido sob demanda. `id`s são UUID (únicos entre
+  // aparelhos) e cada registro carrega `atualizadoEm`/`versaoRegistro`/
+  // `removidoEm` — ainda sem uso além do backup, mas é o que uma API futura
+  // precisaria pra sincronizar sem mudar o formato (seção 6.2 da spec).
+  // Toda leitura/escrita de avaliação passa por estes métodos: são a
+  // fronteira que um adaptador remoto poderia implementar depois.
+
+  static listarAvaliacoesDoAluno(alunoId) {
+    return [...instantaneo.avaliacoesCorporais.values()]
+      .filter((a) => a.alunoId === alunoId && !a.removidoEm)
+      .sort((a, b) => new Date(a.medidoEm) - new Date(b.medidoEm));
+  }
+
+  static obterAvaliacao(id) {
+    const avaliacao = instantaneo.avaliacoesCorporais.get(id);
+    return avaliacao && !avaliacao.removidoEm ? avaliacao : null;
+  }
+
+  static gerarIdCorporal() {
+    if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
+    return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+  }
+
+  // Cria (sem `id`) ou atualiza. Devolve o documento gravado.
+  static salvarAvaliacao(avaliacao) {
+    const agora = new Date().toISOString();
+    const existente = avaliacao.id ? instantaneo.avaliacoesCorporais.get(avaliacao.id) : null;
+    const completa = {
+      protocolo: { id: "nosso-treino", versao: 1 },
+      medidas: [],
+      fotos: [],
+      condicoes: {},
+      observacoes: "",
+      ...avaliacao,
+      id: avaliacao.id || TreinosStorage.gerarIdCorporal(),
+      criadoEm: existente ? existente.criadoEm : agora,
+      atualizadoEm: agora,
+      versaoRegistro: existente ? (existente.versaoRegistro || 1) + 1 : 1,
+      removidoEm: null
+    };
+    instantaneo.avaliacoesCorporais.set(completa.id, completa);
+    enfileirarEscrita(() => BancoIndexedDB.gravar("avaliacoesCorporais", completa));
+    return completa;
+  }
+
+  // Exclusão de verdade: remove o documento e todos os Blobs de foto dela.
+  static excluirAvaliacao(id) {
+    instantaneo.avaliacoesCorporais.delete(id);
+    enfileirarEscrita(async () => {
+      await BancoIndexedDB.removerPorIndice("fotosCorporais", "porAvaliacao", id);
+      await BancoIndexedDB.remover("avaliacoesCorporais", id);
+    });
+  }
+
+  // Grava o Blob e devolve o `fotoId` já (a gravação real é em segundo plano).
+  static salvarFotoCorporal(avaliacaoId, blob) {
+    const id = TreinosStorage.gerarIdCorporal();
+    enfileirarEscrita(() =>
+      BancoIndexedDB.gravar("fotosCorporais", { id, avaliacaoId, blob, tipoMime: blob.type || "image/jpeg", bytes: blob.size })
+    );
+    return id;
+  }
+
+  static async obterFotoCorporal(fotoId) {
+    await TreinosStorage.aguardarEscritas();
+    const registro = await BancoIndexedDB.ler("fotosCorporais", fotoId);
+    return registro ? registro.blob : null;
+  }
+
+  static excluirFotoCorporal(fotoId) {
+    enfileirarEscrita(() => BancoIndexedDB.remover("fotosCorporais", fotoId));
+  }
+
+  // { quantidade, bytes } das fotos guardadas — usado pra avisar o tamanho
+  // antes de baixar um backup com fotos.
+  static async resumoFotosCorporais() {
+    await TreinosStorage.aguardarEscritas();
+    const registros = await BancoIndexedDB.lerTodos("fotosCorporais");
+    return { quantidade: registros.length, bytes: registros.reduce((soma, r) => soma + (r.bytes || 0), 0) };
+  }
+
+  // Pontos { medidoEm, valor, metodo } de uma métrica, em ordem de data —
+  // alimenta o gráfico. `lado` "nenhum" pra peso/cintura/quadril.
+  static lerSerieDeMedida(alunoId, tipo, lado = "nenhum") {
+    return TreinosStorage.listarAvaliacoesDoAluno(alunoId).flatMap((avaliacao) =>
+      avaliacao.medidas
+        .filter((m) => m.tipo === tipo && (m.lado || "nenhum") === lado)
+        .map((m) => ({ medidoEm: avaliacao.medidoEm, valor: m.valor, metodo: m.metodo || "" }))
+    );
+  }
+
   // --- Backup completo (todos os alunos e planos) ---
 
   static montarBackup() {
@@ -1114,8 +1229,24 @@ export class TreinosStorage {
       planos,
       dadosPorPlano,
       bibliotecaPersonalizada: TreinosStorage.listarBibliotecaPersonalizada(),
-      tiposAtividade: TreinosStorage.listarTiposAtividade()
+      tiposAtividade: TreinosStorage.listarTiposAtividade(),
+      // Só documentos (leves) — os Blobs de foto só entram se quem baixa
+      // o backup escolher (montarBackupComFotos).
+      avaliacoesCorporais: [...instantaneo.avaliacoesCorporais.values()]
     };
+  }
+
+  // Backup + fotos corporais em base64 (campo `fotosCorporais`). Fotos são
+  // dado sensível e deixam o arquivo grande, então este caminho é sempre
+  // uma escolha explícita de quem baixa — ver seção 8 da spec.
+  static async montarBackupComFotos() {
+    const backup = TreinosStorage.montarBackup();
+    await TreinosStorage.aguardarEscritas();
+    const registros = await BancoIndexedDB.lerTodos("fotosCorporais");
+    backup.fotosCorporais = await Promise.all(
+      registros.map(async (r) => ({ id: r.id, avaliacaoId: r.avaliacaoId, tipoMime: r.tipoMime, dadosBase64: await blobParaBase64(r.blob) }))
+    );
+    return backup;
   }
 
   static restaurarBackup(backupOriginal) {
@@ -1151,6 +1282,28 @@ export class TreinosStorage {
     enfileirarEscrita(async () => {
       await BancoIndexedDB.limparLoja("tiposAtividade");
       await BancoIndexedDB.gravarVarios("tiposAtividade", tiposAtividade);
+    });
+
+    // Avaliações corporais MESCLAM em vez de substituir: entram por `id`
+    // (mesmo id → fica a de `atualizadoEm` mais recente), então reimportar o
+    // mesmo arquivo é idempotente e um backup sem fotos nunca apaga as
+    // fotos que já estão no aparelho.
+    (backup.avaliacoesCorporais || []).forEach((avaliacao) => {
+      const existente = instantaneo.avaliacoesCorporais.get(avaliacao.id);
+      if (existente && new Date(existente.atualizadoEm) >= new Date(avaliacao.atualizadoEm)) return;
+      instantaneo.avaliacoesCorporais.set(avaliacao.id, avaliacao);
+      enfileirarEscrita(() => BancoIndexedDB.gravar("avaliacoesCorporais", avaliacao));
+    });
+    (backup.fotosCorporais || []).forEach((foto) => {
+      enfileirarEscrita(() =>
+        BancoIndexedDB.gravar("fotosCorporais", {
+          id: foto.id,
+          avaliacaoId: foto.avaliacaoId,
+          blob: base64ParaBlob(foto.dadosBase64, foto.tipoMime),
+          tipoMime: foto.tipoMime,
+          bytes: Math.floor(foto.dadosBase64.length * 0.75)
+        })
+      );
     });
 
     TreinosStorage.ativarPlano(backup.planoAtivoId || null);

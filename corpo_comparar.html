@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Comparar fotos</title>
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/componentes.css" />
+  <link rel="stylesheet" href="css/paginas/corpo.css" />
+</head>
+<body>
+  <main>
+    <header class="top">
+      <a class="voltar-icon" href="corpo_menu.html" aria-label="Voltar">←</a>
+      <div>
+        <h1>🖼️ Comparar fotos</h1>
+        <p class="subtitle">Duas avaliações, mesmo enquadramento.</p>
+      </div>
+    </header>
+
+    <div id="vazio" class="card-corpo" hidden>
+      <p>Você precisa de pelo menos duas avaliações com fotos para comparar.</p>
+      <a class="botao primary" href="corpo_avaliacao_nova.html" style="width:100%">Nova avaliação</a>
+    </div>
+
+    <section id="conteudo" hidden>
+      <div class="comparar-controles campo">
+        <div>
+          <label for="antesSelect">Antes</label>
+          <select id="antesSelect"></select>
+        </div>
+        <div>
+          <label for="depoisSelect">Depois</label>
+          <select id="depoisSelect"></select>
+        </div>
+      </div>
+
+      <div class="modo-toggle" id="vistaToggle"></div>
+      <div class="modo-toggle" id="modoToggle">
+        <button type="button" class="modo-opcao" data-modo="lado" aria-pressed="true">Lado a lado</button>
+        <button type="button" class="modo-opcao" data-modo="slider" aria-pressed="false">Slider</button>
+        <button type="button" class="modo-opcao" data-modo="sobreposicao" aria-pressed="false">Sobreposição</button>
+      </div>
+
+      <div id="palco"></div>
+      <div id="controleWrap" hidden>
+        <input type="range" id="controle" class="comparar-slider" min="0" max="100" value="50" />
+        <div class="comparar-legenda" id="controleLegenda"></div>
+      </div>
+
+      <div class="card-corpo" id="variacaoCard" style="margin-top:14px" hidden>
+        <h2>Variação</h2>
+        <div id="variacaoLista"></div>
+      </div>
+    </section>
+
+    <p class="rodape-apoio"><a href="index.html#apoio">❤️ Apoiar o Nosso Treino</a></p>
+  </main>
+
+  <script type="module" src="js/paginas/corpo-comparar.js"></script>
+</body>
+</html>

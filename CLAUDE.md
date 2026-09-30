@@ -83,6 +83,8 @@ Atividade livre (`atividade_livre_menu.html`) é um quarto pilar, mas não segue
 
 `agenda.html` (📅 em `sistema.html`) mostra uma janela rolante de dias (não uma semana-calendário fixa) cruzando `atividadesRecorrentes` do plano ativo com `historico.sessaoLivre.v1` — cada ocorrência prevista pode ser marcada como feita (grava histórico normal) ou não aconteceu (só fica registrado na própria regra, `confirmacoes`). Pra hoje, também mostra um link pro treino de musculação do dia via `distribuicaoSemanal` (já existia, hoje também usado pro destaque "Hoje ·" em `treino_musculacao_menu.html`) — sem nenhuma mudança na lógica de "continuar de onde parou". Ver `docs/agenda-especificacao.md`.
 
+Medidas e fotos corporais (`corpo_menu.html` 📏 em `sistema.html` → `corpo_avaliacao_nova.html`, `corpo_comparar.html`) é o acompanhamento de evolução do corpo: peso, circunferências (cintura, quadril, braço/coxa/panturrilha esquerdo e direito) e fotos frente/lado/costas, num protocolo próprio versionado (`nosso-treino` v1). Pertence ao **aluno** (atravessa planos), em lojas novas do IndexedDB (`avaliacoesCorporais` + `fotosCorporais`, blobs separados), com ids UUID e carimbos por registro já preparados pra uma API futura. As fotos só saem do aparelho por escolha explícita: o backup pergunta a cada vez se inclui as fotos (padrão: não). Ver `docs/medidas-fotos-especificacao.md`.
+
 `biblioteca_dominios.html` (📚 em `sistema.html`) é o único ponto do código que lê as duas coleções juntas: mostra `tiposAtividade` inteira achatada numa lista só, cada filho identado dentro da categoria (sem navegar nível por nível) — como um item pode ter mais de uma categoria (multi-tag, não pai único), ele pode aparecer em mais de um ramo. Tocar num nó com domínio de verdade em `DOMINIOS` (hoje só `musculacao`/`alongamento`, cujos ids coincidem de propósito com as duas raízes semeadas em `tiposAtividade`) manda direto pra `biblioteca.html?dominio=<id>`; qualquer outro nó abre `biblioteca.html` vazia pra aquele tipo, pronta pra ganhar itens no futuro. O link "✏️ Categorias" dentro de `biblioteca.html` reaproveita `atividade_livre_tipo_novo.html` (modo `?editar=<id>`) pra editar as categorias de um tipo. Ver seção "Convergência de `tiposAtividade` e `DOMINIOS`" em `docs/dominios-taxonomia-especificacao.md`.
 
 ### Fluxos de tela
@@ -105,6 +107,8 @@ index.html (institucional)
                         │                              └─> biblioteca.html?dominio=musculacao (📚, ver/criar/editar exercícios)
                         ├─> atividade_livre_menu.html → atividade_livre_novo.html (uma vez ou recorrente)
                         │                             └─> atividade_livre_tipo_novo.html (aba nova, criar tipo/subtipo)
+                        ├─> corpo_menu.html → corpo_avaliacao_nova.html[?editar=<id>] (assistente: peso, fotos, medidas)
+                        │                  └─> corpo_comparar.html (antes/depois de fotos)
                         ├─> agenda.html (📅, janela rolante — feito/faltou; hoje: link pro treino de musculação do dia)
                         └─> biblioteca_dominios.html (📚, navega a coleção de tiposAtividade;
                                                        nó com domínio de verdade → biblioteca.html?dominio=<id>)

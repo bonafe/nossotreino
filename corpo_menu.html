@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Medidas e Fotos</title>
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/componentes.css" />
+  <link rel="stylesheet" href="css/paginas/corpo.css" />
+</head>
+<body>
+  <div id="confirmOverlay" class="overlay" hidden>
+    <div class="confirm-card">
+      <p id="confirmTexto"></p>
+      <div class="confirm-botoes">
+        <button id="confirmCancelar" class="secondary" type="button">Cancelar</button>
+        <button id="confirmOk" class="danger" type="button">Excluir avaliação</button>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <header class="top">
+      <a class="voltar-icon" href="sistema.html" aria-label="Voltar">←</a>
+      <div>
+        <h1>📏 Medidas e fotos</h1>
+        <p class="subtitle" id="subtitulo">Acompanhe a evolução do corpo.</p>
+      </div>
+      <a class="icon-btn" href="corpo_avaliacao_nova.html" aria-label="Nova avaliação">+</a>
+    </header>
+
+    <section id="primeira" class="card-corpo" hidden>
+      <h2>Faça sua primeira avaliação</h2>
+      <p>Ela será o ponto inicial para acompanhar a sua evolução. Meça sempre do mesmo jeito e compare a tendência ao longo do tempo.</p>
+      <p class="nota">🔒 Suas fotos ficam só neste aparelho e servem para acompanhar a sua própria evolução.</p>
+      <a class="botao primary" href="corpo_avaliacao_nova.html" style="width:100%">Começar avaliação</a>
+    </section>
+
+    <section id="evolucao" hidden>
+      <div class="card-corpo">
+        <h2>Evolução</h2>
+        <div class="campo">
+          <select id="metricaSelect" aria-label="Métrica"></select>
+        </div>
+        <div class="periodo-botoes" role="group" aria-label="Período do gráfico">
+          <button type="button" class="periodo-btn" data-meses="1">1 mês</button>
+          <button type="button" class="periodo-btn" data-meses="3">3 meses</button>
+          <button type="button" class="periodo-btn" data-meses="6">6 meses</button>
+          <button type="button" class="periodo-btn" data-meses="12">1 ano</button>
+          <button type="button" class="periodo-btn active" data-meses="0">Tudo</button>
+        </div>
+        <svg id="graficoMedidas" viewBox="0 0 800 300" preserveAspectRatio="xMidYMid meet"></svg>
+        <p id="graficoVazio" class="nota" hidden>Nenhum registro dessa medida no período.</p>
+      </div>
+
+      <div class="card-corpo" id="variacaoCard" hidden>
+        <h2 id="variacaoTitulo">Variação</h2>
+        <div id="variacaoLista"></div>
+      </div>
+
+      <div class="acoes" style="margin-bottom:14px">
+        <a class="botao secondary" href="corpo_comparar.html">🖼️ Comparar fotos</a>
+        <a class="botao primary" href="corpo_avaliacao_nova.html">+ Nova avaliação</a>
+      </div>
+
+      <h2 style="font-size:1.02rem;color:#bef264;margin:18px 0 10px">Avaliações</h2>
+      <div id="lista"></div>
+    </section>
+
+    <p class="rodape-apoio"><a href="index.html#apoio">❤️ Apoiar o Nosso Treino</a></p>
+  </main>
+
+  <script src="d3.v7.min.js"></script>
+  <script type="module" src="js/paginas/corpo-menu.js"></script>
+</body>
+</html>

@@ -75,7 +75,7 @@ através de um script único e compartilhado:
 
 ## 2. Esquema do banco e política de versionamento
 
-Banco `nossotreino` (`js/armazenamento-indexeddb.js`), 9 object stores:
+Banco `nossotreino` (`js/armazenamento-indexeddb.js`), 11 object stores:
 
 | Loja | `keyPath` | Índices | Registro |
 |---|---|---|---|
@@ -88,6 +88,8 @@ Banco `nossotreino` (`js/armazenamento-indexeddb.js`), 9 object stores:
 | `meta` | `chave` | — | bookkeeping interno do próprio motor de armazenamento, nunca dado de usuário |
 | `bibliotecaPersonalizada` | `[dominio, id]` | — | `{dominio, id, origem, baseadoEmVersao, entrada, criadoEm, atualizadoEm}` — exercícios/alongamentos novos ou editados localmente, escopo global (não por aluno/plano). Ver seção 26 de [especificacao-biblioteca-exercicios.md](./especificacao-biblioteca-exercicios.md) |
 | `tiposAtividade` | `id` | `porPai`→`tipoAtividadePaiId` (vestigial — nenhum registro pós-migração tem esse campo, ver item 10 abaixo) | `{id, nome, categoriaIds, criadoEm}` — coleção local (multi-categoria, cada item pode ter 0+ vínculos) de tipos de atividade pra "atividade livre", escopo global (não por aluno/plano), semeada com duas raízes (`musculacao`, `alongamento`). Ver [atividade-livre-especificacao.md](./atividade-livre-especificacao.md) |
+| `avaliacoesCorporais` | `id` | `porAluno`→`alunoId` | documento de uma avaliação corporal (peso, medidas, referências das fotos, condições), **sem binários**; escopo por aluno, atravessa planos. Ver [medidas-fotos-especificacao.md](./medidas-fotos-especificacao.md) |
+| `fotosCorporais` | `id` | `porAvaliacao`→`avaliacaoId` | `{id, avaliacaoId, blob, tipoMime, bytes}` — só o `Blob` (JPEG sem EXIF) de cada foto |
 
 Não existe um "aluno ativo" global: qual aluno está sendo visto é só a
 query string (`planos.html?aluno=<id>`) — nenhuma leitura/escrita de
@@ -215,6 +217,13 @@ nunca reescreve uma entrada antiga:
 11. Backup `versao` `4` → `5` (`migrarBackupDe4Para5`) — mesma conversão
     `tipoAtividadePaiId` → `categoriaIds`, aplicada ao array `tiposAtividade`
     do envelope de backup.
+12. `VERSAO_BANCO` `3` → `4` — lojas `avaliacoesCorporais` e `fotosCorporais`
+    novas (só `createObjectStore`) — ver
+    [medidas-fotos-especificacao.md](./medidas-fotos-especificacao.md).
+13. Backup `versao` `5` → `6` (`migrarBackupDe5Para6`) — campo
+    `avaliacoesCorporais` novo no envelope; backup antigo migra pra `[]`.
+    O campo `fotosCorporais` (base64) é opcional e só existe se quem
+    baixou o backup escolheu incluir as fotos.
 
 ## 3. Hierarquia aluno → plano → sistema
 

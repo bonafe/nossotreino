@@ -2,7 +2,7 @@
 // (esse é sobre cache-busting, não sobre "confirmar que um deploy chegou")
 // — bump manual quando valer a pena poder olhar o rodapé (ex.: no celular,
 // depois de publicar) e confirmar que a versão nova já carregou.
-export const VERSAO_APP = "2026.08.10";
+export const VERSAO_APP = "2026.09.30";
 
 function exibirNoRodape() {
   // `body` é `display: flex` (ver css/base.css) com `<main>` como único

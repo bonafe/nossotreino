@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Nova avaliação corporal</title>
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/componentes.css" />
+  <link rel="stylesheet" href="css/paginas/corpo.css" />
+</head>
+<body>
+  <div id="cameraOverlay" hidden>
+    <div class="camera-palco">
+      <video id="cameraVideo" autoplay playsinline muted></video>
+      <img id="cameraPreview" alt="Foto capturada" hidden />
+      <div id="cameraGuia"></div>
+      <div id="cameraContagem" hidden></div>
+    </div>
+    <div class="camera-barra">
+      <p id="cameraTitulo"></p>
+      <div id="cameraControlesVivo">
+        <div class="camera-temporizador">
+          <label for="cameraTemporizador">Temporizador</label>
+          <select id="cameraTemporizador">
+            <option value="0">Sem</option>
+            <option value="3">3 s</option>
+            <option value="5" selected>5 s</option>
+            <option value="10">10 s</option>
+          </select>
+        </div>
+        <div class="acoes">
+          <button id="cameraFechar" class="secondary" type="button">Fechar</button>
+          <button id="cameraAlternar" class="secondary" type="button">🔄 Virar</button>
+          <button id="cameraTirar" class="primary" type="button">📸 Tirar foto</button>
+        </div>
+      </div>
+      <div id="cameraControlesPreview" class="acoes" hidden>
+        <button id="cameraRefazer" class="secondary" type="button">Refazer</button>
+        <button id="cameraUsar" class="primary" type="button">Usar esta foto</button>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="arquivoInput" accept="image/*" hidden />
+
+  <main>
+    <header class="top">
+      <a class="voltar-icon" href="corpo_menu.html" aria-label="Voltar">←</a>
+      <div>
+        <h1 id="titulo">Nova avaliação</h1>
+        <p class="subtitle" id="subtitulo"></p>
+      </div>
+    </header>
+
+    <div class="progresso" id="progressoTexto"></div>
+    <div class="barra-progresso"><div id="progressoBarra"></div></div>
+
+    <section class="card-corpo">
+      <h2 id="passoTitulo"></h2>
+      <div id="passoConteudo"></div>
+      <div id="mensagem" class="mensagem" hidden></div>
+    </section>
+
+    <div class="acoes">
+      <button id="voltarBtn" class="secondary" type="button">Voltar</button>
+      <button id="pularBtn" class="secondary" type="button">Pular</button>
+      <button id="avancarBtn" class="primary" type="button">Avançar</button>
+    </div>
+
+    <p class="rodape-apoio"><a href="index.html#apoio">❤️ Apoiar o Nosso Treino</a></p>
+  </main>
+
+  <script type="module" src="js/paginas/corpo-avaliacao-nova.js"></script>
+</body>
+</html>

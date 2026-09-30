@@ -3,7 +3,7 @@
 // interpreta o significado de cada loja. Ver seção 2 de
 // docs/armazenamento-local-especificacao.md.
 export const NOME_BANCO = "nossotreino";
-export const VERSAO_BANCO = 3;
+export const VERSAO_BANCO = 4;
 
 function criarEsquemaInicial(banco) {
   banco.createObjectStore("alunos", { keyPath: "id" });
@@ -61,6 +61,20 @@ function criarLojaDeTiposAtividade(banco) {
   tipos.put({ id: "alongamento", nome: "Alongamento", tipoAtividadePaiId: null, criadoEm: agora });
 }
 
+// Avaliações corporais (peso, medidas, fotos — ver
+// docs/medidas-fotos-especificacao.md). Escopo global por aluno (`alunoId`),
+// não por plano: o corpo atravessa os ciclos. O documento da avaliação é
+// leve (sem binários); o Blob de cada foto vive em loja própria
+// (`fotosCorporais`), pra listar/graficar/fazer backup leve nunca carregar
+// imagem.
+function criarLojasDeAvaliacaoCorporal(banco) {
+  const avaliacoes = banco.createObjectStore("avaliacoesCorporais", { keyPath: "id" });
+  avaliacoes.createIndex("porAluno", "alunoId");
+
+  const fotos = banco.createObjectStore("fotosCorporais", { keyPath: "id" });
+  fotos.createIndex("porAvaliacao", "avaliacaoId");
+}
+
 // Tabela de migração estrutural do banco. Chave = versão de destino.
 // `onupgradeneeded` aplica em sequência de (oldVersion+1) até newVersion,
 // então um navegador parado numa versão antiga passa por todas as
@@ -69,7 +83,8 @@ function criarLojaDeTiposAtividade(banco) {
 const MIGRACOES_BANCO = {
   1: criarEsquemaInicial,
   2: criarLojaDeBibliotecaPersonalizada,
-  3: criarLojaDeTiposAtividade
+  3: criarLojaDeTiposAtividade,
+  4: criarLojasDeAvaliacaoCorporal
 };
 
 function promessaDaRequisicao(requisicao) {
@@ -177,6 +192,18 @@ export class BancoIndexedDB {
     } catch (erro) {
       console.warn(`armazenamento-indexeddb: falha ao ler tudo de "${loja}"`, erro);
       return [];
+    }
+  }
+
+  static async contar(loja) {
+    const banco = await BancoIndexedDB.abrir();
+    if (!banco) return 0;
+    try {
+      const transacao = banco.transaction(loja, "readonly");
+      return await promessaDaRequisicao(transacao.objectStore(loja).count());
+    } catch (erro) {
+      console.warn(`armazenamento-indexeddb: falha ao contar "${loja}"`, erro);
+      return 0;
     }
   }
 
