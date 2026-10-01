@@ -199,7 +199,7 @@ class AlunosController {
 
     const megabytes = Math.max(0.1, (bytes * 1.37) / (1024 * 1024));
     document.getElementById("backupFotosTexto").textContent =
-      `Há ${quantidade} foto${quantidade === 1 ? "" : "s"} corporal${quantidade === 1 ? "" : "is"} neste aparelho. Com elas o arquivo fica com cerca de ${megabytes.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} MB e leva imagens sensíveis. Incluir?`;
+      `Há ${quantidade} foto${quantidade === 1 ? "" : "s"} ${quantidade === 1 ? "corporal" : "corporais"} neste aparelho. Com elas o arquivo fica com cerca de ${megabytes.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} MB e leva imagens sensíveis. Incluir?`;
 
     const overlay = document.getElementById("backupFotosOverlay");
     const fechar = () => {
